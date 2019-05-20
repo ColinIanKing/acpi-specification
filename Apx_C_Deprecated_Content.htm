@@ -1,0 +1,521 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2016/HTML Export Filter">
+<LINK REL="STYLESHEET" HREF="Apx_C_Deprecated_Content.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE> Appendix C: Deprecated Content</TITLE></HEAD>
+<BODY>
+<DIV>
+<H1 CLASS="zHeading-1-Appendix">
+<A NAME="pgfId-1347747"></A><A NAME="93711"></A>Deprecated Content<DIV>
+<IMG SRC="Apx_C_Deprecated_Content-1.gif" ALT="">
+</DIV>
+</H1>
+<DIV>
+<H3 CLASS="zHeading-2-Appendix">
+<A NAME="pgfId-1349603"></A>Description</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1396592"></A>This section will display content (if any) that are planned to be deprecated from the ACPI specification. The deprecation is highlighted in this appendix because the main specification contents haven't been changed. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1349604"></A>The deprecation items listed in this appendix serve as a warning that in the next released revision of the specification, the corresponding contents will be removed from the main portion of the specification.</P>
+</DIV>
+<DIV>
+<H3 CLASS="zHeading-2-Appendix">
+<A NAME="pgfId-1396609"></A><A NAME="68776"></A>Deprecated Content</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1397753"></A>Device Identification Objects (<A HREF="Device_Configuration.htm#64694" CLASS="XRef">See Device Identification Objects.</A>):</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1397825"></A>Object</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1397827"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397829"></A>_PRD </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397831"></A>Object that evaluates to a package of device property subpackages.</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1397337"></A> <BR>
+==============================================================================</P>
+<DIV>
+<H4 CLASS="SubHeading">
+<A NAME="pgfId-1396765"></A>19.6.146 Unload (Unload Definition Block)</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1397301"></A>Syntax</P>
+<P CLASS="Body">
+<A NAME="pgfId-1397316"></A>Unload (Handle)</P>
+<P CLASS="Body">
+<A NAME="pgfId-1397303"></A>Arguments</P>
+<P CLASS="Body">
+<A NAME="pgfId-1397313"></A>Handle is evaluated as a DDBHandle data type.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1397305"></A>Description</P>
+<P CLASS="Body">
+<A NAME="pgfId-1397308"></A>Performs a run-time unload of a Definition Block that was loaded using a Load term or LoadTable term. Loading or unloading a Definition Block is a synchronous operation, and no control method execution occurs during the function. On completion of the Unload operation, the Definition Block has been unloaded (all the namespace objects created as a result of the corresponding Load operation will be removed from the namespace).</P>
+<P CLASS="Body">
+<A NAME="pgfId-1396939"></A>==============================================================================</P>
+</DIV>
+<DIV>
+<H4 CLASS="SubHeading">
+<A NAME="pgfId-1397023"></A>6.2.11.3  OSC Implementation Example for PCI Host Bridge Devices</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1397024"></A>The following section is an excerpt from the PCI Firmware Specification Revision 3.0 and is reproduced with the permission of the PCI SIG. </P>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1397025"></A>The PCI SIG owns the definition of _OSC behavior and parameter bit definitions for PCI devices. In the event of a discrepancy between the following example and the PCI Firmware Specification, the latter has precedence.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1397026"></A>The _OSC interface defined in this section applies only to &#8220;Host Bridge&#8221; ACPI devices that originate PCI, PCI-X or PCI Express hierarchies. These ACPI devices must have a _HID of (or _CID including) either EISAID(&#8220;PNP0A03&#8221;) or EISAID(&#8220;PNP0A08&#8221;). For a host bridge device that originates a PCI Express hierarchy, the _OSC interface defined in this section is required. For a host bridge device that originates a PCI/PCI-X bus hierarchy, inclusion of an _OSC object is optional.</P>
+<DIV>
+<H5 CLASS="Bullet">
+<A NAME="pgfId-1397027"></A>The _OSC interface for a PCI/PCI-X/PCI Express hierarchy is identified by the following UUID:</H5>
+</DIV>
+<DIV>
+<H5 CLASS="BulletPara">
+<A NAME="pgfId-1397028"></A>33DB4D5B-1FF7-401C-9657-7441C03DD766</H5>
+<P CLASS="Body">
+<A NAME="pgfId-1397029"></A>A revision ID of 1 encompasses fields defined in this section of this revision of this specification, comprised of 3 DWORDs, including the first DWORD described by the generic ACPI definition of _OSC.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1397030"></A>The first DWORD in the _OSC Capabilities Buffer contain bits are generic to _OSC and include status and error information.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1397031"></A>The second DWORD in the _OSC capabilities buffer is the Support Field. Bits defined in the Support Field provide information regarding OS supported features. Contents in the Support Field are passed one-way; the OS will disregard any changes to this field when returned. See <A HREF="Device_Configuration.htm#42686" CLASS="XRef">See PCI-X Setting Record Content.</A> for descriptions of capabilities bits in this field passed as a parameter into the _OSC control method.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1397035"></A>The third DWORD in the _OSC Capabilities Buffer is the Control Field. Bits defined in the Control Field are used to submit request by the OS for control/handling of the associated feature, typically (but not excluded to) those features that utilize native interrupts or events handled by an OS-level driver. See <A HREF="Device_Configuration.htm#21183" CLASS="XRef">See Platform-Wide _OSC Capabilities DWORD 2.</A> for descriptions of capabilities bits in this field passed as a parameter into the _OSC control method. If any bits in the Control Field are returned cleared (masked to zero) by the _OSC control method, the respective feature is designated unsupported by the platform and must not be enabled by the OS. Some of these features may be controlled by platform firmware prior to OS boot or during runtime for a legacy OS, while others may be disabled/inoperative until native OS support is available. See the following table for descriptions of capabilities bits in this returned field.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1397042"></A>If the _OSC control method is absent from the scope of a host bridge device, then the OS must not enable or attempt to use any features defined in this section for the hierarchy originated by the host bridge. Doing so could contend with platform firmware operations, or produce undesired results. It is recommended that a machine with multiple host bridge devices should report the same capabilities for all host bridges, and also negotiate control of the features described in the Control Field in the same way for all host bridges.</P>
+<P CLASS="TableHeading">
+<A NAME="pgfId-1397079"></A>Table: <A NAME="49797"></A>Interpretation of _OSC Support Field</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="Body">
+<A NAME="pgfId-1397046"></A>Support Field bit offset</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="Body">
+<A NAME="pgfId-1397048"></A>Interpretation</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397050"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397052"></A>Extended PCI Config operation regions supported</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1397053"></A>The OS sets this bit to 1 if it supports ASL accesses through PCI Config operation regions to extended configuration space (offsets greater than 0xFF). Otherwise, the OS sets this bit to 0.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397055"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397057"></A>Active State Power Management supported</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1397058"></A>The OS sets this bit to 1 if it natively supports configuration of Active State Power Management registers in PCI Express devices. Otherwise, the OS sets this bit to 0.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397060"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397062"></A>Clock Power Management Capability supported</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1397063"></A>The OS sets this bit to 1 if it supports the Clock Power Management Capability, and will enable this feature during a native hot plug insertion event if supported by the newly added device. Otherwise, the OS sets this bit to 0.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1397064"></A>Note: The Clock Power Management Capability is defined in an errata to the PCI Express Base Specification, 1.0.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397066"></A>3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397068"></A>PCI Segment Groups supported</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1397069"></A>The OS sets this bit to 1 if it supports PCI Segment Groups as defined by the _SEG object, and access to the configuration space of devices in PCI Segment Groups as described by this specification. Otherwise, the OS sets this bit to 0.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397071"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397073"></A>MSI supported</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1397074"></A>The OS sets this bit to 1 if it supports configuration of devices to generate message-signaled interrupts, either through the MSI Capability or the MSI-X Capability. Otherwise, the OS sets this bit to 0.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397076"></A>5-31</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397078"></A><EM CLASS="Italic">
+Reserved</EM>
+</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="TableHeading">
+<A NAME="pgfId-1397115"></A>Table: <A NAME="26819"></A>Interpretation of _OSC Control Field, Passed in via Arg3</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1397083"></A>Control Field bit offset</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1397085"></A>Interpretation</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397087"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397089"></A>PCI Express Native Hot Plug control</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1397090"></A>The OS sets this bit to 1 to request control over PCI Express native hot plug. If the OS successfully receives control of this feature, it must track and update the status of hot plug slots and handle hot plug events as described in the PCI Express Base Specification. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397092"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397094"></A>SHPC Native Hot Plug control</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1397095"></A>The OS sets this bit to 1 to request control over PCI/PCI-X Standard Hot-Plug Controller (SHPC) hot plug. If the OS successfully receives control of this feature, it must track and update the status of hot plug slots and handle hot plug events as described in the SHPC Specification.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397097"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397099"></A>PCI Express Native Power Management Events control</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1397100"></A>The OS sets this bit to 1 to request control over PCI Express native power management event interrupts (PMEs). If the OS successfully receives control of this feature, it must handle power management events as described in the PCI Express Base Specification. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397102"></A>3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397104"></A>PCI Express Advanced Error Reporting (AER) control</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1397105"></A>The OS sets this bit to 1 to request control over PCI Express AER. If the OS successfully receives control of this feature, it must handle error reporting through the AER Capability as described in the PCI Express Base Specification.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397107"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397109"></A>PCI Express Capability Structure control</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1397110"></A>The OS sets this bit to 1 to request control over the PCI Express Capability Structures (standard and extended) defined in the PCI Express Base Specification version 1.1. These capability structures are the PCI Express Capability, the virtual channel extended capability, the power budgeting extended capability, the advanced error reporting extended capability, and the serial number extended capability. If the OS successfully receives control of this feature, it is responsible for configuring the registers in all PCI Express Capabilities in a manner that complies with the PCI Express Base Specification. Additionally, the OS is responsible for saving and restoring all PCI Express Capability register settings across power transitions when register context may have been lost.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397112"></A>5-31</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397114"></A><EM CLASS="Italic">
+Reserved</EM>
+</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="TableHeading">
+<A NAME="pgfId-1397151"></A>Table: Interpretation of _OSC Control Field, Returned Value</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1397118"></A>Control Field bit offset</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1397120"></A>Interpretation</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397122"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397124"></A>PCI Express Native Hot Plug control</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1397125"></A>The firmware sets this bit to 1 to grant control over PCI Express native hot plug interrupts. If firmware allows the OS control of this feature, then in the context of the _OSC method it must ensure that all hot plug events are routed to device interrupts as described in the PCI Express Base Specification. Additionally, after control is transferred to the OS, firmware must not update the state of hot plug slots, including the state of the indicators and power controller. If control of this feature was requested and denied or was not requested, firmware returns this bit set to 0.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397127"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397129"></A>SHPC Native Hot Plug control</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1397130"></A>The firmware sets this bit to 1 to grant control over control over PCI/PCI-X Standard Hot-Plug Controller (SHPC)hot plug. If firmware allows the OS control of this feature, then in the context of the _OSC method it must ensure that all hot plug events are routed to device interrupts as described in the SHPC Specification. Additionally, after control is transferred to the OS, firmware must not update the state of hot plug slots, including the state of the indicators and power controller. If control of this feature was requested and denied or was not requested, firmware returns this bit set to 0.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397132"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397134"></A>PCI Express Native Power Management Events control</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1397135"></A>The firmware sets this bit to 1 to grant control over control over PCI Express native power management event interrupts (PMEs). If firmware allows the OS control of this feature, then in the context of the _OSC method it must ensure that all PMEs are routed to root port interrupts as described in the PCI Express Base Specification. Additionally, after control is transferred to the OS, firmware must not update the PME Status field in the Root Status register or the PME Interrupt Enable field in the Root Control register. If control of this feature was requested and denied or was not requested, firmware returns this bit set to 0.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397137"></A>3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397139"></A>PCI Express Advanced Error Reporting control</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1397140"></A>The firmware sets this bit to 1 to grant control over PCI Express Advanced Error Reporting. If firmware allows the OS control of this feature, then in the context of the _OSC method it must ensure that error messages are routed to device interrupts as described in the PCI Express Base Specification. Additionally, after control is transferred to the OS, firmware must not modify the Advanced Error Reporting Capability. If control of this feature was requested and denied or was not requested, firmware returns this bit set to 0.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397142"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397144"></A>PCI Express Capability Structure control</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1397145"></A>The firmware sets this bit to 1 to grant control over the PCI Express Capability. If the firmware does not grant control of this feature, firmware must handle configuration of the PCI Express Capability Structure.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1397146"></A>If firmware grants the OS control of this feature, any firmware configuration of the PCI Express Capability may be overwritten by an OS configuration, depending on OS policy.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397148"></A>5-31</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1397150"></A><EM CLASS="Italic">
+Reserved</EM>
+</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="SubHeading">
+<A NAME="pgfId-1397152"></A>6.2.11.4  ASL Example</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1397153"></A>A sample _OSC implementation for a mobile system incorporating a PCI Express hierarchy is shown below:</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397154"></A>Device(PCI0)  // Root PCI bus</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397155"></A>{</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397156"></A>  Name(_HID,EISAID(&quot;PNP0A08&quot;))  // PCI Express Root Bridge</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397157"></A>  Name(_CID,EISAID(&quot;PNP0A03&quot;))  // Compatible PCI Root Bridge</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397158"></A>  Name(SUPP,0)          // PCI _OSC Support Field value</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397159"></A>  Name(CTRL,0)          // PCI _OSC Control Field value</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397160"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397161"></A>  Method(_OSC,4)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397162"></A>  {                // Check for proper UUID</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397163"></A>    If(LEqual(Arg0,ToUUID(&quot;33DB4D5B-1FF7-401C-9657-7441C03DD766&quot;)))</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397164"></A>    {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397165"></A>      // Create DWord-adressable fields from the Capabilities Buffer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397166"></A>      CreateDWordField(Arg3,0,CDW1)  </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397167"></A>      CreateDWordField(Arg3,4,CDW2)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397168"></A>      CreateDWordField(Arg3,8,CDW3)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397169"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397170"></A>      // Save Capabilities DWord2 &amp; 3</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397171"></A>      Store(CDW2,SUPP)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397172"></A>      Store(CDW3,CTRL)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397173"></A>        </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397174"></A>      // Only allow native hot plug control if OS supports:</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397175"></A>      //  * ASPM</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397176"></A>      //  * Clock PM</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397177"></A>      //  * MSI/MSI-X</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397178"></A>      If(LNotEqual(And(SUPP, 0x16), 0x16))</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397179"></A>      {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397180"></A>        And(CTRL,0x1E,CTRL) // Mask bit 0 (and undefined bits)  </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397181"></A>      }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397182"></A>      </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397183"></A>      // Always allow native PME, AER (no dependencies)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397184"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397185"></A>      // Never allow SHPC (no SHPC controller in this system)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397186"></A>      And(CTRL,0x1D,CTRL)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397187"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397188"></A>      If(LNot(And(CDW1,1)))   // Query flag clear?</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397189"></A>      {  // Disable GPEs for features granted native control.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397190"></A>        If(And(CTRL,0x01))  // Hot plug control granted?</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397191"></A>        {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397192"></A>          Store(0,HPCE)  // clear the hot plug SCI enable bit</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397193"></A>          Store(1,HPCS)  // clear the hot plug SCI status bit</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397194"></A>        }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397195"></A>        If(And(CTRL,0x04))  // PME control granted?</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397196"></A>        {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397197"></A>          Store(0,PMCE)  // clear the PME SCI enable bit</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397198"></A>          Store(1,PMCS)  // clear the PME SCI status bit</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397199"></A>        }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397200"></A>        If(And(CTRL,0x10))  // OS restoring PCIe cap structure?</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397201"></A>        {          // Set status to not restore PCIe cap structure </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397202"></A>                   // upon resume from S3</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397203"></A>          Store(1,S3CR)  </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397204"></A>        }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397205"></A>      }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397206"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397207"></A>      If(LNotEqual(Arg1,One))</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397208"></A>      {            // Unknown revision</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397209"></A>        Or(CDW1,0x08,CDW1)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397210"></A>      }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397211"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397212"></A>      If(LNotEqual(CDW3,CTRL))</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397213"></A>      {            // Capabilities bits were masked</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397214"></A>        Or(CDW1,0x10,CDW1)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397215"></A>      }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397216"></A>      // Update DWORD3 in the buffer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397217"></A>      Store(CTRL,CDW3)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397218"></A>      Return(Arg3)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397219"></A>    } Else {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397220"></A>      Or(CDW1,4,CDW1)    // Unrecognized UUID</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397221"></A>      Return(Arg3)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397222"></A>    }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1397223"></A>  }               // End _OSC</P>
+<P CLASS="Body">
+<A NAME="pgfId-1397019"></A>}  // End PCI0</P>
+<P CLASS="Body">
+<A NAME="pgfId-1396840"></A>&nbsp;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1396838"></A><BR>
+&nbsp;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1396607"></A>&nbsp;</P>
+</DIV>
+</DIV>
+</DIV>
+</BODY>
+</HTML>

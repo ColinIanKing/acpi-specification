@@ -1,0 +1,4852 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2016/HTML Export Filter">
+<LINK REL="STYLESHEET" HREF="ACPI_Machine_Language_Specification.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE> 20 ACPI Machine Language (AML) Specification</TITLE></HEAD>
+<BODY>
+<DIV>
+<H1 CLASS="Heading-1">
+<A NAME="pgfId-1347747"></A><A NAME="35965"></A>ACPI Machine Language (AML) Specification<DIV>
+<IMG SRC="ACPI_Machine_Language_Specification-1.gif" ALT="">
+</DIV>
+</H1>
+<P CLASS="Body">
+<A NAME="pgfId-1348563"></A>This section formally defines the ACPI Control Method Machine Language (AML) language. AML is the ACPI Control Method virtual machine language, machine code for a virtual machine that is supported by an ACPI-compatible OS. ACPI control methods can be written in AML, but humans ordinarily write control methods in ASL.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348564"></A>AML is the language processed by the ACPI AML interpreter. It is primarily a declarative language. It&#8217;s best not to think of it as a stream of code, but rather as a set of declarations that the ACPI AML interpreter will compile into the ACPI Namespace at definition block load time. For example, notice that DefByte allocates an anonymous integer variable with a byte-size initial value in ACPI namespace, and passes in an initial value. The byte in the AML stream that defines the initial value is not the address of the variable&#8217;s storage location.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348565"></A>An OEM or platform firmware vendor needs to write ASL and be able to single-step AML for debugging. (Debuggers and other ACPI control method language tools are expected to be AML-level tools, not source-level tools.) An ASL translator implementer must understand how to read ASL and generate AML. An AML interpreter author must understand how to execute AML.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348566"></A>AML and ASL are different languages, though they are closely related.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448359"></A>All ACPI-compatible operating systems must support AML. A given user can define some arbitrary source language (to replace ASL) and write a tool to translate it to AML. However, the ACPI group will support a single translator for a single language, ASL.</P>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1448368"></A><A NAME="_Toc489272742"></A><A NAME="_Toc4819450"></A><A NAME="_Toc202342097"></A><A NAME="_Toc258262727"></A>Notation Conventions<A NAME="marker-1448365"></A><A NAME="marker-1448366"></A><A NAME="marker-1448367"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1348580"></A>The notation conventions in the table below help the reader to interpret the AML formal grammar.</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1348581"></A>AML Grammar Notation Conventions</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1437845"></A>Notation Convention</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1437847"></A>Description</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1437849"></A>Example</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348590"></A>0xdd</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348592"></A>Refers to a byte value expressed as 2 hexadecimal digits.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348594"></A>0x21</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348597"></A>Number in bold.<A NAME="marker-1348596"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348601"></A>Denotes the encoding of the AML term.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348603"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348605"></A>Term =&gt; Evaluated Type</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348607"></A>Shows the resulting type of the evaluation of Term.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348609"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348612"></A>Single quotes (&#8216; &#8217;)<A NAME="marker-1348611"></A><A NAME="marker-1348613"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348617"></A>Indicate constant characters.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348619"></A>&#8216;A&#8217; =&gt; 0x41</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348621"></A>Term := Term Term ...</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348623"></A>The term to the left of := can be expanded into the sequence of terms on the right.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348625"></A>aterm := bterm cterm means that aterm can be expanded into the two-term sequence of bterm followed by cterm.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348628"></A>Term Term Term ...<A NAME="marker-1348627"></A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348630"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348632"></A>Terms separated from each other by spaces form an ordered list.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348634"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348637"></A>Angle brackets (&lt; &gt; )<A NAME="marker-1348636"></A><A NAME="marker-1348638"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348642"></A>Used to group items.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348644"></A>&lt;a b&gt; | &lt;c d&gt; means either a b or c d. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348648"></A>Bar symbol ( | )<A NAME="marker-1348647"></A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348650"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348652"></A>Separates alternatives.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348654"></A>aterm := bterm  |  [cterm  dterm]   means the following constructs are possible:</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348655"></A>   bterm<BR>
+   cterm  dterm</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348656"></A>aterm := [bterm | cterm] dterm   means the following constructs are possible:</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348657"></A>   bterm  dterm<BR>
+   cterm  dterm</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348660"></A>Dash character ( - )<A NAME="marker-1348659"></A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348662"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348664"></A>Indicates a range.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348666"></A>1-9 means a single digit in the range 1 to 9 inclusive.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348668"></A>Parenthesized term following another term.<A NAME="marker-1348669"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348673"></A>The parenthesized term is the repeat count of the previous term.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348675"></A>aterm(3) means aterm aterm aterm.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348676"></A>bterm(n) means n number of bterms.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1348689"></A><A NAME="_Toc489272743"></A><A NAME="_Toc4819451"></A><A NAME="_Toc202342098"></A><A NAME="_Toc258262728"></A>AML Grammar Definition<A NAME="marker-1348687"></A><A NAME="marker-1348688"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1348690"></A>This section defines the byte values that make up an AML byte stream.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348692"></A>The AML encoding can be categorized in the following groups:<A NAME="marker-1348691"></A></P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348693"></A>Table and Table Header encoding</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348694"></A>Name objects encoding</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348695"></A>Data objects encoding</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348696"></A>Package length encoding</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348697"></A>Term objects encoding</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348698"></A>Miscellaneous objects encoding</LI>
+</UL>
+<DIV>
+<H4 CLASS="Heading-3">
+<A NAME="pgfId-1348704"></A><A NAME="_Toc202342099"></A><A NAME="_Toc258262729"></A>Table and Table Header Encoding<A NAME="marker-1348702"></A><A NAME="marker-1348703"></A></H4>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348706"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1445613"></A>AMLCode           := DefBlockHeader TermList</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348707"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348708"></A>DefBlockHeader    := TableSignature TableLength SpecCompliance CheckSum OemID </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1445688"></A>                     OemTableID OemRevision CreatorID CreatorRevision</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348709"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348710"></A>TableSignature    := DWordData    // As defined in section 5.2.3.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348711"></A>TableLength       := DWordData    // Length of the table in bytes including<BR>
+                                  // the block header.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348712"></A>SpecCompliance    := ByteData     // The revision of the structure.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348713"></A>CheckSum          := ByteData     // Byte checksum of the entire table.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348714"></A>OemID             := ByteData(6)  // OEM ID of up to 6 characters. If the OEM<BR>
+                                  // ID is shorter than 6 characters, it<BR>
+                                  // can be terminated with a NULL<BR>
+                                  // character.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348715"></A>OemTableID        := ByteData(8)  // OEM Table ID of up to 8 characters. If<BR>
+                                  // the OEM Table ID is shorter than 8<BR>
+                                 // characters, it can be terminated with<BR>
+                                 // a NULL character.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348716"></A>OemRevision       := DWordData   // OEM Table Revision.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348717"></A>CreatorID         := DWordData   // Vendor ID of the ASL compiler. </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348718"></A>CreatorRevision   := DWordData   // Revision of the ASL compiler.</P>
+</DIV>
+<DIV>
+<H4 CLASS="Heading-3">
+<A NAME="pgfId-1348728"></A><A NAME="_Toc489267545"></A><A NAME="_Toc489267770"></A><A NAME="_Toc489272744"></A><A NAME="_Toc4819452"></A><A NAME="_Toc202342100"></A><A NAME="_Toc258262730"></A>Name Objects Encoding<A NAME="marker-1348726"></A><A NAME="marker-1348727"></A></H4>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348730"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1445624"></A>LeadNameChar      := &#8216;A&#8217;-&#8216;Z&#8217; | &#8216;_&#8217;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348731"></A>DigitChar         := &#8216;<EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0</EM>
+&#8217;-&#8216;<EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+9</EM>
+&#8217;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348732"></A>NameChar          := DigitChar | LeadNameChar</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348733"></A>RootChar          := &#8216;&#92;&#8217;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348734"></A>ParentPrefixChar  := &#8216;^&#8217;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348735"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348736"></A>&#8216;A&#8217;-&#8216;Z&#8217;           := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x41 </EM>
+- <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x5A</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348737"></A>&#8216;_&#8217;               := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x5F</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348738"></A>&#8216;0&#8217;-&#8216;9&#8217;           := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x30 </EM>
+- <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x39</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348739"></A>&#8216;&#92;&#8217;               := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x5C</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348740"></A>&#8216;^&#8217;               := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x5E</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348741"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348742"></A>NameSeg           := &lt;LeadNameChar NameChar NameChar NameChar&gt;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1445699"></A>                     // Notice that NameSegs shorter than 4 characters are filled with<BR>
+                     // trailing underscores (&#8216;_&#8217;s).</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348743"></A>NameString        := &lt;RootChar NamePath&gt; | &lt;PrefixPath NamePath&gt;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348744"></A>PrefixPath        := Nothing | &lt;&#8216;^&#8217; PrefixPath&gt;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348745"></A>NamePath          := NameSeg | DualNamePath | MultiNamePath | NullName</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348746"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348747"></A>DualNamePath      := DualNamePrefix NameSeg NameSeg</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348748"></A>DualNamePrefix    := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x2E</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348749"></A>MultiNamePath     := MultiNamePrefix SegCount NameSeg(SegCount)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348750"></A>MultiNamePrefix   := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x2F</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348751"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348752"></A>SegCount          := ByteData</P>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1348754"></A>SegCount can be from 1 to 255. For example: MultiNamePrefix(35) is encoded as 0x2f 0x23 and followed by 35 NameSegs. So, the total encoding length will be 1 + 1 + 35*4 = 142. Notice that: DualNamePrefix NameSeg NameSeg has a smaller encoding than the encoding of: MultiNamePrefix(2) NameSeg NameSeg</LI>
+</UL>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1445631"></A>SimpleName         := NameString | ArgObj | LocalObj</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348756"></A>SuperName          := SimpleName | DebugObj | Type6Opcode </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348757"></A>NullName           := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x00</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348758"></A>Target             := SuperName | NullName</P>
+</DIV>
+<DIV>
+<H4 CLASS="Heading-3">
+<A NAME="pgfId-1348768"></A><A NAME="_Toc489267546"></A><A NAME="_Toc489267771"></A><A NAME="_Toc489272745"></A><A NAME="_Toc4819453"></A><A NAME="_Toc202342101"></A><A NAME="_Toc258262731"></A>Data Objects Encoding<A NAME="marker-1348766"></A><A NAME="marker-1348767"></A></H4>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348770"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1445638"></A>ComputationalData := ByteConst | WordConst | DWordConst | QWordConst | String | </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1445708"></A>                     ConstObj | RevisionOp | DefBuffer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348771"></A>DataObject        := ComputationalData | DefPackage | DefVarPackage</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348772"></A>DataRefObject     := DataObject | ObjectReference | DDBHandle</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348773"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348774"></A>ByteConst         := BytePrefix ByteData</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348775"></A>BytePrefix        := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x0A</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348776"></A>WordConst         := WordPrefix WordData</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348777"></A>WordPrefix        := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x0B</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348778"></A>DWordConst        := DWordPrefix DWordData</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348779"></A>DWordPrefix       := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x0C</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348780"></A>QWordConst        := QWordPrefix QWordData</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348781"></A>QWordPrefix       := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x0E</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348782"></A>String            := StringPrefix AsciiCharList NullChar</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348783"></A>StringPrefix      := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x0D</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348784"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348785"></A>ConstObj          := ZeroOp | OneOp | OnesOp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348786"></A>ByteList          := Nothing | &lt;ByteData ByteList&gt;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348787"></A>ByteData          := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x00 </EM>
+- <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0xFF</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348788"></A>WordData          := ByteData[0:7] ByteData[8:15]<BR>
+                     // <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x0000-0xFFFF</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348789"></A>DWordData         := WordData[0:15] WordData[16:31]<BR>
+                     // <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x00000000-0xFFFFFFFF</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348790"></A>QWordData         := DWordData[0:31] DWordData[32:63]<BR>
+                     // <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x0000000000000000-0xFFFFFFFFFFFFFFFF</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348791"></A>AsciiCharList     := Nothing | &lt;AsciiChar AsciiCharList&gt;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348792"></A>AsciiChar         := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x01 </EM>
+- <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x7F</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348793"></A>NullChar          := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x00</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348794"></A>ZeroOp            := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x00</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348795"></A>OneOp             := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x01</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348796"></A>OnesOp            := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0xFF</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348797"></A>RevisionOp        := ExtOpPrefix <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x30</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348798"></A>ExtOpPrefix       := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x5B</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1446340"></A>&nbsp;</P>
+</DIV>
+<DIV>
+<H4 CLASS="Heading-3">
+<A NAME="pgfId-1348807"></A><A NAME="_Toc489267547"></A><A NAME="_Toc489267772"></A><A NAME="_Toc489272746"></A><A NAME="_Toc4819454"></A><A NAME="_Toc202342102"></A><A NAME="_Toc258262732"></A>Package Length Encoding<A NAME="marker-1348805"></A><A NAME="marker-1348806"></A></H4>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348809"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1445645"></A>PkgLength         := PkgLeadByte |<BR>
+                     &lt;PkgLeadByte ByteData&gt; |<BR>
+                     &lt;PkgLeadByte ByteData ByteData&gt; |<BR>
+                     &lt;PkgLeadByte ByteData ByteData ByteData&gt;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348810"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348811"></A>PkgLeadByte       := &lt;bit 7-6: ByteData count that follows (0-3)&gt;<BR>
+                     &lt;bit 5-4: Only used if PkgLength &lt; 63&gt;<BR>
+                     &lt;bit 3-0: Least significant package length nybble&gt;</P>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1348813"></A><EM CLASS="Grammar-Comment-Char-Char">
+The high 2 bits of the first byte reveal how many follow bytes are in the PkgLength. If the PkgLength has only one byte, bit 0 through 5 are used to encode the package length (in other words, values 0-63). If the package length value is more than 63, more than one byte must be used for the encoding in which case bit 4 and 5 of the PkgLeadByte are reserved and must be zero. If the multiple bytes encoding is used, bits 0-3 of the PkgLeadByte become the least significant 4 bits of the resulting package length value. The next ByteData will become the next least significant 8 bits of the resulting value and so on, up to 3 ByteData bytes. Thus, the maximum package length is 2**28.</EM>
+</LI>
+</UL>
+</DIV>
+<DIV>
+<H4 CLASS="Heading-3">
+<A NAME="pgfId-1348823"></A><A NAME="_Toc489267548"></A><A NAME="_Toc489267773"></A><A NAME="_Toc489272747"></A><A NAME="_Toc4819455"></A><A NAME="_Toc202342103"></A><A NAME="_Toc258262733"></A>Term Objects Encoding<A NAME="marker-1348821"></A><A NAME="marker-1348822"></A></H4>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348825"></A>Object               := NameSpaceModifierObj | NamedObj</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1445652"></A>TermObj              := Object | Type1Opcode | Type2Opcode </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348826"></A>TermList             := Nothing | &lt;TermObj TermList&gt;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348827"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348828"></A>TermArg              := Type2Opcode | DataObject | ArgObj | LocalObj</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348829"></A>MethodInvocation     := NameString TermArgList</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348830"></A>TermArgList          := Nothing | &lt;TermArg TermArgList&gt;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348831"></A>&nbsp;</P>
+<DIV>
+<H5 CLASS="Heading-4">
+<A NAME="pgfId-1348839"></A>N<A NAME="_Toc489267549"></A>amespace Modifier Objects Encoding<A NAME="marker-1348837"></A><A NAME="marker-1348838"></A></H5>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348841"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1445659"></A>NameSpaceModifierObj := DefAlias | DefName | DefScope</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348842"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348843"></A>DefAlias             := AliasOp NameString NameString</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348844"></A>AliasOp              := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x06</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348845"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348846"></A>DefName              := NameOp NameString DataRefObject</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348847"></A>NameOp               := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x08</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348848"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348849"></A>DefScope             := ScopeOp PkgLength NameString TermList</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348850"></A>ScopeOp              := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x10</EM>
+</P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-4">
+<A NAME="pgfId-1348856"></A>N<A NAME="_Toc489267550"></A>amed Objects Encoding<A NAME="marker-1348854"></A><A NAME="marker-1348855"></A></H5>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348858"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1445666"></A>NamedObj        := DefBankField | DefCreateBitField | DefCreateByteField | DefCreateDWordField |</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1445745"></A>                   DefCreateField | DefCreateQWordField |DefCreateWordField | DefDataRegion | </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1445754"></A>                   DefExternal | DefOpRegion | DefPowerRes | DefProcessor | DefThermalZone</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348859"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348860"></A>DefBankField    := BankFieldOp PkgLength NameString NameString BankValue FieldFlags FieldList</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348861"></A>BankFieldOp     := ExtOpPrefix <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x87</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348862"></A>BankValue       := TermArg =&gt; Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348863"></A>FieldFlags      := ByteData      // bit 0-3:        AccessType<BR>
+                                 //                 0    AnyAcc<BR>
+                                 //                 1    <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+ByteAcc<BR>
+</EM>
+                                 //                 2    <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+WordAcc<BR>
+</EM>
+                                 //                 3    <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+DWordAcc<BR>
+</EM>
+                                 //                 4    <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+QWordAcc<BR>
+</EM>
+                                 //                 5    <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+BufferAcc<BR>
+</EM>
+                                 //                 6    <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+Reserved<BR>
+</EM>
+                                 //                 7-15 Reserved<BR>
+                                 // bit 4:          LockRule<BR>
+                                 //                 0    <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+NoLock<BR>
+</EM>
+                                 //                 1    <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+Lock<BR>
+</EM>
+                                 // bit 5-6:        UpdateRule<BR>
+                                 //                 0    <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+Preserve<BR>
+</EM>
+                                 //                 1    <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+WriteAsOnes <BR>
+</EM>
+                                 //                2    W<EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+riteAsZeros<BR>
+</EM>
+                                 // bit 7:         Reserved (must be 0)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348864"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448377"></A>FieldList           := Nothing | &lt;FieldElement FieldList&gt;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448379"></A>NamedField          := NameSeg PkgLength</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348868"></A>ReservedField       := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x00</EM>
+ PkgLength</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348869"></A>AccessField         := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x01</EM>
+ AccessType AccessAttrib</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448545"></A>AccessType          := ByteData // Bits 0:3 - Same as AccessType bits of FieldFlags.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448546"></A>                                // Bits 4:5 - Reserved</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448547"></A>                                // Bits 7:6 - 0 = AccessAttrib = Normal Access Attributes</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448548"></A>                                //            1 = AccessAttrib = AttribBytes (x)  </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448549"></A>                                //            2 = AccessAttrib = AttribRawBytes (x)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448550"></A>                                //            3 = AccessAttrib = AttribRawProcessBytes (x)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448551"></A>                                //</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448552"></A>                                //             x' is encoded as bits 0:7 of the AccessAttrib byte.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348870"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448425"></A>AccessAttrib        := ByteData // If AccessType is BufferAcc for the SMB or<BR>
+                                // GPIO OpRegions, AccessAttrib can be one of <BR>
+                                // the following values:<BR>
+                                //        0x02    AttribQuick<BR>
+                                //        0x04    AttribSendReceive<BR>
+                                //        0x06    AttribByte   </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448442"></A>                                //        0x08    AttribWord<BR>
+                                //        0x0A    <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+AttribBlock</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448487"></A>                                //        0x0C    Attrib<EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+ProcessCall<BR>
+</EM>
+                                //        0x0D    <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+AttribBlockProcessCall</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348872"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448504"></A>ConnectField         := &lt;0x02 NameString&gt; | &lt;0x02 BufferData&gt;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448523"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348873"></A>DefCreateBitField    := CreateBitFieldOp SourceBuff BitIndex NameString</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348874"></A>CreateBitFieldOp     := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x8D</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348875"></A>SourceBuff           := TermArg =&gt; Buffer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348876"></A>BitIndex             := TermArg =&gt; Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348877"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348878"></A>DefCreateByteField   := CreateByteFieldOp SourceBuff ByteIndex NameString</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348879"></A>CreateByteFieldOp    := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x8C</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348880"></A>ByteIndex            := TermArg =&gt; Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348881"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348882"></A>DefCreateDWordField  := CreateDWordFieldOp SourceBuff ByteIndex NameString</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348883"></A>CreateDWordFieldOp   := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x8A</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348884"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348885"></A>DefCreateField       := CreateFieldOp SourceBuff BitIndex NumBits NameString</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348886"></A>CreateFieldOp        := ExtOpPrefix <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x13</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348887"></A>NumBits              := TermArg =&gt; Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348888"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348889"></A>DefCreateQWordField  := CreateQWordFieldOp SourceBuff ByteIndex NameString</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348890"></A>CreateQWordFieldOp   := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x8F</EM>
+</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348891"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348892"></A>DefCreateWordField   := CreateWordFieldOp SourceBuff ByteIndex NameString</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348893"></A>CreateWordFieldOp    := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x8B</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348894"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348895"></A>DefDataRegion        := DataRegionOp NameString TermArg TermArg TermArg</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348896"></A>DataRegionOp         := ExOpPrefix <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x88</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348897"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348898"></A>DefDevice            := DeviceOp PkgLength NameString TermList</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348899"></A>DeviceOp             := ExtOpPrefix <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x82</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348900"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348901"></A>DefEvent             := EventOp NameString</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348902"></A>EventOp              := ExtOpPrefix <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x02</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449154"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449125"></A>DefExternal          := ExternalOp NameString ObjectType ArgumentCount</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449126"></A>ExternalOp           := 0x15</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449127"></A>ObjectType           := ByteData</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348903"></A>ArgumentCount        := ByteData (0 - 7)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449151"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348904"></A>DefField             := FieldOp PkgLength NameString FieldFlags FieldList</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348905"></A>FieldOp              := ExtOpPrefix <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x81</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348906"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348907"></A>DefIndexField        := IndexFieldOp PkgLength NameString NameString FieldFlags FieldList</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348908"></A>IndexFieldOp         := ExtOpPrefix <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x86</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348909"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348910"></A>DefMethod            := MethodOp PkgLength NameString MethodFlags TermList</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348911"></A>MethodOp             := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x14</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348912"></A>MethodFlags          := ByteData    // bit 0-2:        ArgCount (0-7)<BR>
+                                    // bit 3:          SerializeFlag<BR>
+                                    //                 0    <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+NotSerialized</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448745"></A>                                    //                1    <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+Serialized<BR>
+</EM>
+                                    // bit 4-7:       SyncLevel (0x00-0x0f)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348913"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348914"></A>DefMutex            := MutexOp NameString SyncFlags</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348915"></A>MutexOp             := ExtOpPrefix <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x01</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348916"></A>SyncFlags           := ByteData    // bit 0-3:        SyncLevel (0x00-0x0f)<BR>
+                                   // bit 4-7:        Reserved (must be 0)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348917"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348918"></A>DefOpRegion         := OpRegionOp NameString RegionSpace RegionOffset RegionLen</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1446129"></A>OpRegionOp          := ExtOpPrefix <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x80</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1446130"></A>RegionSpace         := ByteData    // 0x00            <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+SystemMemory</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1446135"></A>                                   // 0x01            <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+SystemIO<BR>
+</EM>
+                                   // 0x02            <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+PCI_Config<BR>
+</EM>
+                                   // 0x03            <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+EmbeddedControl</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1446117"></A>                                   // 0x04            <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+SMBus<BR>
+</EM>
+                                   // 0x05            System<EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+CMOS<BR>
+</EM>
+                                   // 0x06            <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+PciBarTarget</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1446110"></A>                                   // 0x07            IPMI</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449630"></A>                                   // 0x08            GeneralPurposeIO </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449631"></A>                                   // 0x09            GenericSerialBus</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1454316"></A>                                   // 0x0A            PCC</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449622"></A>                                   // 0x80-0xFF:      OEM Defined</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348921"></A>RegionOffset     := TermArg =&gt; Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348922"></A>RegionLen        := TermArg =&gt; Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348923"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348924"></A>DefPowerRes      := PowerResOp PkgLength NameString SystemLevel ResourceOrder TermList</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348925"></A>PowerResOp       := ExtOpPrefix <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x84</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348926"></A>SystemLevel      := ByteData</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348927"></A>ResourceOrder    := WordData</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348928"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348929"></A>DefProcessor     := ProcessorOp PkgLength NameString ProcID PblkAddr PblkLen TermList</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348930"></A>ProcessorOp      := ExtOpPrefix <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x83</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348931"></A>ProcID           := ByteData</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348932"></A>PblkAddr         := DWordData</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348933"></A>PblkLen          := ByteData</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348934"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348935"></A>DefThermalZone   := ThermalZoneOp PkgLength NameString TermList</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348936"></A>ThermalZoneOp    := ExtOpPrefix <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x85</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448666"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448587"></A>ExtendedAccessField := 0x03 AccessType ExtendedAccessAttrib AccessLength</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448588"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448589"></A>ExtendedAccessAttrib := ByteData   // 0x0B            AttribBytes</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448590"></A>                                   // 0x0E            AttribRawBytes</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448591"></A>                                   // 0x0F            AttribRawProcess</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448567"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448579"></A>FieldElement     := NamedField | ReservedField | AccessField | ExtendedAccessField |</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448568"></A>                    ConnectField</P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-4">
+<A NAME="pgfId-1348943"></A>T<A NAME="_Toc489267551"></A>ype 1 Opcodes Encoding<A NAME="marker-1348940"></A><A NAME="marker-1348941"></A><A NAME="marker-1348942"></A></H5>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1446191"></A>Type1Opcode       := DefBreak | DefBreakPoint | DefContinue | DefFatal | DefIfElse | </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1446207"></A>                     DefLoad | DefNoop | DefNotify | DefRelease | DefReset | DefReturn | </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1446208"></A>                     DefSignal | DefSleep | DefStall | DefWhile</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348946"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348947"></A>DefBreak          := BreakOp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348948"></A>BreakOp           := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0xA5</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348949"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348950"></A>DefBreakPoint     := BreakPointOp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348951"></A>BreakPointOp      := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0xCC</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348952"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348953"></A>DefContinue       := ContinueOp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348954"></A>ContinueOp        := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x9F</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348955"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348956"></A>DefElse           := Nothing | &lt;ElseOp PkgLength TermList&gt;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348957"></A>ElseOp            := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0xA1</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348958"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348959"></A>DefFatal          := FatalOp FatalType FatalCode FatalArg</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348960"></A>FatalOp           := ExtOpPrefix <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x32</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348961"></A>FatalType         := ByteData</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348962"></A>FatalCode         := DWordData</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348963"></A>FatalArg          := TermArg =&gt; Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348964"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348965"></A>DefIfElse         := IfOp PkgLength Predicate TermList DefElse</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348966"></A>IfOp              := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0xA0</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348967"></A>Predicate         := TermArg =&gt; Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348968"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348969"></A>DefLoad           := LoadOp NameString DDBHandleObject</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348970"></A>LoadOp            := ExtOpPrefix <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x20</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348971"></A>DDBHandleObject   := SuperName</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348972"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348973"></A>DefNoop           := NoopOp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348974"></A>NoopOp            := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0xA3</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348975"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348976"></A>DefNotify         := NotifyOp NotifyObject NotifyValue</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348977"></A>NotifyOp          := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x86</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348978"></A>NotifyObject      := SuperName =&gt; ThermalZone | Processor | Device</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348979"></A>NotifyValue       := TermArg =&gt; Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348980"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348981"></A>DefRelease        := ReleaseOp MutexObject</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348982"></A>ReleaseOp         := ExtOpPrefix <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x27</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348983"></A>MutexObject       := SuperName</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348984"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348985"></A>DefReset          := ResetOp EventObject</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348986"></A>ResetOp           := ExtOpPrefix <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x26</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348987"></A>EventObject       := SuperName</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348988"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348989"></A>DefReturn         := ReturnOp ArgObject</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348990"></A>ReturnOp          := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0xA4</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348991"></A>ArgObject         := TermArg =&gt; DataRefObject</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348992"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348993"></A>DefSignal         := SignalOp EventObject</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348994"></A>SignalOp          := ExtOpPrefix <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x24</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348995"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348996"></A>DefSleep          := SleepOp MsecTime</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348997"></A>SleepOp           := ExtOpPrefix <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x22</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348998"></A>MsecTime          := TermArg =&gt; Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348999"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349000"></A>DefStall          := StallOp UsecTime</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349001"></A>StallOp           := ExtOpPrefix <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x21</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349002"></A>UsecTime          := TermArg =&gt; ByteData</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349003"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349007"></A>DefWhile          := WhileOp PkgLength Predicate TermList</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349008"></A>WhileOp           := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0xA2</EM>
+</P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-4">
+<A NAME="pgfId-1349015"></A>T<A NAME="_Toc489267552"></A>ype 2 Opcodes Encoding<A NAME="marker-1451866"></A><A NAME="marker-1451867"></A><A NAME="marker-1451868"></A></H5>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1445680"></A>Type2Opcode       := DefAcquire | DefAdd | DefAnd | DefBuffer | DefConcat | </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1446218"></A>                    DefConcatRes | DefCondRefOf | DefCopyObject | DefDecrement | </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1446229"></A>                     DefDerefOf | DefDivide | DefFindSetLeftBit | DefFindSetRightBit | </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1446236"></A>                     DefFromBCD | DefIncrement | DefIndex | DefLAnd | DefLEqual | </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1446243"></A>                     DefLGreater | DefLGreaterEqual | DefLLess | DefLLessEqual | DefMid |</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1446250"></A>                     DefLNot | DefLNotEqual | DefLoadTable | DefLOr | DefMatch | DefMod | </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1446257"></A>                     DefMultiply | DefNAnd | DefNOr | DefNot | DefObjectType | DefOr | </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1446264"></A>                     DefPackage | DefVarPackage | DefRefOf | DefShiftLeft | DefShiftRight | </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1446271"></A>                     DefSizeOf | DefStore | DefSubtract | DefTimer | DefToBCD | DefToBuffer |</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1446285"></A>                     DefToDecimalString | DefToHexString | DefToInteger | DefToString | </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1446292"></A>                     DefWait | DefXOr | MethodInvocation</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349018"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349019"></A>Type6Opcode        := DefRefOf | DefDerefOf | DefIndex | UserTermObj</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349020"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349021"></A>DefAcquire         := AcquireOp MutexObject Timeout</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349022"></A>AcquireOp          := ExtOpPrefix <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x23</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349023"></A>Timeout            := WordData</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349024"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349025"></A>DefAdd             := AddOp Operand Operand Target</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349026"></A>AddOp              := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x72</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349027"></A>Operand            := TermArg =&gt; Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349028"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349029"></A>DefAnd             := AndOp Operand Operand Target</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349030"></A>AndOp              := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x7B</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349031"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349032"></A>DefBuffer          := BufferOp PkgLength BufferSize ByteList</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349033"></A>BufferOp           := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x11</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349034"></A>BufferSize         := TermArg =&gt; Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349035"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349036"></A>DefConcat          := ConcatOp Data Data Target</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349037"></A>ConcatOp           := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x73</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349038"></A>Data               := TermArg =&gt; ComputationalData</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349039"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349040"></A>DefConcatRes       := ConcatResOp BufData BufData Target</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349041"></A>ConcatResOp        := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x84</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349042"></A>BufData            := TermArg =&gt; Buffer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349043"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349044"></A>DefCondRefOf       := CondRefOfOp SuperName Target</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349045"></A>CondRefOfOp        := ExtOpPrefix <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x12</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349046"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349047"></A>DefCopyObject      := CopyObjectOp TermArg SimpleName</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349048"></A>CopyObjectOp       := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x9D</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349049"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349050"></A>DefDecrement       := DecrementOp SuperName</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349051"></A>DecrementOp        := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x76</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349052"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349053"></A>DefDerefOf         := DerefOfOp ObjReference</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349054"></A>DerefOfOp          := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x83</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349055"></A>ObjReference       := TermArg =&gt; ObjectReference | String<BR>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349056"></A>DefDivide          := DivideOp Dividend Divisor Remainder Quotient</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349057"></A>DivideOp           := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x78</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349058"></A>Dividend           := TermArg =&gt; Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349059"></A>Divisor            := TermArg =&gt; Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349060"></A>Remainder          := Target</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349061"></A>Quotient           := Target</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1437818"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1437819"></A>DefFindSetLeftBit  := FindSetLeftBitOp Operand Target</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1437820"></A>FindSetLeftBitOp   := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x81</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349065"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349066"></A>DefFindSetRightBit := FindSetRightBitOp Operand Target</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349067"></A>FindSetRightBitOp  := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x82</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349068"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349069"></A>DefFromBCD         := FromBCDOp BCDValue Target</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349070"></A>FromBCDOp          := ExtOpPrefix <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x28</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349071"></A>BCDValue           := TermArg =&gt; Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349072"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349073"></A>DefIncrement       := IncrementOp SuperName</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349074"></A>IncrementOp        := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x75</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349075"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349076"></A>DefIndex           := IndexOp BuffPkgStrObj IndexValue Target</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349077"></A>IndexOp            := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x88</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349078"></A>BuffPkgStrObj      := TermArg =&gt; Buffer, Package or String </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349079"></A>IndexValue         := TermArg =&gt; Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349080"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349081"></A>DefLAnd            := LandOp Operand Operand</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349082"></A>LandOp             := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x90</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349083"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349084"></A>DefLEqual          := LequalOp Operand Operand</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349085"></A>LequalOp           := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x93</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349086"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349087"></A>DefLGreater        := LgreaterOp Operand Operand</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349088"></A>LgreaterOp         := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x94</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349089"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349090"></A>DefLGreaterEqual   := LgreaterEqualOp Operand Operand</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349091"></A>LgreaterEqualOp    := LnotOp LlessOp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349092"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349093"></A>DefLLess           := LlessOp Operand Operand</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349094"></A>LlessOp            := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x95</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349095"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349096"></A>DefLLessEqual      := LlessEqualOp Operand Operand</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349097"></A>LlessEqualOp       := LnotOp LgreaterOp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349098"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349099"></A>DefLNot            := LnotOp Operand</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349100"></A>LnotOp             := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x92</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349101"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349102"></A>DefLNotEqual       := LnotEqualOp Operand Operand</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349103"></A>LnotEqualOp        := LnotOp LequalOp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349104"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349105"></A>DefLoadTable       := LoadTableOp TermArg TermArg TermArg TermArg TermArg TermArg</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349106"></A>LoadTableOp        := ExtOpPrefix <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x1F</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349107"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349108"></A>DefLOr             := LorOp Operand Operand</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349109"></A>LorOp              := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x91</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349110"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349111"></A>DefMatch           := MatchOp SearchPkg MatchOpcode Operand MatchOpcode Operand StartIndex</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349112"></A>MatchOp            := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x89</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349113"></A>SearchPkg          := TermArg =&gt; Package</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349114"></A>MatchOpcode        := ByteData    // 0    MTR<BR>
+                                  // 1    MEQ<BR>
+                                  // 2    MLE</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1446308"></A>                                  // 3    MLT</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1446301"></A>                                  // 4    MGE<BR>
+                                  // 5    MGT</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349115"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349116"></A>StartIndex         := TermArg =&gt; Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349117"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349118"></A>DefMid             := MidOp MidObj TermArg TermArg Target</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349119"></A>MidOp              := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x9E</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349120"></A>MidObj             := TermArg =&gt; Buffer | String </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349121"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349122"></A>DefMod             := ModOp Dividend Divisor Target</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349123"></A>ModOp              := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x85</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349124"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349125"></A>DefMultiply        := MultiplyOp Operand Operand Target</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349126"></A>MultiplyOp         := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x77</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349127"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349128"></A>DefNAnd            := NandOp Operand Operand Target</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349129"></A>NandOp             := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x7C</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349130"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349131"></A>DefNOr             := NorOp Operand Operand Target</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349132"></A>NorOp              := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x7E</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349133"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349134"></A>DefNot             := NotOp Operand Target</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349135"></A>NotOp              := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x80</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349136"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448800"></A>DefObjectType      := ObjectTypeOp &lt;SimpleName | DebugObj |</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448801"></A>                        DefRefOf | DefDerefOf | DefIndex&gt;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349137"></A>ObjectTypeOp       := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x8E</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349139"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349140"></A>DefOr              := OrOp Operand Operand Target</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349141"></A>OrOp               := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x7D</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349142"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349143"></A>DefPackage         := PackageOp PkgLength NumElements PackageElementList</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349144"></A>PackageOp          := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x12</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349145"></A>DefVarPackage      := VarPackageOp PkgLength VarNumElements PackageElementList</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349146"></A>VarPackageOp       := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x13</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349147"></A>NumElements        := ByteData</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349148"></A>VarNumElements     := TermArg =&gt; Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349149"></A>PackageElementList := Nothing | &lt;PackageElement PackageElementList&gt;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349150"></A>PackageElement     := DataRefObject | NameString</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349151"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349152"></A>DefRefOf           := RefOfOp SuperName</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349153"></A>RefOfOp            := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x71</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349154"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349155"></A>DefShiftLeft       := ShiftLeftOp Operand ShiftCount Target</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349156"></A>ShiftLeftOp        := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x79</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349157"></A>ShiftCount         := TermArg =&gt; Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349158"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349159"></A>DefShiftRight      := ShiftRightOp Operand ShiftCount Target</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349160"></A>ShiftRightOp       := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x7A</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349161"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349162"></A>DefSizeOf          := SizeOfOp SuperName</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349163"></A>SizeOfOp           := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x87</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349164"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349165"></A>DefStore           := StoreOp TermArg SuperName</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349166"></A>StoreOp            := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x70</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349167"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349168"></A>DefSubtract        := SubtractOp Operand Operand Target</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349169"></A>SubtractOp         := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x74</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349170"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349171"></A>DefTimer           := TimerOp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349172"></A>TimerOp            := 0x5B 0x33</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349173"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349174"></A>DefToBCD            := ToBCDOp Operand Target</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349175"></A>ToBCDOp             := ExtOpPrefix <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x29</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349176"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349177"></A>DefToBuffer         := ToBufferOp Operand Target</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349178"></A>ToBufferOp          := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x96</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1437831"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1437832"></A>DefToDecimalString  := ToDecimalStringOp Operand Target</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1437833"></A>ToDecimalStringOp   := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x97</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349182"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349183"></A>DefToHexString      := ToHexStringOp Operand Target</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349184"></A>ToHexStringOp       := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x98</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349185"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349186"></A>DefToInteger        := ToIntegerOp Operand Target</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349187"></A>ToIntegerOp         := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x99</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349188"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349189"></A>DefToString         := ToStringOp TermArg LengthArg Target</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349190"></A>LengthArg           := TermArg =&gt; Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349191"></A>ToStringOp          := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x9C</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349192"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349193"></A>DefWait             := WaitOp EventObject Operand</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349194"></A>WaitOp              := ExtOpPrefix <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x25</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349195"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349196"></A>DefXOr              := XorOp Operand Operand Target</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349197"></A>XorOp               := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x7F</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1446410"></A>&nbsp;</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="Heading-3">
+<A NAME="pgfId-1349205"></A><A NAME="_Toc489267553"></A><A NAME="_Toc489267774"></A><A NAME="_Toc489272748"></A><A NAME="_Toc4819456"></A><A NAME="_Toc202342104"></A><A NAME="_Toc258262734"></A>Miscellaneous Objects Encoding</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1349206"></A>Miscellaneous objects include:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1349207"></A>Arg objects</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1349208"></A>Local objects</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1349209"></A>Debug objects</LI>
+</UL>
+<DIV>
+<H5 CLASS="Heading-4">
+<A NAME="pgfId-1349215"></A>A<A NAME="_Toc489267554"></A>rg Objects Encoding<A NAME="marker-1349213"></A><A NAME="marker-1349214"></A></H5>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349217"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1446417"></A>ArgObj    := Arg0Op | Arg1Op | Arg2Op | Arg3Op | Arg4Op | Arg5Op | Arg6Op</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349218"></A>Arg0Op    := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x68</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349219"></A>Arg1Op    := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x69</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349220"></A>Arg2Op    := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x6A</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349221"></A>Arg3Op    := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x6B</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349222"></A>Arg4Op    := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x6C</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349223"></A>Arg5Op    := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x6D</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349224"></A>Arg6Op    := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x6E</EM>
+</P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-4">
+<A NAME="pgfId-1349230"></A>L<A NAME="_Toc489267555"></A>ocal Objects Encoding<A NAME="marker-1349228"></A><A NAME="marker-1349229"></A></H5>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1446431"></A>LocalObj    := Local0Op | Local1Op | Local2Op | Local3Op | Local4Op | Local5Op | Local6Op | Local7Op</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349233"></A>Local0Op    := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x60</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349234"></A>Local1Op    := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x61</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349235"></A>Local2Op    := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x62</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349236"></A>Local3Op    := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x63</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349237"></A>Local4Op    := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x64</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349238"></A>Local5Op    := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x65</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349239"></A>Local6Op    := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x66</EM>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349240"></A>Local7Op    := <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x67</EM>
+</P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-4">
+<A NAME="pgfId-1349246"></A> D<A NAME="_Toc489267556"></A>ebug Objects Encoding<A NAME="marker-1349244"></A><A NAME="marker-1349245"></A></H5>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1446445"></A>DebugObj    := DebugOp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349249"></A>DebugOp     := ExtOpPrefix <EM CLASS="Style-Grammar-Char-Char-Bold-Char-Char">
+0x31</EM>
+</P>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1349259"></A><A NAME="_Toc489267557"></A><A NAME="_Toc489267775"></A><A NAME="_Toc489272749"></A><A NAME="_Toc4819457"></A><A NAME="_Toc202342105"></A><A NAME="_Toc258262735"></A>AML Byte Stream Byte Values<A NAME="marker-1349257"></A><A NAME="marker-1349258"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1349260"></A>The following table lists all the byte values that can be found in an AML byte stream and the meaning of each byte value. This table is useful for debugging AML code.</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1437873"></A><A NAME="90491"></A>AML Byte Stream Byte Values</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446496"></A>Encoding Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446498"></A>Encoding Name</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446500"></A>Encoding Group</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446502"></A>Fixed List Arguments</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446504"></A>Variable List Arguments</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446508"></A>0x00</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446510"></A>ZeroOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446512"></A>Data Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446514"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446516"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446520"></A>0x01</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446522"></A>OneOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446524"></A>Data Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446526"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446528"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446532"></A>0x02-0x05</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446534"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446536"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446538"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446540"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446544"></A>0x06</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446546"></A>AliasOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446548"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446550"></A>NameString NameString</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446552"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446556"></A>0x07</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446558"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446560"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446562"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446564"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446568"></A>0x08</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446570"></A>NameOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446572"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446574"></A>NameString DataRefObject</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446576"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446580"></A>0x09</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446582"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446584"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446586"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446588"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446592"></A>0x0A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446594"></A>BytePrefix</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446596"></A>Data Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446598"></A>ByteData</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446600"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446604"></A>0x0B</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446606"></A>WordPrefix</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446608"></A>Data Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446610"></A>WordData</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446612"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446616"></A>0x0C</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446618"></A>DWordPrefix</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446620"></A>Data Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446622"></A>DWordData</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446624"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446628"></A>0x0D</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446630"></A>StringPrefix</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446632"></A>Data Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446634"></A>AsciiCharList NullChar</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446636"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446640"></A>0x0E</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446642"></A>QWordPrefix</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446644"></A>Data Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446646"></A>QWordData</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446648"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446652"></A>0x0F</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446654"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446656"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446658"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446660"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446664"></A>0x10</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446666"></A>ScopeOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446668"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446670"></A>NameString</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446672"></A>TermList</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446676"></A>0x11</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446678"></A>BufferOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446680"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446682"></A>TermArg</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446684"></A>ByteList</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446688"></A>0x12</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446690"></A>PackageOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446692"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446694"></A>ByteData</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446696"></A>Package TermList</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446700"></A>0x13</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446702"></A>VarPackageOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446704"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446706"></A>TermArg</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446708"></A>Package TermList</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446712"></A>0x14</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446714"></A>MethodOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446716"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446718"></A>NameString ByteData</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446720"></A>TermList</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1449194"></A>0x15</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1449196"></A>ExternalOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1449198"></A>Name Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1449258"></A>NameString ByteData ByteData</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1449200"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1449202"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446724"></A>0x16-0x2D</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446726"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446728"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446730"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446732"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446736"></A>0x2E (&#8216;.&#8217;)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446738"></A>DualNamePrefix</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446740"></A>Name Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446742"></A>NameSeg NameSeg</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446744"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446748"></A>0x2F (&#8216;/&#8217;)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446750"></A>MultiNamePrefix</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446752"></A>Name Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446754"></A>ByteData NameSeg(N)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446756"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448104"></A>0x30-0x39 ('0'-'9')</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448106"></A>DigitChar--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448108"></A>Name Object--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448237"></A>--</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1448110"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448225"></A>--</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1448112"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446760"></A>0x3A-0x40</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446762"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446764"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446766"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446768"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446772"></A>0x41-0x5A (&#8216;A&#8217;-&#8216;Z&#8217;)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446774"></A>NameChar</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446776"></A>Name Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446778"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446780"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446784"></A>0x5B (&#8216;[&#8217;)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446786"></A>ExtOpPrefix</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446788"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446790"></A>ByteData</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446792"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448255"></A>0x5B 0x00</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448267"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448269"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448271"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448273"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446796"></A>0x5B 0x01</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446798"></A>MutexOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446800"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446802"></A>NameString ByteData</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446804"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446808"></A>0x5B 0x02</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446810"></A>EventOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446812"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446814"></A>NameString</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446816"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446820"></A>0x5B 0x12</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446822"></A>CondRefOfOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446824"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446826"></A>SuperName SuperName</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446828"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446832"></A>0x5B 0x13</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446834"></A>CreateFieldOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446836"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446838"></A>TermArg TermArg TermArg NameString</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446840"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446844"></A>0x5B 0x1F</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446846"></A>LoadTableOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446848"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446850"></A>TermArg TermArg TermArg TermArg TermArg TermArg</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446852"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446856"></A>0x5B 0x20</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446858"></A>LoadOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446860"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446862"></A>NameString SuperName</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446864"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446868"></A>0x5B 0x21</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446870"></A>StallOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446872"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446874"></A>TermArg</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446876"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446880"></A>0x5B 0x22</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446882"></A>SleepOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446884"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446886"></A>TermArg</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446888"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446892"></A>0x5B 0x23</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446894"></A>AcquireOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446896"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446898"></A>SuperName WordData</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446900"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446904"></A>0x5B 0x24</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446906"></A>SignalOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446908"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446910"></A>SuperName</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446912"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446916"></A>0x5B 0x25</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446918"></A>WaitOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446920"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446922"></A>SuperName TermArg</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446924"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446928"></A>0x5B 0x26</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446930"></A>ResetOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446932"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446934"></A>SuperName</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446936"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446940"></A>0x5B 0x27</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446942"></A>ReleaseOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446944"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446946"></A>SuperName</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446948"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446952"></A>0x5B 0x28</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446954"></A>FromBCDOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446956"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446958"></A>TermArg Target</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446960"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446964"></A>0x5B 0x29</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446966"></A>ToBCD</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446968"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446970"></A>TermArg Target</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446972"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446976"></A>0x5B 0x2A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446978"></A>Reserved</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446980"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446982"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446984"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446988"></A>0x5B 0x30</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446990"></A>RevisionOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446992"></A>Data Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446994"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1446996"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447000"></A>0x5B 0x31</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447002"></A>DebugOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447004"></A>Debug Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447006"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447008"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447012"></A>0x5B 0x32</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447014"></A>FatalOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447016"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447018"></A>ByteData DWordData TermArg</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447020"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447024"></A>0x5B 0x33</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447026"></A>TimerOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447028"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447030"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447032"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447036"></A>0x5B 0x80</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447038"></A>OpRegionOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447040"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447042"></A>NameString ByteData TermArg TermArg</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447044"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447048"></A>0x5B 0x81</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447050"></A>FieldOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447052"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447054"></A>NameString ByteData</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447056"></A>FieldList</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447060"></A>0x5B 0x82</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447062"></A>DeviceOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447064"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447066"></A>NameString</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447068"></A>TermList</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447072"></A>0x5B 0x83</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447074"></A>ProcessorOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447076"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447078"></A>NameString ByteData DWordData ByteData</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447080"></A>TermList</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447084"></A>0x5B 0x84</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447086"></A>PowerResOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447088"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447090"></A>NameString ByteData WordData</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447092"></A>TermList</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447096"></A>0x5B 0x85</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447098"></A>ThermalZoneOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447100"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447102"></A>NameString</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447104"></A>TermList</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447108"></A>0x5B 0x86</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447110"></A>IndexFieldOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447112"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447114"></A>NameString NameString ByteData</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447116"></A>FieldList</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447120"></A>0x5B 0x87</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447122"></A>BankFieldOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447124"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447126"></A>NameString NameString TermArg ByteData</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447128"></A>FieldList</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447132"></A>0x5B 0x88</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447134"></A>DataRegionOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447136"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447138"></A>NameString TermArg TermArg TermArg</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447140"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448289"></A>0x5B 0x80 - 0x5B 0xFF</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448303"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448305"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448307"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448309"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447144"></A>0x5C (&#8216;&#92;&#8217;)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447146"></A>RootChar</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447148"></A>Name Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447150"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447152"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447156"></A>0x5D</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447158"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447160"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447162"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447164"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447168"></A>0x5E (&#8216;^&#8217;)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447170"></A>ParentPrefixChar</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447172"></A>Name Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447174"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447176"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447180"></A>0x5F(&#8216;_&#8217;)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447182"></A>NameChar--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447184"></A>Name Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447186"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447188"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447192"></A>0x60 (&#8216;`&#8217;)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447194"></A>Local0Op</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447196"></A>Local Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447198"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447200"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447204"></A>0x61 (&#8216;a&#8217;)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447206"></A>Local1Op</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447208"></A>Local Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447210"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447212"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447216"></A>0x62 (&#8216;b&#8217;)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447218"></A>Local2Op</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447220"></A>Local Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447222"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447224"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447228"></A>0x63 (&#8216;c&#8217;)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447230"></A>Local3Op</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447232"></A>Local Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447234"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447236"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447240"></A>0x64 (&#8216;d&#8217;)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447242"></A>Local4Op</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447244"></A>Local Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447246"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447248"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447252"></A>0x65 (&#8216;e&#8217;)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447254"></A>Local5Op</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447256"></A>Local Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447258"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447260"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447264"></A>0x66 (&#8216;f&#8217;)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447266"></A>Local6Op</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447268"></A>Local Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447270"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447272"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447276"></A>0x67 (&#8216;g&#8217;)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447278"></A>Local7Op</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447280"></A>Local Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447282"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447284"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447288"></A>0x68 (&#8216;h&#8217;)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447290"></A>Arg0Op</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447292"></A>Arg Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447294"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447296"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447300"></A>0x69 (&#8216;i&#8217;)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447302"></A>Arg1Op</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447304"></A>Arg Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447306"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447308"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447312"></A>0x6A (&#8216;j&#8217;)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447314"></A>Arg2Op</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447316"></A>Arg Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447318"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447320"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447324"></A>0x6B (&#8216;k&#8217;)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447326"></A>Arg3Op</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447328"></A>Arg Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447330"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447332"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447336"></A>0x6C (&#8216;l&#8217;)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447338"></A>Arg4Op</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447340"></A>Arg Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447342"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447344"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447348"></A>0x6D (&#8216;m&#8217;)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447350"></A>Arg5Op</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447352"></A>Arg Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447354"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447356"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447360"></A>0x6E (&#8216;n&#8217;)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447362"></A>Arg6Op</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447364"></A>Arg Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447366"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447368"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447372"></A>0x6F</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447374"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447376"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447378"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447380"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447384"></A>0x70</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447386"></A>StoreOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447388"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447390"></A>TermArg SuperName</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447392"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447396"></A>0x71</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447398"></A>RefOfOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447400"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447402"></A>SuperName </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447404"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447408"></A>0x72</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447410"></A>AddOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447412"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447414"></A>TermArg TermArg Target</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447416"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447420"></A>0x73</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447422"></A>ConcatOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447424"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447426"></A>TermArg TermArg Target</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447428"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447432"></A>0x74</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447434"></A>SubtractOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447436"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447438"></A>TermArg TermArg Target</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447440"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447444"></A>0x75</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447446"></A>IncrementOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447448"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447450"></A>SuperName</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447452"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447456"></A>0x76</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447458"></A>DecrementOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447460"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447462"></A>SuperName</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447464"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447468"></A>0x77</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447470"></A>MultiplyOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447472"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447474"></A>TermArg TermArg Target</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447476"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447480"></A>0x78</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447482"></A>DivideOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447484"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447486"></A>TermArg TermArg Target Target</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447488"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447492"></A>0x79</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447494"></A>ShiftLeftOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447496"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447498"></A>TermArg TermArg Target</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447500"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447504"></A>0x7A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447506"></A>ShiftRightOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447508"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447510"></A>TermArg TermArg Target</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447512"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447516"></A>0x7B</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447518"></A>AndOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447520"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447522"></A>TermArg TermArg Target</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447524"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447528"></A>0x7C</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447530"></A>NandOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447532"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447534"></A>TermArg TermArg Target</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447536"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447540"></A>0x7D</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447542"></A>OrOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447544"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447546"></A>TermArg TermArg Target</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447548"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447552"></A>0x7E</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447554"></A>NorOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447556"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447558"></A>TermArg TermArg Target</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447560"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447564"></A>0x7F</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447566"></A>XorOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447568"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447570"></A>TermArg TermArg Target</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447572"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447576"></A>0x80</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447578"></A>NotOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447580"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447582"></A>TermArg Target</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447584"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447588"></A>0x81</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447590"></A>FindSetLeftBitOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447592"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447594"></A>TermArg Target</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447596"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447600"></A>0x82</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447602"></A>FindSetRightBitOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447604"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447606"></A>TermArg Target</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447608"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447612"></A>0x83</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447614"></A>DerefOfOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447616"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447618"></A>TermArg</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447620"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447624"></A>0x84</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447626"></A>ConcatResOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447628"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447630"></A>TermArg TermArg Target</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447632"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447636"></A>0x85</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447638"></A>ModOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447640"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447642"></A>TermArg TermArg Target</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447644"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447648"></A>0x86</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447650"></A>NotifyOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447652"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447654"></A>SuperName TermArg</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447656"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447660"></A>0x87</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447662"></A>SizeOfOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447664"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447666"></A>SuperName</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447668"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447672"></A>0x88</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447674"></A>IndexOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447676"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447678"></A>TermArg TermArg Target</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447680"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447684"></A>0x89</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447686"></A>MatchOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447688"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447690"></A>TermArg ByteData TermArg ByteData TermArg TermArg</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447692"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447696"></A>0x8A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447698"></A>CreateDWordFieldOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447700"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447702"></A>TermArg TermArg NameString</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447704"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447708"></A>0x8B</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447710"></A>CreateWordFieldOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447712"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447714"></A>TermArg TermArg NameString</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447716"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447720"></A>0x8C</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447722"></A>CreateByteFieldOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447724"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447726"></A>TermArg TermArg NameString</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447728"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447732"></A>0x8D</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447734"></A>CreateBitFieldOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447736"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447738"></A>TermArg TermArg NameString</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447740"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447744"></A>0x8E</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447746"></A>ObjectTypeOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447748"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447750"></A>SuperName</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447752"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447756"></A>0x8F</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447758"></A>CreateQWordFieldOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447760"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447762"></A>TermArg TermArg NameString</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447764"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447768"></A>0x90</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447770"></A>LandOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447772"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447774"></A>TermArg TermArg</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447776"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447780"></A>0x91</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447782"></A>LorOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447784"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447786"></A>TermArg TermArg</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447788"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447792"></A>0x92</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447794"></A>LnotOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447796"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447798"></A>TermArg</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447800"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447804"></A>0x92 0x93</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447806"></A>LNotEqualOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447808"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447810"></A>TermArg TermArg</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447812"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447816"></A>0x92 0x94</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447818"></A>LLessEqualOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447820"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447822"></A>TermArg TermArg</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447824"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447828"></A>0x92 0x95</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447830"></A>LGreaterEqualOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447832"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447834"></A>TermArg TermArg</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447836"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447840"></A>0x93</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447842"></A>LEqualOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447844"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447846"></A>TermArg TermArg</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447848"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447852"></A>0x94</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447854"></A>LGreaterOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447856"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447858"></A>TermArg TermArg</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447860"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447864"></A>0x95</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447866"></A>LLessOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447868"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447870"></A>TermArg TermArg</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447872"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447876"></A>0x96</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447878"></A>ToBufferOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447880"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447882"></A>TermArg Target</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447884"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447888"></A>0x97</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447890"></A>ToDecimalStringOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447892"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447894"></A>TermArg Target</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447896"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447900"></A>0x98</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447902"></A>ToHexStringOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447904"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447906"></A>TermArg Target</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447908"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447912"></A>0x99</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447914"></A>ToIntegerOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447916"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447918"></A>TermArg Target</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447920"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447924"></A>0x9A-0x9B</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447926"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447928"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447930"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447932"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447936"></A>0x9C</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447938"></A>ToStringOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447940"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447942"></A>TermArg TermArg Target</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447944"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447948"></A>0x9D</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447950"></A>CopyObjectOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447952"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447954"></A>TermArg SimpleName</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447956"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447960"></A>0x9E</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447962"></A>MidOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447964"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447966"></A>TermArg TermArg TermArg Target</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447968"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447972"></A>0x9F</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447974"></A>ContinueOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447976"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447978"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447980"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447984"></A>0xA0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447986"></A>IfOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447988"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447990"></A>TermArg</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447992"></A>TermList</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447996"></A>0xA1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1447998"></A>ElseOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448000"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448002"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448004"></A>TermList</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448008"></A>0xA2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448010"></A>WhileOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448012"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448014"></A>TermArg</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448016"></A>TermList</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448020"></A>0xA3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448022"></A>NoopOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448024"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448026"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448028"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448032"></A>0xA4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448034"></A>ReturnOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448036"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448038"></A>TermArg</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448040"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448044"></A>0xA5</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448046"></A>BreakOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448048"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448050"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448052"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448056"></A>0xA6-0xCB</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448058"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448060"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448062"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448064"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448068"></A>0xCC</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448070"></A>BreakPointOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448072"></A>Term Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448074"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448076"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448080"></A>0xCD-0xFE</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448082"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448084"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448086"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448088"></A>--</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448092"></A>0xFF</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448094"></A>OnesOp</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448096"></A>Data Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448098"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1448100"></A>--</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1350894"></A> <A NAME="_Toc489267776"></A><A NAME="_Toc489272750"></A><A NAME="_Toc4819458"></A><A NAME="_Toc202342106"></A><A NAME="_Toc258262736"></A>AML Encoding of Names in the Namespac<A NAME="marker-1350891"></A><A NAME="marker-1350892"></A>e</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1350895"></A>Assume the following namespace exists:</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350896"></A>        &#92;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350898"></A>        S0</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350899"></A>            MEM</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350900"></A>                SET</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350901"></A>                GET</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350902"></A>        S1</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350903"></A>            MEM</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350904"></A>                SET</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350905"></A>                GET</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350906"></A>            CPU</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350907"></A>                SET</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350908"></A>                GET</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1446459"></A>&nbsp;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350909"></A>Assume further that a definition block is loaded that creates a node &#92;S0.CPU.SET, and loads a block using it as a root. Assume the loaded block contains the following names:</P>
+<DIV>
+<H3 CLASS="CodeParagraph">
+<A NAME="pgfId-1350910"></A>&nbsp;</H3>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350911"></A>    STP1</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350912"></A>    ^GET</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350913"></A>    ^^PCI0</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350914"></A>    ^^PCI0.SBS</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350915"></A>    &#92;S2</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350916"></A>    &#92;S2.ISA.COM1</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350917"></A>    ^^^S3</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350918"></A>    ^^^S2.MEM</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350919"></A>    ^^^S2.MEM.SET</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350920"></A>    Scope(&#92;S0.CPU.SET.STP1) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350921"></A>        XYZ</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350922"></A>        ^ABC</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350923"></A>        ^ABC.DEF</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350924"></A>    }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1446466"></A>&nbsp;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350926"></A>This will be encoded in AML as:</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350928"></A>'STP1'</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350929"></A>ParentPrefixChar 'GET_'</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350930"></A>ParentPrefixChar ParentPrefixChar 'PCI0'</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350931"></A>ParentPrefixChar ParentPrefixChar DualNamePrefix 'PCI0' 'SBS_'</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350932"></A>RootChar 'S2__'</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350933"></A>RootChar MultiNamePrefix 3 'S2__'  'ISA_'  'COM1'</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350934"></A>ParentPrefixChar ParentPrefixChar ParentPrefixChar 'S3__'</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350935"></A>ParentPrefixChar ParentPrefixChar ParentPrefixChar DualNamePrefix 'S2__'  'MEM_'</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350936"></A>ParentPrefixChar ParentPrefixChar ParentPrefixChar MultiNamePrefix 3 'S2__'  'MEM_'  'SET_'</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1446473"></A>&nbsp;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350937"></A>After the block is loaded, the namespace will look like this (names added to the namespace by the loading operation are shown in bold):</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350939"></A>    &#92;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350940"></A>        S0</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350941"></A>            MEM</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350942"></A>                SET</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350943"></A>                GET</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350944"></A>            CPU</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350945"></A>                SET</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350946"></A>                    STP1</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350947"></A>                        XYZ</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350948"></A>                    ABC</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350949"></A>                        DEF</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350950"></A>                GET</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350951"></A>            PCI0</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350952"></A>                SBS</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350953"></A>        S1</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350954"></A>            MEM</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350955"></A>                SET</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350956"></A>                GET</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350957"></A>            CPU</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350958"></A>                SET</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350959"></A>                GET</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350960"></A>        S2</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350961"></A>            ISA</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350962"></A>                COM1</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350963"></A>            MEM</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350964"></A>                SET</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350965"></A>        S3</P>
+<P CLASS="Body">
+<A NAME="pgfId-1346798"></A>&nbsp;</P>
+</DIV>
+</DIV>
+</DIV>
+</BODY>
+</HTML>

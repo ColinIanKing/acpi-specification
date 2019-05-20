@@ -1,0 +1,561 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2016/HTML Export Filter">
+<LINK REL="STYLESHEET" HREF="Waking_and_Sleeping.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE> 16 Waking and Sleeping</TITLE></HEAD>
+<BODY>
+<DIV>
+<H1 CLASS="Heading-1">
+<A NAME="pgfId-1348554"></A><A NAME="91854"></A>Waking and Sleeping<DIV>
+<IMG SRC="Waking_and_Sleeping-1.gif" ALT="">
+</DIV>
+</H1>
+<P CLASS="Body">
+<A NAME="pgfId-1350395"></A>ACPI defines a mechanism to transition the system between the working state (G0) and a sleeping state (G1) or the soft-off (G2) state. During transitions between the working and sleeping states, the context of the user&#8217;s operating environment is maintained. ACPI defines the quality of the G1 sleeping state by defining the system attributes of four types of ACPI sleeping states (S1, S2, S3, and S4). Each sleeping state is defined to allow implementations that can tradeoff cost, power, and wake latencies. Additionally, ACPI defines the sleeping states such that an ACPI platform can support multiple sleeping states, allowing the platform to transition into a particular sleeping state for a predefined period of time and then transition to a lower power/higher wake latency sleeping state (transitioning through the G0 state)<EM CLASS="footnote-reference">
+ <A HREF="#pgfId-1350398" CLASS="footnote">1</A></EM>
+.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350399"></A>ACPI defines a programming model that provides a mechanism for OSPM to initiate the entry into a sleeping or soft-off state (S1-S5); this consists of a 3-bit field SLP_TYPx<A HREF="#pgfId-1350402" CLASS="footnote">2</A> that indicates the type of sleep state to enter, and a single control bit SLP_EN to start the sleeping process. On HW-reduced ACPI systems, the register described by the SLEEP_CONTROL_REG field in the FADT is used instead of the fixed SLP_TYPx and SLP_EN register bit fields.</P>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1350403"></A>Systems containing processors without a hardware mechanism to place the processor in a low-power state may additionally require the execution of appropriate native instructions to place the processor in a low-power state after OSPM sets the SLP_EN bit. The hardware may implement a number of low-power sleeping states and then associate these states with the defined ACPI sleeping states (through the SLP_TYPx fields). The ACPI system firmware creates a sleeping object associated with each supported sleeping state (unsupported sleeping states are identified by the lack of the sleeping object). Each sleeping object contains two constant 3-bit values that OSPM will program into the SLP_TYPa and SLP_TYPb fields (in fixed register space), or, on HW-reduced ACPI platforms, a single 3-bit value that OSPM will write to the register specified by the FADT's SLEEP_CONTROL_REG field.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1350404"></A>On systems that are not HW-reduced ACPI platforms, an alternate mechanism for entering and exiting the S4 state is defined. This mechanism passes control to the platform runtime firmware to save and restore platform context. Context ownership is similar in definition to the S3 state, but hardware saves and restores the context of memory to non-volatile storage (such as a disk drive), and OSPM treats this as an S4 state with implied latency and power constraints. This alternate mechanism of entering the S4 state is referred to as the S4BIOS transition.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350405"></A>Prior to entering a sleeping state (S1-S4), OSPM will execute OEM-specific AML/ASL code contained in the _PTS (Prepare To Sleep) control method. One use of the _PTS control method is that it can indicate to the embedded controller what sleeping state the system will enter. The embedded controller can then respond by executing the proper power-plane sequencing upon sleep state entry.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350407"></A>The _WAK (Wake) control method is then executed. This control method again contains OEM-specific AML/ASL code. One use of the _WAK control method requests OSPM to check the platform for any devices that might have been added or removed from the system while the system was asleep. For example, a PC Card controller might have had a PC Card added or removed, and because the power to this device was off in the sleeping state, the status change event was not generated.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350408"></A>This section discusses the system initialization sequence of an ACPI-enabled platform. This includes the boot sequence, different wake scenarios, and an example to illustrate how to use the system address map reporting interfaces. This sequence is part of the ACPI event programming model.</P>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1370440"></A>HW-reduced ACPI platforms do not implement the Legacy Mode nor the S4BIOS state described below.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1350409"></A>For detailed information on the power management control methods described above, see <A HREF="Power_and_Performance_Mgmt.htm#84676" CLASS="XRef">See Power and Performance Management.</A>, &#8220;Power and Performance Management.&#8221;</P>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1350437"></A><A NAME="_Toc356222087"></A><A NAME="_Ref362661655"></A><A NAME="_Toc365910084"></A><A NAME="_Toc366066134"></A><A NAME="_Toc366136553"></A><A NAME="_Toc366325469"></A><A NAME="_Toc366331435"></A><A NAME="_Toc368559146"></A><A NAME="_Toc369679840"></A><A NAME="_Toc369801452"></A><A NAME="_Toc369936225"></A><A NAME="_Toc370017315"></A><A NAME="_Toc374114759"></A><A NAME="_Ref374115604"></A><A NAME="_Toc374252870"></A><A NAME="_Toc375244401"></A><A NAME="_Toc375924797"></A><A NAME="_Toc423760020"></A><A NAME="_Toc475523681"></A><A NAME="_Toc486665478"></A><A NAME="_Toc489256119"></A><A NAME="_Toc489268043"></A><A NAME="_Toc489272596"></A><A NAME="_Toc202341917"></A><A NAME="_Toc258262536"></A>Sleeping States</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1369622"></A>The illustration below shows the transitions between the working state, the sleeping states, and the Soft Off state.</P>
+<DIV>
+<IMG SRC="Waking_and_Sleeping-2.gif" ALT="">
+</DIV>
+<DIV>
+<H6 CLASS="FigureTitle">
+<A NAME="pgfId-1369698"></A><A NAME="46934"></A>Example Sleeping States</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1369702"></A>ACPI defines distinct differences between the G0 and G1 system states.<A NAME="marker-1369699"></A><A NAME="marker-1369700"></A><A NAME="marker-1369701"></A></P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350449"></A>In the G0 state, work is being performed by the OS/application software and the hardware. The CPU or any particular hardware device could be in any one of the defined power states (C0-C3 or D0-D3); however, some work will be taking place in the system.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350450"></A>In the G1 state, the system is assumed to be doing no work. Prior to entering the G1 state, OSPM will place devices in a device power state compatible with the system sleeping state to be entered; if a device is enabled to wake the system, then OSPM will place these devices into the lowest Dx state from which the device supports wake. This is defined in the power resource description of that device object. This definition of the G1 state implies:</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350451"></A>The CPUs execute no instructions in the G1 state.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350452"></A>Hardware devices are not operating (except possibly to generate a wake event).</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350453"></A>If not HW-reduced, ACPI registers are affected as follows:</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350454"></A>Wake event bits are enabled in the corresponding fixed or general-purpose registers according to enabled wake options.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350455"></A>PM1 control register is programmed for the desired sleeping state.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350456"></A>WAK_STS is set by hardware in the sleeping state.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1350457"></A>All sleeping states have these specifications. ACPI defines additional attributes that allow an ACPI platform to have up to four different sleeping states, each of which has different attributes. The attributes were chosen to allow differentiation of sleeping states that vary in power, wake latency, and implementation cost tradeoffs.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350458"></A>Running processors at reduced levels of performance is not an ACPI sleeping state (G1); this is a working (G0) state-defined event. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1350459"></A>The CPU cannot execute any instructions when in the sleeping state; OSPM relies on this fact. A platform designer might be tempted to support a sleeping system by reducing the clock frequency of the system, which allows the platform to maintain a low-power state while at the same time maintaining communication sessions that require constant interaction (as with some network environments). This is definitely a G0 activity where an OS policy decision has been made to turn off the user interface (screen) and run the processor in a reduced performance mode. This type of reduced performance state as a sleeping state is not defined by the ACPI specification; ACPI assumes no code execution during sleeping states.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350460"></A>ACPI defines attributes for four sleeping states: S1, S2, S3 and S4. (Notice that S4 and S5 are very similar from a hardware standpoint.) ACPI-compatible platforms can support multiple sleeping states. ACPI specifies that a 3-bit binary number be associated with each sleeping state (these numbers are given objects within ACPI&#8217;s root namespace: &#92;_S0, &#92;_S1, &#92;_S2, &#92;_S3, &#92;_S4 and &#92;_S5). When entering a system sleeping state, OSPM will do the following:<A NAME="marker-1350461"></A><A NAME="marker-1350462"></A><A NAME="marker-1350463"></A><A NAME="marker-1350464"></A></P>
+<DIV>
+<H6 CLASS="StepNumList-1">
+<A NAME="pgfId-1350465"></A>Pick the deepest sleeping state supported by the platform and enabled waking devices.</H6>
+<OL>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350466"></A>Execute the _PTS control method (which passes the type of intended sleep state to OEM AML code). </LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350467"></A>If OS policy decides to enter the S4 state and chooses to use the S4BIOS mechanism and S4BIOS is supported by the platform, OSPM will pass control to the platform runtime firmware software by writing the S4BIOS_REQ value to the SMI_CMD port. </LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350468"></A>If not using the S4BIOS mechanism, OSPM gets the SLP_TYPx value from the associated sleeping object (&#92;_S1, &#92;_S2, &#92;_S3, &#92;_S4 or &#92;_S5).</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350469"></A>Program the SLP_TYPx fields with the values contained in the selected sleeping object.</LI>
+<LI CLASS="Note">
+<A NAME="pgfId-1350470"></A>Compatibility Note: The _GTS method is deprecated in ACPI 5.0A. For earlier versions, execute the _GTS control method, passing an argument that indicates the sleeping state to be entered (1, 2, 3, or 4 representing S1, S2, S3, and S4).</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350471"></A>If entering S1, S2, or S3, flush the processor caches.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350472"></A>If not entering S4BIOS, set the SLP_EN bit to start the sleeping sequence. (This actually occurs on the same write operation that programs the SLP_TYPx field in the PM1_CNT register.) If entering S4BIOS, write the S4BIOS_REQ value into the SMI_CMD port.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1370462"></A>If HW-reduced, program the register indicated by the SLEEP_CONTROL_REG FADT field with the HW-reduced ACPI Sleep Type value (retrieved from the sleep state object in step 4 above) and with the SLP_EN bit set to one.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350473"></A>On systems containing processors without a hardware mechanism to place the processor in a low-power state, execute appropriate native instructions to place the processor in a low-power state.</LI>
+</OL>
+<P CLASS="Body">
+<A NAME="pgfId-1350474"></A>The _PTS control method provides the platform runtime firmware a mechanism for performing some housekeeping, such as writing the sleep type value to the embedded controller, before entering the system sleeping state. Control method execution occurs &#8220;just prior&#8221; to entering the sleeping state and is not an event synchronized with the write to the PM1_CNT register. Execution can take place several seconds prior to the system actually entering the sleeping state. As such, no hardware power-plane sequencing takes place by execution of the _PTS control method.</P>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1350475"></A>Compatibility Note: The _BFS method is deprecated in ACPI 5.0A. In earlier versions, on waking, the _BFS control method is executed. OSPM then executes the _WAK control method. This control method executes OEM-specific ASL/AML code that can search for any devices that have been added or removed during the sleeping state.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1350476"></A>The following sections describe the sleeping state attributes.</P>
+</DIV>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1350503"></A><A NAME="_Toc489256120"></A><A NAME="_Toc489268044"></A><A NAME="_Toc489272597"></A><A NAME="_Toc202341918"></A><A NAME="_Toc258262537"></A>S1 Sleeping State<A NAME="marker-1350502"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1350504"></A>The S1 state is defined as a low wake-latency sleeping state. In this state, all system context is preserved with the exception of CPU caches. Before entering S1, OSPM will flush the system caches. If the platform supports the WBINVD instruction (as indicated by the WBINVD and WBINVD_FLUSH flags in the FADT), OSPM will execute the WBINVD instruction. The hardware is responsible for maintaining all other system context, which includes the context of the CPU, memory, and chipset. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1350505"></A>Examples of S1 sleeping state implementation alternatives follow.</P>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1350516"></A>Example 1: S1 Sleeping State Implementation</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1350517"></A>This example references an IA processor that supports the stop grant state through the assertion of the STPCLK# signal. When SLP_TYPx is programmed to the S1 value (the OEM chooses a value, which is then placed in the &#92;_S1 object) and the SLP_ENx bit is subsequently set, or when the HW-reduced ACPI Sleep Type value for S1 and the SLP_EN bit are written to the Sleep Control Register, the hardware can implement an S1 state by asserting the STPCLK# signal to the processor, causing it to enter the stop grant state. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1350518"></A>In this case, the system clocks (PCI and CPU) are still running. Any enabled wake event causes the hardware to de-assert the STPCLK# signal to the processor whereby OSPM must first invalidate the CPU caches and then transition back into the working state.<A NAME="_Toc369679843"></A><A NAME="_Toc369801455"></A><A NAME="_Toc369936228"></A><A NAME="_Toc370017318"></A><A NAME="_Toc374114762"></A><A NAME="_Toc374252873"></A><A NAME="_Toc375244404"></A><A NAME="_Toc375924800"></A><A NAME="_Toc423760023"></A></P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1350529"></A>Example 2: S1 Sleeping State Implementation</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1350530"></A>When SLP_TYPx is programmed to the S1 value and the SLP_ENx bit is subsequently set, or the HW-reduced ACPI Sleep Type value for S1 and the SLP_EN bit are written to the Sleep Control Register, the hardware will implement an S1 sleeping state transition by doing the following:</P>
+<DIV>
+<H6 CLASS="StepNumList-1">
+<A NAME="pgfId-1350531"></A>Placing the processor into the stop grant state.</H6>
+<OL>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350532"></A>Stopping the processor&#8217;s input clock, placing the processor into the stop clock state.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350533"></A>Placing system memory into a self-refresh or suspend-refresh state. Refresh is maintained by the memory itself or through some other reference clock that is not stopped during the sleeping state.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350534"></A>Stopping all system clocks (asserts the standby signal to the system PLL chip). Normally the RTC will continue running.</LI>
+</OL>
+<P CLASS="Body">
+<A NAME="pgfId-1350535"></A>In this case, all clocks in the system have been stopped (except for the RTC). Hardware must reverse the process (restarting system clocks) upon any enabled wake event whereby OSPM must first invalidate the CPU caches and then transition back into the working state.</P>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1350562"></A><A NAME="_Toc489256121"></A><A NAME="_Toc489268045"></A><A NAME="_Toc489272598"></A><A NAME="_Toc202341919"></A><A NAME="_Toc258262538"></A>S2 Sleeping State<A NAME="marker-1350561"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1350563"></A>The S2 state is defined as a low wake latency sleep state. This state is similar to the S1 sleeping state where any context except for system memory may be lost. Additionally, control starts from the processor&#8217;s reset vector after the wake event. Before entering S2 the SLP_EN bit, OSPM will flush the system caches. If the platform supports the WBINVD instruction (as indicated by the WBINVD and WBINVD_FLUSH flags in the FADT), OSPM will execute the WBINVD instruction. The hardware is responsible for maintaining chip set and memory context. An example of an S2 sleeping state implementation follows.</P>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1352374"></A>Example: S2 Sleeping State Implementation</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1350575"></A>When the SLP_TYPx register(s) are programmed to the S2 value (found in the &#92;_S2 object) and the SLP_EN bit is set, or the HW-reduced ACPI Sleep Type value for S2 and the SLP_EN bit are written to the Sleep Control Register, the hardware will implement an S2 sleeping state transition by doing the following:</P>
+<DIV>
+<H6 CLASS="StepNumList-1">
+<A NAME="pgfId-1350576"></A>Stopping system clocks (the only running clock is the RTC).</H6>
+<OL>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350577"></A>Placing system memory into a self-refresh or suspend-refresh state.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350578"></A>Powering off the CPU and cache subsystem.</LI>
+</OL>
+<P CLASS="Body">
+<A NAME="pgfId-1350579"></A>In this case, the CPU is reset upon detection of the wake event; however, core logic and memory maintain their context. Execution control starts from the CPU&#8217;s boot vector. The platform boot firmware is required to:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350580"></A>Program the initial boot configuration of the CPU (such as the CPU&#8217;s MSR and MTRR registers).</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350581"></A>Initialize the cache controller to its initial boot size and configuration.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350582"></A>Enable the memory controller to accept memory accesses.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350583"></A>Jump to the waking vector.</LI>
+</UL>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1350610"></A><A NAME="_Toc489256122"></A><A NAME="_Toc489268046"></A><A NAME="_Toc489272599"></A><A NAME="_Toc202341920"></A><A NAME="_Toc258262539"></A>S3 Sleeping State<A NAME="marker-1350609"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1350611"></A>The S3 state is defined as a low wake-latency sleep state. From the software viewpoint, this state is functionally the same as the S2 state. The operational difference is that some Power Resources that may have been left ON in the S2 state may not be available to the S3 state. As such, some devices may be in a lower power state when the system is in S3 state than when the system is in the S2 state. Similarly, some device wake events can function in S2 but not S3. An example of an S3 sleeping state implementation follows.</P>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1352408"></A>Example: S3 Sleeping State Implementation</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1350623"></A>When the SLP_TYPx register(s) are programmed to the S3 value (found in the &#92;_S3 object) and the SLP_EN bit is set, or the HW-reduced ACPI Sleep Type value for S3 and the SLP_EN bit are written to the Sleep Control Register, the hardware will implement an S3 sleeping state transition by doing the following:</P>
+<DIV>
+<H6 CLASS="StepNumList-1">
+<A NAME="pgfId-1350624"></A>Placing the memory into a low-power auto-refresh or self-refresh state.</H6>
+<OL>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350625"></A>Devices that are maintaining memory isolating themselves from other devices in the system.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350626"></A>Removing power from the system. At this point, only devices supporting memory are powered (possibly partially powered). The only clock running in the system is the RTC clock.</LI>
+</OL>
+<P CLASS="Body">
+<A NAME="pgfId-1350627"></A>In this case, the wake event repowers the system and resets most devices (depending on the implementation). </P>
+<P CLASS="Body">
+<A NAME="pgfId-1350628"></A>Execution control starts from the CPU&#8217;s boot vector. The platform boot firmware is required to:</P>
+<OL>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350629"></A>Program the initial boot configuration of the CPU (such as the MSR and MTRR registers).</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350630"></A>Initialize the cache controller to its initial boot size and configuration.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350631"></A>Enable the memory controller to accept memory accesses.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350632"></A>Jump to the waking vector.</LI>
+</OL>
+<P CLASS="Body">
+<A NAME="pgfId-1350633"></A>Notice that if the configuration of cache memory controller is lost while the system is sleeping, the platform boot firmware is required to reconfigure it to either the pre-sleeping state or the initial boot state configuration. The platform boot firmware can store the configuration of the cache memory controller into the reserved memory space, where it can then retrieve the values after waking. OSPM will call the _PTS method once per session (prior to sleeping).</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350634"></A>The platform boot firmware is also responsible for restoring the memory controller&#8217;s configuration. If this configuration data is destroyed during the S3 sleeping state, then the platform boot firmware needs to store the pre-sleeping state or initial boot state configuration in a non-volatile memory area (as with RTC CMOS RAM) to enable it to restore the values during the waking process.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350635"></A>When OSPM re-enumerates buses coming out of the S3 sleeping state, it will discover any devices that have been inserted or removed, and configure devices as they are turned on.</P>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1350662"></A><A NAME="_Toc489256123"></A><A NAME="_Toc489268047"></A><A NAME="_Toc489272600"></A><A NAME="_Toc202341921"></A><A NAME="_Toc258262540"></A>S4 Sleeping State<A NAME="marker-1350661"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1350664"></A>The S4 sleeping state is the lowest-power, longest wake-latency sleeping state supported by ACPI. In order to reduce power to a minimum, it is assumed that the hardware platform has powered off all devices. Because this is a sleeping state, the platform context is maintained. Depending on how the transition into the S4 sleeping state occurs, the responsibility for maintaining system context changes. S4 supports two entry mechanisms: OS initiated and platform runtime firmware-initiated. The OSPM-initiated mechanism is similar to the entry into the S1-S3 sleeping states; OSPM driver writes the SLP_TYPx fields and sets the SLP_EN bit, or writes the HW-reduced ACPI Sleep Type value for S3 and the SLP_EN bit to the Sleep Control Register. The platform runtime firmware-initiated mechanism occurs by OSPM transferring control to the platform runtime firmware by writing the S4BIOS_REQ value to the SMI_CMD port, and is not supported on HW-reduced ACPI platforms.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1370573"></A>In OSPM-initiated S4 sleeping state, OSPM is responsible for saving all system context. Before entering the S4 state, OSPM will save context of all memory as specified in <A HREF="Sys_Address_Map_Interfaces.htm#68313" CLASS="XRef">See System Address Map Interfaces.</A>. See <A HREF="Sys_Address_Map_Interfaces.htm#68313" CLASS="XRef">See System Address Map Interfaces.</A>, &quot;System Address Map Interfaces&#8221; for more information.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1371678"></A>Upon waking, OSPM shall then restore the system context. When OSPM re-enumerates buses coming out of the S4 sleeping state, it will discover any devices that have come and gone, and configure devices as they are turned on.<A NAME="marker-1350665"></A><A NAME="marker-1350666"></A><A NAME="marker-1350667"></A><A NAME="marker-1350668"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1350669"></A>In the platform runtime firmware-initiated S4 sleeping state, OSPM is responsible for the same system context as described in the S3 sleeping state (platform runtime firmware restores the memory and some chip set context). The S4BIOS transition transfers control to the platform runtime firmware, allowing it to save context to non-volatile memory (such as a disk partition).</P>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1352451"></A>Operating System-Initiated S4 Transition</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1371571"></A>If OSPM supports OSPM-initiated S4 transition, it will not generate a platform firmware-initiated S4 transition. Platforms that support the platform firmware-initiated S4 transition also support OSPM-initiated S4 transition.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1371572"></A>OSPM-initiated S4 transition is initiated by OSPM by saving system context, writing the appropriate values to the SLP_TYPx register(s), and setting the SLP_EN bit, or writes the HW-reduced ACPI Sleep Type value for S4 and the SLP_EN bit to the Sleep Control Register. Upon exiting the S4 sleeping state, the platform boot firmware restores the chipset to its POST condition, updates the hardware signature (described later in this section), and passes control to OSPM through a normal boot process.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1371573"></A>When the platform boot firmware builds the ACPI tables, it generates a hardware signature for the system. If the hardware configuration has changed during an OS-initiated S4 transition, the platform boot firmware updates the hardware signature in the FACS table. A change in hardware configuration is defined to be any change in the platform hardware that would cause the platform to fail when trying to restore the S4 context; this hardware is normally limited to boot devices. For example, changing the graphics adapter or hard disk controller while in the S4 state should cause the hardware signature to change. On the other hand, removing or adding a PC Card device from a PC Card slot should not cause the hardware signature to change.</P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1350688"></A><A NAME="17584"></A>The S4BIOS Transition</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1371588"></A>This transition is not supported on HW-reduced ACPI platforms. On other systems, the platform runtime firmware-initiated S4 transition begins with OSPM writing the S4BIOS_REQ value into the SMI_CMD port (as specified in the FADT). Once gaining control, the platform runtime firmware then saves the appropriate memory and chip set context, and then places the platform into the S4 state (power off to all devices).</P>
+<P CLASS="Body">
+<A NAME="pgfId-1371589"></A>In the FACS memory table, there is the S4BIOS_F bit that indicates hardware support for the platform runtime firmware-initiated S4 transition. If the hardware platform supports the S4BIOS state, it sets the S4BIOS_F flag within the FACS memory structure prior to booting the OS. If the S4BIOS_F flag in the FACS table is set, this indicates that OSPM can request the platform runtime firmware to transition the platform into the S4BIOS sleeping state by writing the S4BIOS_REQ value (found in the FADT) to the SMI_CMD port (identified by the SMI_CMD value in the FADT).</P>
+<P CLASS="Body">
+<A NAME="pgfId-1371590"></A>Upon waking the platform boot firmware restores memory context and jumps to the waking vector (similar to wake from an S3 state). Coming out of the S4BIOS state, the platform boot firmware must only configure boot devices (so it can read the disk partition where it saved system context). When OSPM re-enumerates buses coming out of the S4BIOS state, it will discover any devices that have come and gone, and configure devices as they are turned on.</P>
+</DIV>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1352478"></A><A NAME="_Toc489256124"></A><A NAME="_Toc489268048"></A><A NAME="_Toc489272601"></A><A NAME="_Toc202341922"></A><A NAME="_Toc258262541"></A>S5 Soft Off State<A NAME="marker-1350713"></A><A NAME="marker-1350714"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1350716"></A>OSPM places the platform in the S5 soft off state to achieve a logical off. Notice that the S5 state is not a sleeping state (it is a G2 state) and no context is saved by OSPM or hardware but power may still be applied to parts of the platform in this state and as such, it is not safe to disassemble. Also notice that from a hardware perspective, the S4 and S5 states are nearly identical. When initiated, the hardware will sequence the system to a state similar to the off state. The hardware has no responsibility for maintaining any system context (memory or I/O); however, it does allow a transition to the S0 state due to a power button press or a Remote Start. Upon start-up, the platform boot firmware performs a normal power-on reset, loads the boot sector, and executes (but not the waking vector, as all ACPI table context is lost when entering the S5 soft off state).</P>
+<P CLASS="Body">
+<A NAME="pgfId-1370853"></A>The _TTS control method allows the platform runtime firmware a mechanism for performing some housekeeping, such as storing the targeted sleep state in a &#8220;global&#8221; variable that is accessible by other control methods (such as _PS3 and _DSW).</P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1370860"></A><A NAME="_Toc202341923"></A><A NAME="_Toc258262542"></A>Transitioning from the Working to the Sleeping State<A NAME="marker-1370856"></A><A NAME="marker-1370857"></A><A NAME="marker-1370858"></A><A NAME="marker-1370859"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1370861"></A>On a transition of the system from the working to the sleeping state, the following occurs:</P>
+<DIV>
+<H6 CLASS="StepNumList-1">
+<A NAME="pgfId-1350727"></A>OSPM decides (through a policy scheme) to place the system into the sleeping state.</H6>
+<OL>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350728"></A>OSPM invokes the _TTS method to indicate the deepest possible system state the system will transition to (1, 2, 3, or 4 representing S1, S2, S3, and S4).</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350729"></A>OSPM examines all devices enabled to wake the system and determines the deepest possible sleeping state the system can enter to support the enabled wake functions. The _PRW named object under each device is examined, as well as the power resource object it points to.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350730"></A>OSPM places all device drivers into their respective Dx state. If the device is enabled for wake, it enters the Dx state associated with the wake capability. If the device is not enabled to wake the system, it enters the D3 state.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350731"></A>OSPM executes the _PTS control method, passing an argument that indicates the desired sleeping state (1, 2, 3, or 4 representing S1, S2, S3, and S4). </LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350732"></A>OSPM saves any other processor&#8217;s context (other than the local processor) to memory.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350733"></A>OSPM writes the waking vector into the FACS table in memory.</LI>
+<LI CLASS="Note">
+<A NAME="pgfId-1350734"></A>Compatibility Note: The _GTS method is deprecated in ACPI 5.0A. For earlier versions, OSPM executes the _GTS control method, passing an argument that indicates the sleeping state to be entered (1, 2, 3, or 4 representing S1, S2, S3, and S4).</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1370622"></A>If not a HW-reduced ACPI platform, OSPM clears the WAK_STS in the PM1a_STS and PM1b_STS registers. On HW-reduced ACPI platforms, OSPM clears the WAK_STS bit in the Sleep Status Register.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350736"></A>OSPM saves the local processor&#8217;s context to memory.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1370640"></A>OSPM flushes caches (only if entering S1, S2 or S3).</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1370641"></A>OSPM sets GPE enable registers or enables wake-capable interrupts to ensure that all appropriate wake signals are armed</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1370642"></A>If entering an S4 state using the S4BIOS mechanism, OSPM writes the S4BIOS_REQ value (from the FADT) to the SMI_CMD port. This passes control to the platform runtime firmware, which then transitions the platform into the S4BIOS state.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350740"></A>If not entering an S4BIOS state, and not a HW-reduced ACPI platform, then OSPM writes SLP_TYPa (from the associated sleeping object) with the SLP_ENa bit set to the PM1a_CNT register.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350741"></A>OSPM writes SLP_TYPb with the SLP_EN bit set to the PM1b_CNT register, or writes the HW-reduced ACPI Sleep Type value and the SLP_EN bit to the Sleep Control Register.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350742"></A>On systems containing processors without a hardware mechanism to place the processor in a low-power state, OSPM executes appropriate native instructions to place the processor in a low-power state.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350743"></A>OSPM loops on the WAK_STS bit, either in both the PM1a_CNT and PM1b_CNT registers, or in the SLEEP_STATUS_REG, in the case of HW-reduced ACPI platforms</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350744"></A>The system enters the specified sleeping state. </LI>
+<LI CLASS="Note">
+<A NAME="pgfId-1350745"></A>This is accomplished after step 14 or 15 above.</LI>
+</OL>
+</DIV>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1350769"></A><A NAME="_Toc489256126"></A><A NAME="_Toc489268050"></A><A NAME="_Toc489272603"></A><A NAME="_Toc202341924"></A><A NAME="_Toc258262543"></A>Transitioning from the Working to the Soft Off State</H5>
+<P CLASS="Body">
+<A NAME="pgfId-1350776"></A><A NAME="marker-1350770"></A><A NAME="marker-1350771"></A><A NAME="marker-1350772"></A><A NAME="marker-1350773"></A><A NAME="marker-1350774"></A><A NAME="marker-1350775"></A>On a transition of the system from the working to the soft off state, the following occurs:</P>
+<DIV>
+<H6 CLASS="StepNumList-1">
+<A NAME="pgfId-1350777"></A>OSPM executes the _PTS control method, passing the argument 5.</H6>
+<OL>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350778"></A>OSPM prepares its components to shut down (flushing disk caches). </LI>
+<LI CLASS="Note">
+<A NAME="pgfId-1350779"></A>Compatibility Note: The _GTS method is deprecated in ACPI 5.0A. For earlier versions, OSPM executes the _GTS control method, passing the argument 5.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350780"></A>If not a HW-reduced ACPI platform, OSPM writes SLP_TYPa (from the &#92;_S5 object) with the SLP_ENa bit set to the PM1a_CNT register.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350781"></A>OSPM writes SLP_TYPb (from the &#92;_S5 object) with the SLP_ENb bit set to the PM1b_CNT register, or writes the HW-reduced ACPI Sleep Type value for S5 and the SLP_EN bit to the Sleep Control Register.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1350782"></A>The system enters the Soft Off state.</LI>
+</OL>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1350798"></A><A NAME="_Toc489256127"></A><A NAME="_Toc489268051"></A><A NAME="_Toc489272604"></A><A NAME="_Toc202341925"></A><A NAME="_Toc258262544"></A>Flushing Caches<A NAME="marker-1350795"></A><A NAME="marker-1350796"></A><A NAME="marker-1350797"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1350799"></A>Before entering the S1, S2 or S3 sleeping states, OSPM is responsible for flushing the system caches. ACPI provides a number of mechanisms to flush system caches. These include:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350800"></A>Using a native instruction (for example, the IA-32 architecture WBINVD instruction) to flush and invalidate platform caches.<BR>
+WBINVD_FLUSH flag set (1) in the FADT indicates the system provides this support level.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350801"></A>Using the IA-32 instruction WBINVD to flush but not invalidate the platform caches.<BR>
+WBINVD flag set (1) in the FADT indicates the system provides this support level.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1350803"></A>The manual flush mechanism has two caveats:<A NAME="marker-1350802"></A></P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350804"></A>Largest cache is 1 MB in size (FLUSH_SIZE is a maximum value of 2 MB).</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350805"></A>No victim caches (for which the manual flush algorithm is unreliable).</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1350806"></A>Processors with built-in victim caches will not support the manual flush mechanism and are therefore required to support the WBINVD mechanism to use the S2 or S3 state.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350809"></A>The manual cache-flushing mechanism relies on the two FADT fields:<A NAME="marker-1350807"></A><A NAME="marker-1350808"></A></P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350810"></A>FLUSH_SIZE. Indicates twice the size of the largest cache in bytes.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350811"></A>FLUSH_STRIDE. Indicates the smallest line size of the caches in bytes.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1350812"></A>The cache flush size value is typically twice the size of the largest cache size, and the cache flush stride value is typically the size of the smallest cache line size in the platform. OSPM will flush the system caches by reading a contiguous block of memory indicated by the cache flush size.</P>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1350832"></A><A NAME="_Toc489256128"></A><A NAME="_Toc489268052"></A><A NAME="_Toc489272605"></A><A NAME="_Ref42578945"></A><A NAME="_Toc202341926"></A><A NAME="_Toc258262545"></A>Initialization<A NAME="marker-1350828"></A><A NAME="marker-1350829"></A><A NAME="marker-1350830"></A><A NAME="marker-1350831"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1350833"></A>This section covers the initialization sequences for an ACPI platform. After a reset or wake from an S2, S3, or S4 sleeping state (as defined by the ACPI sleeping state definitions), the CPU will start execution from its boot vector. At this point, the initialization software has many options, depending on what the hardware platform supports. This section describes at a high level what should be done for these different options. <A HREF="Waking_and_Sleeping.htm#27991" CLASS="XRef">See Platform Firmware Initialization.</A> illustrates the flow of the boot-up software.</P>
+<DIV>
+<H3 CLASS="Normal">
+<A NAME="pgfId-1350838"></A><IMG SRC="Waking_and_Sleeping-3.gif" ALIGN="BASELINE" ALT="">
+&nbsp;</H3>
+<DIV>
+<H6 CLASS="FigureTitle">
+<A NAME="pgfId-1350842"></A><A NAME="27991"></A>Platform Firmware Initialization<A NAME="marker-1350840"></A><A NAME="marker-1350841"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1350843"></A>The processor will start executing at its power-on reset vector when waking from an S2, S3, or S4 sleeping state, during a power-on sequence, or as a result of a hard or soft reset. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1350844"></A>When executing from the power-on reset vector as a result of a power-on sequence, a hard or soft reset, or waking from an S4 sleep state, the platform firmware performs complete hardware initialization; placing the system in a boot configuration. The firmware then passes control to the operating system boot loader.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350845"></A>When executing from the power-on reset vector as a result of waking from an S2 or S3 sleep state, the platform firmware performs only the hardware initialization required to restore the system to either the state the platform was in prior to the initial operating system boot, or to the pre-sleep configuration state. In multiprocessor systems, non-boot processors should be placed in the same state as prior to the initial operating system boot. The platform firmware then passes control back to OSPM system by jumping to either the Firmware_Waking_Vector or the X_Firmware_Waking_Vector in the FACS (see <A HREF="ACPI_Software_Programming_Model.htm#34632" CLASS="XRef">See Firmware ACPI Control Structure (FACS).</A> for more information). The contents of operating system memory contents may not be changed during the S2 or S3 sleep state.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350846"></A>First, the platform runtime firmware determines whether this is a wake from S2 or S3 by examining the SLP_TYP register value, which is preserved between sleeping sessions. If this is an S2 or S3 wake, then the platform runtime firmware restores minimum context of the system before jumping to the waking vector. This includes:<A NAME="marker-1350847"></A></P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350848"></A>CPU configuration. Platform runtime firmware restores the pre-sleep configuration or initial boot configuration of each CPU (MSR, MTRR,  firmware update, SMBase, and so on). Interrupts must be disabled (for IA-32 processors, disabled by CLI instruction). <A NAME="marker-1350849"></A></LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350852"></A>Memory controller configuration. If the configuration is lost during the sleeping state, the platform runtime firmware initializes the memory controller to its pre-sleep configuration or initial boot configuration.<A NAME="marker-1350853"></A></LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350856"></A>Cache memory configuration. If the configuration is lost during the sleeping state, the platform runtime firmware initializes the cache controller to its pre-sleep configuration or initial boot configuration.<A NAME="marker-1350857"></A></LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350860"></A>Functional device configuration. The platform runtime firmware doesn&#8217;t need to configure/restore context of functional devices such as a network interface (even if it is physically included in chipset) or interrupt controller. OSPM is responsible for restoring all context of these devices. The only requirement for the hardware and platform runtime firmware is to ensure that interrupts are not asserted by devices when the control is passed to OS.<A NAME="marker-1350861"></A></LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350864"></A>ACPI registers. SCI_EN bit must be set on non-HW-reduced ACPI platforms, and all event status/enable bits (PM1x_STS, PM1x_EN, GPEx_STS and GPEx_EN) must not be changed by platform runtime firmware.</LI>
+<LI CLASS="Note">
+<A NAME="pgfId-1350865"></A>The platform runtime firmware may reconfigure the CPU, memory controller and cache memory controller to either the pre-sleeping configuration or the initial boot configuration. OSPM must accommodate both configurations. </LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1350866"></A>When waking from an S4BIOS sleeping state, the platform boot firmware initializes a minimum number of devices such as CPU, memory, cache, chipset and boot devices. After initializing these devices, the platform boot firmware restores memory context from non-volatile memory such as hard disk, and jumps to waking vector.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350867"></A>As mentioned previously, waking from an S4 state is treated the same as a cold boot: the platform boot firmware runs POST and then initializes memory to contain the ACPI system description tables. After it has finished this, it can call OSPM loader, and control is passed to OSPM.<A NAME="marker-1350868"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1350869"></A>When waking from S4 (either S4OS or S4BIOS), the platform boot firmware may optionally set SCI_EN bit before passing control to OSPM. In this case, interrupts must be disabled (for IA-32 processors, disabled CLI instruction) until the control is passed to OSPM and the chipset must be configured in ACPI mode.</P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1350889"></A><A NAME="_Toc489256129"></A><A NAME="_Toc489268053"></A><A NAME="_Toc489272606"></A><A NAME="_Toc202341927"></A><A NAME="_Toc258262546"></A>Placing the System in ACPI Mode<A NAME="marker-1350888"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1350890"></A>When a platform initializes from a cold boot (mechanical off or from an S4 or S5 state), the hardware platform may be configured in a legacy configuration, if not a HW-reduced ACPI platform. From these states, the platform boot firmware software initializes the computer as it would for a legacy operating system. When control is passed to the operating system, OSPM will check the SCI_EN bit and if it is not set will then enable ACPI mode by first finding the ACPI tables, and then by generating a write of the ACPI_ENABLE value to the SMI_CMD port (as described in the FADT). The hardware platform will set the SCI_EN bit to indicate to OSPM that the hardware platform is now configured for ACPI. </P>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1350891"></A>Before SCI is enabled, no SCI interrupt can occur. Nor can any SCI interrupt occur immediately after ACPI is on. The SCI interrupt can only be signaled after OSPM has enabled one of the GPE/PM1 enable bits.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1350892"></A>When the platform is waking from an S1, S2 or S3 state, and from S4 and S5 on HW-reduced ACPI platforms, OSPM assumes the hardware is already in the ACPI mode and will not issue an ACPI_ENABLE command to the SMI_CMD port</P>
+<DIV>
+<H6 CLASS="Pb">
+<A NAME="pgfId-1350893"></A>&nbsp;</H6>
+</DIV>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1350923"></A><A NAME="_Toc489256130"></A><A NAME="_Toc489268054"></A><A NAME="_Toc489272607"></A><A NAME="_Toc202341928"></A><A NAME="_Toc258262547"></A>Platform Boot Firmware Initialization of Memory<A NAME="marker-1350921"></A><A NAME="marker-1350922"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1350924"></A>During a power-on reset, an exit from an S4 sleeping state, or an exit from an S5 soft-off state, the platform boot firmware needs to initialize memory. This section explains how the platform boot firmware should configure memory for use by a number of features including:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350925"></A>ACPI tables.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350926"></A>Platform firmware memory that wants to be saved across S4 sleeping sessions and should be cached.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350927"></A>Platform firmware memory that does not require saving and should be cached.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1350928"></A>For example, the configuration of the platform&#8217;s cache controller requires an area of memory to store the configuration data. During the wake sequence, the platform boot firmware will re-enable the memory controller and can then use its configuration data to reconfigure the cache controllers. To support these three items, IA-PC-based systems contain system address map reporting interfaces that return the following memory range types:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350929"></A>ACPI Reclaim Memory. Memory identified by the platform boot firmware that contains the ACPI tables. This memory can be any place above 8 MB and contains the ACPI tables. When OSPM is finished using the ACPI tables, it is free to reclaim this memory for system software use (application space).<A NAME="marker-1350930"></A></LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350933"></A>ACPI Non-Volatile-Sleeping Memory (NVS). Memory identified by the BIOS as being reserved by the platform boot firmware for its use. OSPM is required to tag this memory as cacheable, and to save and restore its image before entering an S4 state. Except as directed by control methods, OSPM is not allowed to use this physical memory. OSPM will call the _PTS control method some time before entering a sleeping state, to allow the platform&#8217;s AML code to update this memory image before entering the sleeping state. After the system awakes from an S4 state, OSPM will restore this memory area and call the _WAK control method to enable the platform boot firmware to reclaim its memory image.<A NAME="marker-1350934"></A><A NAME="marker-1350935"></A><A NAME="marker-1350936"></A></LI>
+<LI CLASS="Note">
+<A NAME="pgfId-1350939"></A>The memory information returned from the system address map reporting interfaces should be the same before and after an S4 sleep.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1350940"></A>When the system is first booting, OSPM will invoke E820 interfaces on IA-PC-based legacy systems or the GetMemoryMap() interface on UEFI-enabled systems to obtain a system memory map (see <A HREF="Sys_Address_Map_Interfaces.htm#68313" CLASS="XRef">See System Address Map Interfaces.</A>, &#8220;System Address Map Interfaces,&#8221; for more information). As an example, the following memory map represents a typical IA-PC-based legacy platform&#8217;s physical memory map.</P>
+<P CLASS="spacing">
+<A NAME="pgfId-1350945"></A>&nbsp;</P>
+<DIV>
+<IMG SRC="Waking_and_Sleeping-4.gif" ALT="">
+</DIV>
+<DIV>
+<H6 CLASS="FigureTitle">
+<A NAME="pgfId-1351052"></A>Example Physical Memory Map</H6>
+<DIV>
+<H6 CLASS="Pb">
+<A NAME="pgfId-1351053"></A>&nbsp;</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1351054"></A>The names and attributes of the different memory regions are listed below:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1351056"></A>0-640 KB. Compatibility Memory. Application executable memory for an 8086 system.<A NAME="marker-1351055"></A></LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1351059"></A>640 KB-1 MB. Compatibility Holes. Holes within memory space that allow accesses to be directed to the PC-compatible frame buffer (A0000h-BFFFFh), to adapter ROM space (C0000h-DFFFFh), and to system platform firmware space (E0000h-FFFFFh).<A NAME="marker-1351060"></A></LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1351063"></A>1 MB-8 MB. Contiguous RAM. An area of contiguous physical memory addresses. Operating systems may require this memory to be contiguous in order for its loader to load the OS properly on boot up. (No memory-mapped I/O devices should be mapped into this area.)<A NAME="marker-1351064"></A></LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1351067"></A>8 MB-Top of Memory1. This area contains memory to the &#8220;top of memory1&#8221; boundary. In this area, memory-mapped I/O blocks are possible.<A NAME="marker-1351068"></A></LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1351072"></A>Boot Base-4 GB. This area contains the bootstrap ROM.<A NAME="marker-1351071"></A></LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1351075"></A>The platform boot firmware should decide where the different memory structures belong, and then configure the E820 handler to return the appropriate values.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1352719"></A>For this example, the platform boot firmware will report the system memory map by E820 as shown in Figure 15-4. Notice that the memory range from 1 MB to top of memory is marked as system memory, and then a small range is additionally marked as ACPI reclaim memory. A legacy OS that does not support the E820 extensions will ignore the extended memory range calls and correctly mark that memory as system memory.</P>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="Art">
+<A NAME="pgfId-1352723"></A>&nbsp;</H4>
+<DIV>
+<IMG SRC="Waking_and_Sleeping-5.gif" ALT="">
+</DIV>
+<DIV>
+<H6 CLASS="FigureTitle">
+<A NAME="pgfId-1351316"></A>Memory as Configured after Boot</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1351317"></A>Also, from the Top of Memory1 to the Top of Memory2, the platform boot firmware has set aside some memory for its own use and has marked as reserved both ACPI NVS Memory and Reserved Memory. A legacy OS will throw out the ACPI NVS Memory and correctly mark this as reserved memory (thus preventing this memory range from being allocated to any add-in device).</P>
+<P CLASS="Body">
+<A NAME="pgfId-1351319"></A>OSPM will call the _PTS control method prior to initiating a sleep (by programming the sleep type, followed by setting the SLP_EN bit). During a catastrophic failure (where the integrity of the AML code interpreter or driver structure is questionable), if OSPM decides to shut the system off, it will not issue a _PTS, but will immediately issue a SLP_TYP of &quot;soft off&quot; and then set the SLP_EN bit, or directly write the HW-reduced ACPI Sleep Type value and the SLP_EN bit to the Sleep Control Register. Hence, the hardware should not rely solely on the _PTS control method to sequence the system to the &quot;soft off&quot; state. After waking from an S4 state, OSPM will restore the ACPI NVS memory image and then issue the _WAK control method that informs platform runtime firmware that its memory image is back.</P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1351344"></A><A NAME="_Toc489256131"></A><A NAME="_Toc489268055"></A><A NAME="_Toc489272608"></A><A NAME="_Toc202341929"></A><A NAME="_Toc258262548"></A>OS Loading<A NAME="marker-1351343"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1351345"></A>At this point, the platform boot firmware has passed control to OSPM, either by using OSPM boot loader (a result of waking from an S4/S5 or boot condition) or OSPM waking vector (a result of waking from an S2 or S3 state). For the Boot OS Loader path, OSPM will get the system address map via one of the mechanisms describe in <A HREF="Sys_Address_Map_Interfaces.htm#68313" CLASS="XRef">See System Address Map Interfaces.</A>, &#8220;System Address Map Interfaces.&#8221; If OSPM is booting from an S4 state, it will then check the NVS image file&#8217;s hardware signature with the hardware signature within the FACS table (built by platform boot firmware) to determine whether it has changed since entering the sleeping state (indicating that the platforms fundamental hardware configuration has changed during the current sleeping state). If the signature has changed, OSPM will not restore the system context and can boot from scratch (from the S4 state). Next, for an S4 wake, OSPM will check the NVS file to see whether it is valid. If valid, then OSPM will load the NVS image into system memory. Next, if not a HW-reduced ACPI platform, OSPM will check the SCI_EN bit and if it is not set, will write the ACPI_ENABLE value to the SMI_CMD register to switch into the system into ACPI mode and will then reload the memory image from the NVS file.<A NAME="marker-1351346"></A></P>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Normal">
+<A NAME="pgfId-1351347"></A>&nbsp;</H3>
+<DIV>
+<H4 CLASS="Art">
+<A NAME="pgfId-1351351"></A><IMG SRC="Waking_and_Sleeping-6.gif" ALIGN="BASELINE" ALT="">
+&nbsp;</H4>
+<DIV>
+<H6 CLASS="FigureTitle">
+<A NAME="pgfId-1351354"></A>OS Initialization<A NAME="marker-1351353"></A></H6>
+<P CLASS="ACPINormal">
+<A NAME="pgfId-1351355"></A>If an NVS image file did not exist, then OSPM loader will load OSPM from scratch. At this point, OSPM will generate a _WAK call that indicates to the platform runtime firmware that its ACPI NVS memory image has been successfully and completely updated.</P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1351376"></A><A NAME="_Toc489256132"></A><A NAME="_Toc489268056"></A><A NAME="_Toc489272609"></A><A NAME="_Toc202341930"></A><A NAME="_Toc258262549"></A>Exiting ACPI Mode<A NAME="marker-1351374"></A><A NAME="marker-1351375"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1351377"></A>For machines that do not boot in ACPI mode, ACPI provides a mechanism that enables the OS to disable ACPI. The following occurs:</P>
+<DIV>
+<H6 CLASS="StepNumList-1">
+<A NAME="pgfId-1351378"></A>OSPM unloads all ACPI drivers (including the ACPI driver).</H6>
+<OL>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1351379"></A>OSPM disables all ACPI events.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1351380"></A>OSPM finishes using all ACPI registers.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1351381"></A>OSPM issues an I/O access to the port at the address contained in the SMI_CMD field (in the FADT) with the value contained in the ACPI_DISABLE field (in the FADT).</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1351382"></A>Platform runtime firmware then remaps all SCI events to legacy events and resets the SCI_EN bit.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1351383"></A>Upon seeing the SCI_EN bit cleared, the ACPI OS enters the legacy OS mode.</LI>
+</OL>
+<P CLASS="Body">
+<A NAME="pgfId-1346798"></A>When and if the legacy OS returns control to the ACPI OS, if the legacy OS has not maintained the ACPI tables (in reserved memory and ACPI NVS memory), the ACPI OS will reboot the system to allow the platform runtime firmware to re-initialize the tables.</P>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+<HR>
+<DIV CLASS="footnotes">
+<DIV CLASS="footnote">
+<P CLASS="footnote-text">
+<SPAN CLASS="footnoteNumber">
+1.</SPAN>
+<A NAME="pgfId-1350398"></A> OSPM uses the RTC wakeup feature or the Time and Alarm Namespace device to program in the time transition delay. Prior to sleeping, OSPM will program the alarm to the closest (in time) wakeup event:  either a transition to a lower power sleeping state, or a calendar event (to run some application).</P>
+</DIV>
+<DIV CLASS="footnote">
+<P CLASS="footnote-text">
+<SPAN CLASS="footnoteNumber">
+2.</SPAN>
+<A NAME="pgfId-1350402"></A> Notice that there can be two fixed PM1x_CNT registers, each pointing to a different system I/O space region. Normally a register grouping only allows a bit or bit field to reside in a single register group instance (a or b); however, each platform can have two instances of the SLP_TYP (one for each grouping register: a and b). The &#92;_Sx control method gives a package with two values:  the first is the SLP_TYPa value and the second is the SLP_TYPb value.</P>
+</DIV>
+</DIV>
+</BODY>
+</HTML>

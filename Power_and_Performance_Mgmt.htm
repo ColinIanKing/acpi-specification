@@ -1,0 +1,2748 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2016/HTML Export Filter">
+<LINK REL="STYLESHEET" HREF="Power_and_Performance_Mgmt.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE> 7 Power and Performance Management</TITLE></HEAD>
+<BODY>
+<DIV>
+<H1 CLASS="Heading-1">
+<A NAME="pgfId-1375711"></A><A NAME="84676"></A>Power and Performance Management<DIV>
+<IMG SRC="Power_and_Performance_Mgmt-1.gif" ALT="">
+</DIV>
+</H1>
+<P CLASS="Body">
+<A NAME="pgfId-1424609"></A>This section specifies the objects that support the device power management and system power management models described in <A HREF="ACPI_Concepts.htm#32302" CLASS="XRef">See ACPI Concepts.</A>. OSPM uses these objects to manage the platform by achieving a desirable balance between performance and energy conservation goals. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1424610"></A>The system state indicator objects are also specified in this section.</P>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1424611"></A><A NAME="23447"></A>Power Resource Objects and the Power Management Models</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1424612"></A><EM CLASS="SC-12-217093">
+A Power Resource object refers to a software-controllable power plane, clock plane, or other resource upon which an ACPI power-managed device might rely. The unique way that these power resources are distributed to the devices across a given system sets the constraints within which OSPM must optimize the use of power, by individual devices as well as by the system as a whole. ACPI defines objects that reference power resources (or device states that, in turn, reference power resources) to enable OSPM to discover the constraints and capabilities of a given system. As power is managed during system operation, power savings are obtained by turning power resources off and on at the appropriate times. The following table describes how objects from this section provide the information and control required by OSPM to implement and coordinate the power management models. </EM>
+</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1424705"></A>Power Resource Object Provisions for Information and Control</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1424740"></A>Power management function to be performed</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1424742"></A>System entity performing it</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1424744"></A>Platform information required</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1424746"></A>Object providing information</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1424748"></A>Comments</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424625"></A>Choose a supported device state to save power while device is idle</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424627"></A>Device Power Policy Owner</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424629"></A>List of states (D0 through D3hot, and D3cold) supported by the device</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424631"></A>_PRx, </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1425861"></A>PSx</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424633"></A>D3cold support is indicated by explicitly providing _PR3. D3hot is assumed to be supported in all cases.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424635"></A>Choose a supported device state to enable a targeted system sleep or Low-power Idle state</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424637"></A>Device Power Policy Owner</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424639"></A>List of states (D0 through D3hot, and D3cold) supported by the device in the targeted system sleep state</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424641"></A>_PRx,</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1424642"></A>Power Resource Declaration,</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1424643"></A>_SxD</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424645"></A>_PRx maps device states to Power Resources, Power Resource definition maps Power Resources to system states.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1424646"></A>_SxD provides the system state-to-device state mapping explicitly in case power resources do not produce the information.*(See Note, below.)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424648"></A>Choose a device state that supports Wake</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424650"></A>Device Power Policy Owner</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424652"></A>List of supported states, filtered by ability to cause a wake event</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424654"></A>_PRW,</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1424655"></A>_SxW</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424657"></A>Addition of the requirement for additional power resources listed in _PRW cause wake-incapable states to be removed from the list of supported states (above)</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1424658"></A>SxW defines the mapping of wake capable device states to system states</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424660"></A>Arm a device for wake</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424662"></A>OSPM</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424664"></A>Control mechanisms for enabling wake at the platform level</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424666"></A>_PRW,</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1424667"></A>Wake-capable device interrupt,</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1424668"></A>_DSW</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424670"></A>_PRW specifies the GPE bit to enable for wake. On HW-reduced platforms, the wake-capable attribute of a device interrupt indicates which interrupt to enable for wake</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1424671"></A>_DSW is optional, depending on the needs of the platform wake hardware</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424673"></A>Enter a selected device state</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424675"></A>OSPM</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424677"></A>Control mechanisms for power resources</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424679"></A>_ON, _OFF,</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1424680"></A>_PSx</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424682"></A>_ON and _OFF control the power resources</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1424683"></A>PSx controls other platform hardware relevant to state changes but not exposed to OSPM as power resources.*(See Note, below.)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424685"></A>Choose a targeted system sleep state</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424687"></A>System Power Policy Owner</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424689"></A>List of supported system Sleep states (S1-S4)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424691"></A>_Sx</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424693"></A>S0 and S5 are assumed to be supported in all cases</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424695"></A>Enter a selected system state</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424697"></A>OSPM</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424699"></A>Control mechanisms for system states</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424701"></A>_PTS, _TTS and _WAK</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424703"></A>If _S5 exists, ACPI uses the SLP_TYP/SLP_EN bit fields in the PM1 Control Register (or the SLEEP_CONTROL/SLEEP_STATUS registers specified in the FADT)</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1424704"></A>If _S5 is not specified, alternative methods are used to turn-off the system.</P>
+</TD>
+</TR>
+</TABLE>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1375733"></A>*Support for Low-power Idle states requires the use of power resources to describe the device state and wake dependencies. See _RDI, <A HREF="Processor_Configuration_and_Control.htm#27320" CLASS="XRef">See Processor Aggregator Device.</A>, and _LPI, <A HREF="Processor_Configuration_and_Control.htm#66957" CLASS="XRef">See _LPI (Low Power Idle States).</A>I.</LI>
+</UL>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1375712"></A><A NAME="_Toc489256079"></A><A NAME="_Toc489268003"></A><A NAME="_Toc489272556"></A><A NAME="_Toc202341519"></A><A NAME="_Toc258262300"></A>Declaring a Power Resource Object<A NAME="marker-1424863"></A><A NAME="marker-1424864"></A><A NAME="marker-1424865"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1375719"></A>An ASL PowerResource statement is used to declare a PowerResource object. A Power Resource object refers to a software-controllable power plane, clock plane, or other resource upon which an integrated ACPI power-managed device might rely. Power resource objects can appear wherever is convenient in the namespace. <A NAME="marker-1375713"></A><A NAME="marker-1375714"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1373933"></A>The syntax of a PowerResource statement is:</P>
+<P CLASS="Body">
+<A NAME="pgfId-1373934"></A>	PowerResource (resourcename, systemlevel, resourceorder) {TermList} </P>
+<P CLASS="Body">
+<A NAME="pgfId-1373935"></A>where the <EM CLASS="Italic">
+systemlevel</EM>
+ parameter is a number and the <EM CLASS="Italic">
+resourceorder</EM>
+ parameter is a numeric constant (a WORD). For a formal definition of the <EM CLASS="Bold">
+PowerResource</EM>
+ statement syntax, see <A HREF="ACPI_Source_Language_Reference.htm#94069" CLASS="XRef">See ACPI Source Language (ASL) Reference.</A>, &#8220;ACPI Source Language Reference.&#8221;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1373936"></A>Systemlevel is the deepest system sleep level OSPM must maintain to keep this power resource on (0 equates to S0, 1 equates to S1, and so on).</P>
+<P CLASS="Body">
+<A NAME="pgfId-1373937"></A>Each power-managed ACPI device lists the resources it requires for its supported power states. OSPM multiplexes this information from all devices and then enables and disables the required Power Resources accordingly. The <EM CLASS="Italic">
+resourceorder</EM>
+ field in the Power Resource object is a value per Power Resource that provides the system with the order in which Power Resources must be enabled or disabled. Each unique <EM CLASS="Italic">
+resourceorder</EM>
+ value represents a level, and any number of power resources may have the same level. Power Resource levels are enabled from low values to high values and are disabled from high values to low values. The operating software enables or disables all Power Resources in any one <EM CLASS="Italic">
+resourceorder</EM>
+ level at a time before moving on to the next ordered level. Putting Power Resources in different order levels provides power sequencing and serialization where required. Note that no ordering is guaranteed within each level (i.e. between Power Resources with the same <EM CLASS="Italic">
+resourceorder</EM>
+ value). </P>
+<P CLASS="Body">
+<A NAME="pgfId-1373938"></A>A Power Resource can have named objects under its Namespace location. For a description of the ACPI-defined named objects for a Power Resource, see <A HREF="Power_and_Performance_Mgmt.htm#_Toc489256084" CLASS="XRef">See Device Power Management Objects.</A>, &#8220;Device Power Management Objects.&#8221;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1428528"></A>The power management object list is encoded as TermList, so that rather than describing a static power management object list, it is possible to describe a dynamic power management object list according to the system settings. See &quot;<A HREF="ACPI_Software_Programming_Model.htm#36467" CLASS="XRef">See Definition Block Loading.</A>, Definition Block Loading.&quot;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1373939"></A>The following block of ASL sample code shows a use of PowerResource. </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1373941"></A>PowerResource(PIDE, 0, 0) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1373942"></A>    Method(_STA) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1373943"></A>        Return (Xor (GIO.IDEI, One, Zero))  // inverse of isolation</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1373944"></A>    }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1373945"></A>    Method(_ON) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1373946"></A>        Store (One, GIO.IDEP)               // assert power</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1416739"></A>        Sleep (10)                          // wait 10ms</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1416740"></A>        Store (One, GIO.IDER)               // de-assert reset#</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1416741"></A>        Stall (10)                          // wait 10us</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1416736"></A>        Store (Zero, GIO.IDEI)              // de-assert isolation</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1373951"></A>    }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1373952"></A>    Method(_OFF) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1373953"></A>        Store (One, GIO.IDEI)               // assert isolation</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1373954"></A>        Store (Zero, GIO.IDER)              // assert reset#</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1373955"></A>        Store (Zero, GIO.IDEP)              // de-assert power</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1373956"></A>    }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1373957"></A>}</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1421608"></A>&nbsp;</P>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1373969"></A><A NAME="_Toc489256080"></A><A NAME="_Toc489268004"></A><A NAME="_Toc489272557"></A><A NAME="_Toc202341520"></A><A NAME="_Toc258262301"></A>Defined Methods for a Power Resource<A NAME="marker-1427810"></A><A NAME="marker-1427811"></A></H3>
+<P CLASS="Body">
+<A NAME="pgfId-1373970"></A><A HREF="Power_and_Performance_Mgmt.htm#30474" CLASS="XRef">See Power Resource Methods.</A> below lists the control methods that may be defined under a power resource. _ON, _OFF and _STA are required to allow basic control of each power resource. _RST is required in cases where reset of devices is managed through a shared power resource. As OSPM changes the state of device objects in the system, the power resources that are needed will also change, causing OSPM to turn power resources on and off. To determine the initial power resource settings the _STA method can be used. _RST is required in cases where reset of devices is controlled through a shared Power Resource. See <A HREF="Power_and_Performance_Mgmt.htm#33922" CLASS="XRef">See _RST (Device Reset).</A>.</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1373971"></A><A NAME="30474"></A>Power Resource Methods</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1373974"></A>Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1373976"></A>Description</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373978"></A>_OFF</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373980"></A>Set the resource off.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373982"></A>_ON</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373984"></A>Set the resource on.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424263"></A>_RST</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424265"></A>Object that executes a platform level reset of all devices that list this resource in their _PRR object. (See <A HREF="Power_and_Performance_Mgmt.htm#33922" CLASS="XRef">See _RST (Device Reset).</A> for a description of this object.)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373986"></A>_STA</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373988"></A>Object that evaluates to the current on or off state of the Power Resource. 0-OFF, 1-ON</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1374003"></A><A NAME="_Toc489256081"></A><A NAME="_Toc489268005"></A><A NAME="_Toc489272558"></A><A NAME="RSVD_OFF"></A><A NAME="_Toc202341521"></A><A NAME="_Toc258262302"></A>_OFF<A NAME="marker-1374001"></A><A NAME="marker-1374002"></A></H3>
+<P CLASS="Body">
+<A NAME="pgfId-1374004"></A>This power resource control method puts the power resource into the OFF state. The control method must not complete until the power resource is off, including any required sequencing delays between, or after, operations on the power resource. OSPM is required to turn on or off only one resource at a time. The AML code can use Stall or Sleep within the method to cause the proper sequencing delays. OSPM is not required to run the _STA method to confirm that the resource has been successfully turned off, and may run the _OFF method repeatedly, even if the resource is already off.</P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374005"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374006"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374007"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374008"></A>None</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1374028"></A><A NAME="95962"></A>_ON<A NAME="marker-1374027"></A></H3>
+<P CLASS="Body">
+<A NAME="pgfId-1374031"></A>This power resource control method puts the power resource into the ON state. The control method must not complete until the power resource is on, including any required sequencing delays between, or after, operations on the power resource. OSPM is required to turn on or off only one resource at a time. The AML code can use Stall or Sleep within the method to cause the proper sequencing delays. OSPM is not required to run the _STA method to confirm that the resource has been successfully turned on, and may run the _ON method repeatedly, even if the resource is already on.</P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374032"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374033"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374034"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374035"></A>None</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1374049"></A><A NAME="_Toc489256083"></A><A NAME="_Toc489268007"></A><A NAME="_Toc489272560"></A><A NAME="RSVD_STA2"></A><A NAME="_Toc202341527"></A><A NAME="_Toc258262304"></A>_STA (Status)<A NAME="marker-1374047"></A><A NAME="marker-1374048"></A></H3>
+<P CLASS="Body">
+<A NAME="pgfId-1374050"></A>Returns the current ON or OFF status for the power resource. </P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374051"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374052"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374053"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374054"></A>An Integer containing the current power status of the device</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1374055"></A>0 - The power resource is currently off</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1374056"></A>1 - The power resource is currently on</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1424561"></A><A NAME="40486"></A>Passive Power Resources</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1424562"></A>In some platforms, certain power resources may be shared between devices and processors, requiring both to be in specific idle states before they can be turned off. Direct OSPM control of such resources is not possible while the OS is running because the processors depend on the resources being enabled whilst they are running. It is only when processors go idle that it may be possible to turn off these shared resources. For a given resource of this type this is only possible if, in addition to the processors being idle, any other devices that depend on the resource are in a state that allows powering it down. In these cases, the platform can manage the power resource as part of entry/exit from a Low Power Idle (LPI) state and OSPM can guide the decision on whether or not to turn off the resources with its LPI state request. In those cases the power resource _ON/_OFF/_STA methods are completely redundant.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1424563"></A>Passive power resources, which are just like traditional power resources except they do not include _ON, _OFF, or _STA, are introduced to support this case.  Omission of these methods reduces overhead by avoiding redundant evaluations and saves the platform from having to supply (working) methods which it does not need. Since OSPM cannot manage passive power resources directly via _ON/_OFF, passive power resources must be listed as a dependency of at least one LPI state where the platform will manipulate them. The dependencies between LPI states and power resources are described in the _RDI object. See RDI <A HREF="Processor_Configuration_and_Control.htm#94531" CLASS="XRef">See _RDI (Resource Dependencies for Idle).</A><EM CLASS="Italic">
+ </EM>
+for additional details.</P>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1374087"></A><A NAME="_Toc489256084"></A><A NAME="_Toc489268008"></A><A NAME="_Toc489272561"></A><A NAME="_Toc202341528"></A><A NAME="_Toc258262305"></A>Device Power Management Objects<A NAME="marker-1424954"></A><A NAME="marker-1424955"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1424991"></A><EM CLASS="SC-12-217093">
+F</EM>
+or a device that is power-managed using ACPI, a Definition Block contains one or more of the objects found in the table below. Power management of a device is done using Power Resource control.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1424992"></A>Power Resources are resources that could be shared amongst multiple devices. The operating software will automatically handle control of these devices by determining which particular Power Resources need to be in the ON state at any given time. This determination is made by considering the state of all devices connected to a Power Resource. At all times, OSPM ensures that any Power Resources no longer referenced by any device in the system is in the OFF state.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1424993"></A>For systems that do not control device power states through power resource management (i.e. _PSx controls power transitions), but whose devices support multiple D-states, more information is required by the OS to determine the S-state to D-state mapping for the device. The ACPI firmware can give this information to OSPM by way of the _SxD methods. These methods tell OSPM for S-state &#8220;x&#8221;, the shallowest D-state supported by the device is &#8220;y.&#8221; OSPM is allowed to pick a deeper D-state for a given S-state, but OSPM is not allowed to go shallower than the given D-state.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1424994"></A>Additional rules that apply to device power management objects are:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1424995"></A>A device cannot be in a deeper D-state than its parent device.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1424996"></A> If there exists an ACPI Object to set a device to D0 (either through _PSx or _PRx objects), then the corresponding object to set the device into a deeper Dx must also be declared, and vice versa.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1424997"></A> If any ACPI Object that controls power (_PSx or _PRx, where x =0, 1, 2, or 3) exists, then methods to set the device into D0 and D3 device states (at least) must be present.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1424998"></A> If a mixture of _PSx and _PRx methods is declared for the device, then the device states supported through _PSx methods must be identical to the device states supported through _PRx methods.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1424999"></A>When controlling power to devices which must wake the system during a system sleeping state: </P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1425000"></A>The device must declare its ability to wake the system by declaring either the _PRW or _PSW object.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1425001"></A>After OSPM has called _PTS, it must call the device&#8217;s _PSW to enable wake.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1424987"></A>OSPM must transition a device into a D-state which is deeper than or equal to that specified by the device&#8217;s _SxD object (if present) to enable entry into Sx, but shallower than or equal to that specified by the device&#8217;s _SxW object so that it can still wake the system.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1374113"></A>OSPM may transition the system to the specified sleep state.</LI>
+</UL>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1423408"></A><A NAME="52200"></A>Device Power Management Child Objects</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1423317"></A>Object</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1423319"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423321"></A>_DSW</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423323"></A>Control method that enables or disables the device&#8217;s wake function for device-only wake.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423325"></A>_PS0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423327"></A>Control method that puts the device in the D0 device state (device fully on).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423329"></A>_PS1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423331"></A>Control method that puts the device in the D1 device state.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423333"></A>_PS2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423335"></A>Control method that puts the device in the D2 device state.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423337"></A>_PS3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423339"></A>Control method that puts the device in the D3 device state (device off).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423341"></A>_PSC</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423343"></A>Object that evaluates to the device&#8217;s current power state.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423345"></A>_PR0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423347"></A>Object that evaluates to the device&#8217;s power requirements in the D0 device state (device fully on).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423349"></A>_PR1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423351"></A>Object that evaluates to the device&#8217;s power requirements in the D1 device state. The only devices that supply this level are those that can achieve the defined D1 device state according to the related device class.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423353"></A>_PR2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423355"></A>Object that evaluates to the device&#8217;s power requirements in the D2 device state. The only devices that supply this level are those that can achieve the defined D2 device state according to the related device class. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423357"></A>_PR3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423359"></A>Object that evaluates to the device&#8217;s power requirements in the D3hot device state. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423361"></A>_PRW</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423363"></A>Object that evaluates to the device&#8217;s power requirements in order to wake the system from a system sleeping state.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423365"></A>_PSW</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423367"></A>Control method that enables or disables the device&#8217;s wake function.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423369"></A>_IRC</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423371"></A>Object that signifies the device has a significant inrush current draw.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423373"></A>_S1D</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423375"></A>Shallowest D-state supported by the device in the S1 state</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423377"></A>_S2D</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423379"></A>Shallowest D-state supported by the device in the S2 state</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423381"></A>_S3D</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423383"></A>Shallowest D-state supported by the device in the S3 state</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423385"></A>_S4D</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423387"></A>Shallowest D-state supported by the device in the S4 state</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423389"></A>_S0W</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423391"></A>Deepest D-state supported by the device in the S0 state which can wake the device</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423393"></A>_S1W</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423395"></A>Deepest D-state supported by the device in the S1 state which can wake the system.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423397"></A>_S2W</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423399"></A>Deepest D-state supported by the device in the S2 state which can wake the system.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423401"></A>_S3W</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423403"></A>Deepest D-state supported by the device in the S3 state which can wake the system.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423405"></A>_S4W</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423407"></A>Deepest D-state supported by the device in the S4 state which can wake the system.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424343"></A>_RST</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424345"></A>Control method that executes a function level reset of the device.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424347"></A>_PRR</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1424349"></A>Object that evaluates to the device's platform level reset requirements.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1423412"></A><A NAME="RSVD_DSW"></A><A NAME="_Toc202341529"></A><A NAME="_Toc258262306"></A>_DSW (Device Sleep Wake)</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1423413"></A>In addition to _PRW, this control method can be used to enable or disable the device&#8217;s ability to wake a sleeping system. This control method can only access Operation Regions that are either always available while in a system working state or that are available when the Power Resources referenced by the _PRW object are all ON. For example, do not put a power plane control for a bus controller within configuration space located behind the bus. The method should enable the device only for the last system state/device state combination passed in by OSPM. OSPM will only pass in combinations allowed by the _SxD and _SxW objects.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1374241"></A>The arguments provided to _DSW indicate the eventual Device State the device will be transitioned to and the eventual system state that the system will be transitioned to. The target system state is allowed to be the system working state (S0). The _DSW method will be run before the device is placed in the designated state and also before the system is placed in the designated system state.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1374242"></A>Compatibility Note: The _PSW method was deprecated in ACPI 3.0. The _DSW method should be used instead. OSPM will only use the _PSW method if OSPM does not support _DSW or if the _DSW method is not present. </P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374243"></A>Arguments: (3)</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374244"></A>Arg0 - An Integer that contains the device wake capability control</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1374245"></A>0 - Disable the device&#8217;s wake capabilities</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1374246"></A>1 - Enable the device&#8217;s wake capabilities</P>
+<P CLASS="Body">
+<A NAME="pgfId-1374247"></A>Arg1 - An Integer that contains the target system state (0-4)</P>
+<P CLASS="Body">
+<A NAME="pgfId-1423210"></A>Arg2 - An Integer that contains the target device state</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1423211"></A>0 - The device will remain in state D0</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1423212"></A>1 - The device will be placed in either state D0 or D1</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1374253"></A>2 - The device will be placed in either state D0, D1, or D2</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1374254"></A>3 - The device will be placed in either state D0, D1, D2, or D3</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374255"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374256"></A>None</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1374273"></A><A NAME="_Toc489256085"></A><A NAME="_Toc489268009"></A><A NAME="_Toc489272562"></A><A NAME="RSVD_PS0"></A><A NAME="_Toc202341541"></A><A NAME="_Toc258262307"></A>_PS0 (Power State 0)<A NAME="marker-1374269"></A><A NAME="marker-1374270"></A><A NAME="marker-1374271"></A><A NAME="marker-1374272"></A></H3>
+<P CLASS="Body">
+<A NAME="pgfId-1374274"></A>This Control Method is used to put the specific device into its D0 state. This Control Method can only access Operation Regions that are either always available while in a system working state or that are available when the Power Resources references by the _PR0 object are all ON.</P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374275"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374276"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374277"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374278"></A>None</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1374302"></A><A NAME="_Toc489256086"></A><A NAME="_Toc489268010"></A><A NAME="_Toc489272563"></A><A NAME="RSVD_PS1"></A><A NAME="_Toc202341546"></A><A NAME="_Toc258262308"></A>_PS1 (Power State 1)<A NAME="marker-1425079"></A><A NAME="marker-1425080"></A></H3>
+<P CLASS="Body">
+<A NAME="pgfId-1374303"></A>This control method is used to put the specific device into its D1 state. This control method can only access Operation Regions that are either always available while in the system working state (S0) or that are available when the Power Resources referenced by the _PR0 object are all ON.</P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374304"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374305"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374306"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374307"></A>None</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1374331"></A><A NAME="72445"></A>_PS2 (Power State 2)<A NAME="marker-1425111"></A><A NAME="marker-1425112"></A></H3>
+<P CLASS="Body">
+<A NAME="pgfId-1374332"></A>This control method is used to put the specific device into its D2 state. This control method can only access Operation Regions that are either always available while in the system working state (S0) or that are available when the Power Resources referenced by the _PR0 and _PR1 objects are all ON.</P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374333"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374334"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374335"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374336"></A>None</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1374360"></A><A NAME="_Toc489256088"></A><A NAME="_Toc489268012"></A><A NAME="_Toc489272565"></A><A NAME="RSVD_PS3"></A><A NAME="_Toc202341556"></A><A NAME="_Toc258262310"></A>_PS3 (Power State 3)<A NAME="marker-1374358"></A><A NAME="marker-1374359"></A></H3>
+<P CLASS="Body">
+<A NAME="pgfId-1374362"></A>This control method is used to put the specific device into its D3 state. This control method can only access Operation Regions that are either always available while in the system working state (S0) or that are available when the Power Resources referenced by the _PR0, _PR1 and  PR2 objects are all ON.</P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374363"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374364"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374365"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374366"></A>None</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1374388"></A><A NAME="_Toc489256089"></A><A NAME="_Toc489268013"></A><A NAME="_Toc489272566"></A><A NAME="RSVD_PSC"></A><A NAME="_Toc202341557"></A><A NAME="_Toc258262311"></A>_PSC (Power State Current)<A NAME="marker-1374387"></A></H3>
+<P CLASS="Body">
+<A NAME="pgfId-1374389"></A>This control method evaluates to the current device state. This control method is not required if the device state can be inferred by the Power Resource settings. This would be the case when the device does not require a _PS0, _PS1, _PS2, or _PS3 control method.</P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374390"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374391"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374392"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374393"></A>An Integer that contains a code for the current device state</P>
+<P CLASS="Body">
+<A NAME="pgfId-1374395"></A>The device state codes are shown in <A HREF="Power_and_Performance_Mgmt.htm#44403" CLASS="XRef">See PSC Device State Codes.</A>.</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1374397"></A><A NAME="44403"></A>PSC Device State Codes</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1374400"></A>Return Value</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1374402"></A>Device State</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374404"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374406"></A>D0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374408"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374410"></A>D1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374412"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374414"></A>D2</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374416"></A>3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374418"></A>D3</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1422917"></A>_PSE (Power State for Enumeration)<A NAME="marker-1422913"></A><A NAME="marker-1422914"></A><A NAME="marker-1422915"></A><A NAME="marker-1422916"></A></H3>
+<P CLASS="Body">
+<A NAME="pgfId-1422918"></A>This control method is used to put a device into a powered mode appropriate for enumeration by its parent bus. This control method can only access Operation Regions that are either always available while in a system working state or that are available when the Power Resources referenced by the _PRE object are all ON.</P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1422947"></A>Arguments: (1)</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1422922"></A>Arg1 - An Integer indicating whether Enumeration power has been turned ON or will be turned OFF.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1422923"></A>     0 - OFF</P>
+<P CLASS="Body">
+<A NAME="pgfId-1422924"></A>     1 - ON</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1422975"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1422900"></A>None</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1374436"></A><A NAME="_Toc489256090"></A><A NAME="_Toc489268014"></A><A NAME="_Toc489272567"></A><A NAME="RSVD_PR0"></A><A NAME="_Toc202341558"></A><A NAME="_Toc258262312"></A>_PR0 (Power Resources for D0)<A NAME="marker-1374432"></A><A NAME="marker-1374433"></A><A NAME="marker-1374434"></A><A NAME="marker-1374435"></A></H3>
+<P CLASS="Body">
+<A NAME="pgfId-1374437"></A>This object evaluates to a list of power resources that are dependent on this device. For OSPM to put the device in the D0 device state, the following must occur:</P>
+<DIV>
+<H6 CLASS="StepNumList-1">
+<A NAME="pgfId-1374438"></A> All Power Resources referenced by elements 1 through N must be in the ON state.</H6>
+<OL>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1374439"></A>All Power Resources no longer referenced by any device in the system must be in the OFF state.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1374440"></A>If present, the _PS0 control method is executed to set the device into the D0 device state.</LI>
+</OL>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374441"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374442"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374443"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374444"></A>A variable-length Package containing a list of References to power resources</P>
+<P CLASS="Body">
+<A NAME="pgfId-1374445"></A>This object returns a package as defined below:</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1374446"></A><A NAME="17257"></A>Power Resource Requirements Package</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1374449"></A>Element</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1374451"></A>Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1374453"></A>Description</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374455"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374457"></A>object reference</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374459"></A>Reference to required Power Resource #0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374461"></A>N</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374463"></A>object reference</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374465"></A>Reference to required Power Resource #N</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1374469"></A>_PR0 must return the same data each time it is evaluated. All power resources referenced must exist in the namespace.<A NAME="marker-1374470"></A></P>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1374484"></A><A NAME="_Toc489256091"></A><A NAME="_Toc489268015"></A><A NAME="_Toc489272568"></A><A NAME="RSVD_PR1"></A><A NAME="_Toc202341559"></A><A NAME="_Toc258262313"></A>_PR1 (Power Resources for D1)<A NAME="marker-1374482"></A><A NAME="marker-1374483"></A></H3>
+<P CLASS="Body">
+<A NAME="pgfId-1374485"></A>This object evaluates to a list of power resources upon which this device is dependent when it is in the D1 state. For OSPM to transition the device from the D0 state into the D1 state, the following must occur, in order:</P>
+<DIV>
+<H6 CLASS="StepNumList-1">
+<A NAME="pgfId-1374486"></A>If present, the _PS1 control method is executed to set the device into the D1 device state.</H6>
+<OL>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1374487"></A>All Power Resources referenced by elements 1 through N must be in the ON state.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1374488"></A>All Power Resources no longer referenced by any device in the system must be in the OFF state.</LI>
+</OL>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374489"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374490"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374491"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374492"></A>A variable-length Package containing a list of References to power resources</P>
+<P CLASS="Body">
+<A NAME="pgfId-1374493"></A>This object evaluates to a package as defined in <A HREF="Power_and_Performance_Mgmt.htm#17257" CLASS="XRef">See Power Resource Requirements Package.</A>.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1374494"></A>_PR1 must return the same data each time it is evaluated. All power resources referenced must exist in the namespace.<A NAME="marker-1374495"></A></P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1374509"></A><A NAME="_Toc489256092"></A><A NAME="_Toc489268016"></A><A NAME="_Toc489272569"></A><A NAME="RSVD_PR2"></A><A NAME="_Toc202341560"></A><A NAME="_Toc258262314"></A>_PR2 (Power Resources for D2)<A NAME="marker-1374507"></A><A NAME="marker-1374508"></A></H3>
+<P CLASS="Body">
+<A NAME="pgfId-1374510"></A>This object evaluates to a list of power resources upon which this device is dependent when it is in the D2 state. For OSPM to transition the device into the D2 state, the following must occur, in order:</P>
+<DIV>
+<H6 CLASS="StepNumList-1">
+<A NAME="pgfId-1374511"></A>If present, the _PS2 control method is executed to set the device into the D2 device state.</H6>
+<OL>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1374512"></A>All Power Resources referenced by elements 1 through N must be in the ON state.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1374513"></A>All Power Resources no longer referenced by any device in the system must be in the OFF state.</LI>
+</OL>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374514"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374515"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374516"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374517"></A>A variable-length Package containing a list of References to power resources</P>
+<P CLASS="Body">
+<A NAME="pgfId-1374518"></A>_PR2 must return the same data each time it is evaluated. All power resources referenced must exist in the namespace.<A NAME="marker-1374519"></A></P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1374529"></A>_<A NAME="_Toc258262315"></A>PR3 (Power Resources for D3hot)<A NAME="marker-1374527"></A><A NAME="marker-1374528"></A></H3>
+<P CLASS="Body">
+<A NAME="pgfId-1374530"></A>This object evaluates to a list of power resources upon which this device is dependent when it is in the D3hot state. For OSPM to transition the device into the D3hot state, the following must occur, in order:</P>
+<DIV>
+<H6 CLASS="StepNumList-1">
+<A NAME="pgfId-1374531"></A>If present, the _PS3 control method is executed to set the device into the D3hot device state.</H6>
+<OL>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1374532"></A>All Power Resources referenced by elements 1 through N must be in the ON state.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1374533"></A>All Power Resources no longer referenced by any device in the system must be in the OFF state.</LI>
+</OL>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374534"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1423111"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1423112"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1423113"></A>A variable-length Package containing a list of References to power resources</P>
+<P CLASS="Body">
+<A NAME="pgfId-1374538"></A>_PR3 must return the same data each time it is evaluated. All power resources referenced must exist in the namespace.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1374539"></A>Interaction between _PR3 and entry to D3/D3hot (only applicable if platform and OSPM have performed the necessary handshake via _OSC):</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1374540"></A>Platform/drivers must assume that the device will have power completely removed when the device is place into &#8220;D3&#8221; via _PS3</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1374541"></A>It is up to OSPM to determine whether to use D3 or D3hot. If there is a _PR3 for the device, it is up to OSPM to decide whether to keep those power resources on or off after executing _PS3. The decision may be based on other factors (e.g., being armed for wake).</LI>
+</UL>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1423470"></A><A NAME="_Toc489256093"></A><A NAME="_Toc489268017"></A><A NAME="_Toc489272570"></A><A NAME="RSVD_PRW"></A><A NAME="_Toc202341561"></A><A NAME="_Toc258262316"></A>_PRE (Power Resources for Enumeration)</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1423471"></A>This object appears under a device and evaluates to a list of power resources that are required for enumeration of the device by its parent bus. For the bus driver to enumerate any devices while they are in the D3Cold device state, OSPM must ensure that the following occur:</P>
+<DIV>
+<H6 CLASS="StepNumList-1">
+<A NAME="pgfId-1423472"></A>All Power Resources referenced by elements 1 through N must be in the ON state.</H6>
+<OL>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1423474"></A>If present, the _PSE control method is executed to perform any actions on the device to make it accessible for enumeration.</LI>
+</OL>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1423507"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1423476"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1423519"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1423478"></A>A variable-length Package containing a list of References to power resources.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1423550"></A>_PRE must return the same data each time it is evaluated. All power resources referenced must exist in the namespace.</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1374555"></A><A NAME="71464"></A>_PRW (Power Resources for Wake)<A NAME="marker-1374551"></A><A NAME="marker-1374552"></A><A NAME="marker-1374553"></A><A NAME="marker-1374554"></A></H3>
+<P CLASS="Body">
+<A NAME="pgfId-1374556"></A>This object evaluates to a list of power resources upon which this device depends for wake. It also contains additional information needed for wake, including wake events and sleep or soft-off state information. _PRW is only required for devices that have the ability to wake the system from a system sleeping state.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1374557"></A>Four types of general purpose events are supported:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1374558"></A>GPEs that are defined by a GPE block described within the FADT.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1428243"></A>GPEs that are defined by a GPE Block Device. </LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1428260"></A>GPIO-signaled events that are defined by _AEI object of the GPIO controller device</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1428244"></A>Interrupt-signaled events that are defined by _CRS object of the Generic Event Device (GED)</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1374560"></A>The four types of events are differentiated by the type of the EventInfo object in the returned package. For FADT-based GPEs, EventInfo is an Integer containing a bit index. For Block Device-based GPEs, EventInfo is a Package containing a Reference to the parent block device and an Integer containing a bit index. For GPIO-signaled events, EventInfo is a <EM CLASS="Bold">
+Package</EM>
+ containing a Reference to the GPIO controller device and an <EM CLASS="Bold">
+Integer</EM>
+ containing the index of the event in the _AEI object (starting from zero). For Interrupt-signaled events, EventInfo is a <EM CLASS="Bold">
+Package</EM>
+ containing a <EM CLASS="Bold">
+Reference</EM>
+ to the GED and an <EM CLASS="Bold">
+Integer</EM>
+ containing the index of the event in the _CRS object (starting from zero).</P>
+<P CLASS="Body">
+<A NAME="pgfId-1422665"></A>For HW-Reduced ACPI platforms that do not support wake on GPIO-signaled or Interrupt-signaled events, the <EM CLASS="Italic">
+EventInfo</EM>
+ structure is an Integer with value of zero, and is ignored by OSPM. Therefore, _PRW is only required on such platforms if power resources for wakeup must be managed by OSPM (e.g. the _PRW provides a list of Power Resources). Instead, for a device to wake the system, its interrupt must be wake-capable and enabled by the driver. See <A HREF="ACPI_Concepts.htm#17187" CLASS="XRef">See Interrupt-based Wake Events.</A>&quot;Interrupt-based  Wake Events&quot;.</P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374561"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374562"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374563"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374564"></A>A variable-length Package containing wake information and a list of References to power resources</P>
+</DIV>
+<DIV>
+<H4 CLASS="SubHeading">
+<A NAME="pgfId-1374565"></A>Return Value Information</H4>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1374567"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1421629"></A>Package {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1374568"></A>    EventInfo                    // Integer or Package</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1374569"></A>    DeepestSleepState            // Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1374570"></A>    PowerResource [0]            // Reference</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1374571"></A>    . . .</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1374572"></A>    PowerResource [n]            // Reference</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1374573"></A>}</P>
+<P CLASS="Body">
+<A NAME="pgfId-1374574"></A>If EventInfo is a Package, it contains event block device information as described below:</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1374575"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1374576"></A>Package {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1374577"></A>    DeviceName               // Reference</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1374578"></A>    Index                    // Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1374579"></A>}</P>
+<P CLASS="Body">
+<A NAME="pgfId-1374580"></A>EventInfo may be either an Integer or a Package, depending on the event type:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1374581"></A>If it is an Integer, then it contains the bit index of the wake event within the FADT-based GPE enable register.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1374582"></A>If it is a Package, then the package contains event info for an event within either a GPE block device, GPIO controller device, or a GED. It contains a <EM CLASS="Bold">
+Reference</EM>
+ to the device and an <EM CLASS="Bold">
+Integer</EM>
+.  If <EM CLASS="Italic">
+EventInfo</EM>
+ references a GPE block device, the integer contains the bit index of the wake GPE within the Block Device-based GPE enable register.  If the <EM CLASS="Italic">
+EventInfo</EM>
+ references a GPIO controller device, the integer contains the zero-based index of the event within the _AEI object. If the <EM CLASS="Italic">
+EventInfo</EM>
+ references a GED, the integer contains the zero-based index of the event within the _CRS object.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1374583"></A>DeepestSleepState is an Integer that contains the deepest power system sleeping state that can be entered while still providing wake functionality.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1374584"></A>PowerResource 0-n are References to required power resource objects.</P>
+</DIV>
+<DIV>
+<H4 CLASS="SubHeading">
+<A NAME="pgfId-1374585"></A>Additional Information</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374586"></A>For OSPM to have the defined wake capability properly enabled for the device, the following must occur:</P>
+<DIV>
+<H6 CLASS="StepNumList-1">
+<A NAME="pgfId-1374587"></A>All Power Resources referenced by elements 2 through N are put into the ON state.</H6>
+<OL>
+<LI CLASS="StepSubAlpha-1">
+<A NAME="pgfId-1374588"></A>If present, the _DSW control method is executed to set the device-specific registers to enable the wake functionality of the device.</LI>
+<LI CLASS="StepSubAlpha-N">
+<A NAME="pgfId-1374589"></A>The D-state being entered must be deeper than or equal to that specified in the _SxD state but shallower than or equal to that specified in the _SxW state.</LI>
+</OL>
+<P CLASS="Body">
+<A NAME="pgfId-1374596"></A>Then, if the system enters a sleeping state OSPM must ensure:</P>
+</DIV>
+<DIV>
+<H6 CLASS="StepNumList-1">
+<A NAME="pgfId-1374597"></A>Interrupts are disabled.</H6>
+<OL>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1374598"></A>The sleeping state being entered must be less than or equal to the power state declared in element 1 of the _PRW object. </LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1374599"></A>The proper general-purpose register bits are enabled.</LI>
+</OL>
+<P CLASS="Body">
+<A NAME="pgfId-1374600"></A>The system sleeping state specified must be a state that the system supports (in other words, a corresponding &#92;_Sx object must exist in the namespace).</P>
+<P CLASS="Body">
+<A NAME="pgfId-1423625"></A>_PRW must return the same data each time it is evaluated. All power resources referenced must exist in the namespace.</P>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1423644"></A><A NAME="31023"></A><A NAME="_Toc489256094"></A><A NAME="_Toc489268018"></A><A NAME="_Toc489272571"></A><A NAME="RSVD_PSW"></A><A NAME="_Toc202341562"></A><A NAME="_Toc258262317"></A>_PSW (Power State Wake)<A NAME="marker-1423642"></A><A NAME="marker-1423643"></A></H3>
+<P CLASS="Body">
+<A NAME="pgfId-1374616"></A>In addition to the _PRW control method, this control method can be used to enable or disable the device&#8217;s ability to wake a sleeping system. This control method can only access Operation Regions that are either always available while in a system working state or that are available when the Power Resources references by the _PRW object are all ON. For example, do not put a power plane control for a bus controller within configuration space located behind the bus.</P>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1374617"></A>Regarding compatability--The _PSW method was deprecated in ACPI 3.0. OSPM must use _DSW if it is present. Otherwise, it may use _PSW.</LI>
+</UL>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374618"></A>Arguments: (1)</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374619"></A>Arg0 - An Integer containing a wake capability control</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1374620"></A>0 - Disable the device&#8217;s wake capabilities</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1374621"></A>1 - Enable the device&#8217;s wake capabilities</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1377785"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1377786"></A>None</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1377803"></A><A NAME="_Toc489256095"></A><A NAME="_Toc489268019"></A><A NAME="_Toc489272572"></A><A NAME="RSVD_IRC"></A><A NAME="_Toc202341567"></A><A NAME="_Toc258262318"></A>_IRC (In Rush Current)<A NAME="marker-1377800"></A><A NAME="marker-1377801"></A><A NAME="marker-1377802"></A></H3>
+<P CLASS="Body">
+<A NAME="pgfId-1374641"></A>Indicates that this device can cause a significant in-rush current when transitioning to state D0.</P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374642"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374643"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374644"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374645"></A>None</P>
+<P CLASS="Body">
+<A NAME="pgfId-1374646"></A>The presence of this object signifies that transitioning the device to its D0 state causes a system-significant in-rush current load. In general, such operations need to be serialized such that multiple operations are not attempted concurrently. Within ACPI, this type of serialization can be accomplished with the ResourceOrder parameter of the device&#8217;s Power Resources; however, this does not serialize ACPI-controlled devices with non-ACPI controlled devices. _IRC is used to signify this fact outside of OSPM to OSPM such that OSPM can serialize all devices in the system that have in-rush current serialization requirements.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1374647"></A>OSPM can only transition one device containing an _IRC object within its device scope to the D0 state at a time. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1374648"></A>It is important to note that OSPM does not evaluate the _IRC object. It has no defined input arguments nor does it return any value. OSPM derives meaning simply from the existence of the _IRC object.</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1374662"></A><A NAME="_Toc489256096"></A><A NAME="_Toc489268020"></A><A NAME="_Toc489272573"></A><A NAME="_Toc202341568"></A><A NAME="_Toc258262319"></A>_<A NAME="RSVD_S1D"></A>S1D (S1 Device State)<A NAME="marker-1374660"></A><A NAME="marker-1374661"></A></H3>
+<P CLASS="Body">
+<A NAME="pgfId-1374663"></A>This object evaluates to an integer that conveys to OSPM the shallowest D-state supported by this device in the S1 system sleeping state. _S1D must return the same integer each time it is evaluated. This value overrides an S-state to D-state mapping OSPM may ascertain from the device&#8217;s power resource declarations. See <A HREF="Power_and_Performance_Mgmt.htm#44403" CLASS="XRef">See PSC Device State Codes.</A> for valid return values.</P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374664"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374665"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374666"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374667"></A>An Integer containing the shallowest D-state supported in state S1</P>
+<P CLASS="Body">
+<A NAME="pgfId-1377908"></A>If the device can wake the system from the S1 system sleeping state (see _PRW) then the device must support wake in the D-state returned by this object. However, OSPM cannot assume wake from the S1 system sleeping state is supported in any deeper D-state unless specified by a corresponding _S1W object. The table below provides a mapping from Desired Actions to Resultant D-state entered based on the values returned from the _S1D, _PRW, and _S1W objects if they exist . (D/C means Don&#8217;t Care - evaluation is irrelevant, and N/A means Non Applicable - object does not exist).</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1377909"></A>S1 Action / Result Table</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1377912"></A>Desired Action</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1377914"></A>_S1D</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1377916"></A>_PRW</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1377918"></A>_S1W</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1377920"></A>Resultant D-state</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377922"></A>Enter S1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377924"></A>D/C</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377926"></A>D/C</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377928"></A>D/C</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377930"></A>OSPM decides</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377932"></A>Enter S1, No Wake</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377934"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377936"></A>D/C</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377938"></A>D/C</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377940"></A>Enter D2 or D3</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377942"></A>Enter S1, Wake</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377944"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377946"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377948"></A>N/A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377950"></A>Enter D2</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377952"></A>Enter S1, Wake</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377954"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377956"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377958"></A>3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377960"></A>Enter D2 or D3</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377962"></A>Enter S1, Wake</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377964"></A>N/A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377966"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377968"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377970"></A>Enter D0,D1 or D2</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1374748"></A><A NAME="marker-1374732"></A><A NAME="_Toc489256097"></A><A NAME="_Toc489268021"></A><A NAME="_Toc489272574"></A><A NAME="RSVD_S2D"></A><A NAME="_Toc202341569"></A><A NAME="_Toc258262320"></A>_S2D (S2 Device State)<A NAME="marker-1374746"></A><A NAME="marker-1374747"></A></H3>
+<P CLASS="Body">
+<A NAME="pgfId-1374749"></A>This object evaluates to an integer that conveys to OSPM the shallowest D-state supported by this device in the S2 system sleeping state. _S2D must return the same integer each time it is evaluated. This value overrides an S-state to D-state mapping OSPM may ascertain from the device&#8217;s power resource declarations. See <A HREF="Power_and_Performance_Mgmt.htm#44403" CLASS="XRef">See PSC Device State Codes.</A> for valid return values.</P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374750"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374751"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374752"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374753"></A>An Integer containing the shallowest D-state supported in state S2</P>
+<P CLASS="Body">
+<A NAME="pgfId-1374754"></A>If the device can wake the system from the S2 system sleeping state (see _PRW) then the device must support wake in the D-state returned by this object. However, OSPM cannot assume wake from the S2 system sleeping state is supported in any deeper D-state unless specified by a corresponding _S2W object. The table below provides a mapping from Desired Actions to Resultant D-state entered based on the values returned from the _S2D, _PRW, and _S2W objects if they exist . (D/C means Don&#8217;t Care - evaluation is irrelevant, and N/A means Non Applicable - object does not exist).</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1374755"></A>S2 Action / Result Table</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1374758"></A>Desired Action</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1374760"></A>_S2D</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1374762"></A>_PRW</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1374764"></A>_S2W</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1374766"></A>Resultant D-state</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374768"></A>Enter S2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374770"></A>D/C</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374772"></A>D/C</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374774"></A>D/C</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374776"></A>OSPM decides</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374778"></A>Enter S2, No Wake</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374780"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374782"></A>D/C</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374784"></A>D/C</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374786"></A>Enter D2 or D3</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374788"></A>Enter S2, Wake</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374790"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374792"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374794"></A>N/A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374796"></A>Enter D2</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374798"></A>Enter S2, Wake</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374800"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374802"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374804"></A>3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374806"></A>Enter D2 or D3</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374808"></A>Enter S2, Wake</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374810"></A>N/A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374812"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374814"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374816"></A>Enter D0,D1 or D2</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1374834"></A><A NAME="_Toc489256098"></A><A NAME="_Toc489268022"></A><A NAME="_Toc489272575"></A><A NAME="RSVD_S3D"></A><A NAME="_Toc202341571"></A><A NAME="_Toc258262321"></A>_S3D (S3 Device State)<A NAME="marker-1374832"></A><A NAME="marker-1374833"></A></H3>
+<P CLASS="Body">
+<A NAME="pgfId-1374835"></A>This object evaluates to an integer that conveys to OSPM the shallowest D-state supported by this device in the S3 system sleeping state. _S3D must return the same integer each time it is evaluated. This value overrides an S-state to D-state mapping OSPM may ascertain from the device&#8217;s power resource declarations. See <A HREF="Power_and_Performance_Mgmt.htm#44403" CLASS="XRef">See PSC Device State Codes.</A> for valid return values.</P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374836"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374837"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374838"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374839"></A>An Integer containing the shallowest D-state supported in state S3</P>
+<P CLASS="Body">
+<A NAME="pgfId-1374840"></A>If the device can wake the system from the S3 system sleeping state (see _PRW) then the device must support wake in the D-state returned by this object. However, OSPM cannot assume wake from the S3 system sleeping state is supported in any deeper D-state unless specified by a corresponding _S3W object. The table below provides a mapping from Desired Actions to Resultant D-state entered based on the values returned from the _S3D, _PRW, and _S3W objects if they exist . (D/C means Don&#8217;t Care - evaluation is irrelevant, and N/A means Non Applicable - object does not exist).</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1374841"></A>S3 Action / Result Table</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1374844"></A>Desired Action</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1374846"></A>_S3D</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1374848"></A>_PRW</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1374850"></A>_S3W</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1374852"></A>Resultant D-state</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374854"></A>Enter S3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374856"></A>N/A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374858"></A>D/C</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374860"></A>N/A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374862"></A>OSPM decides</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374864"></A>Enter S3, No Wake</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374866"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374868"></A>D/C</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374870"></A>D/C</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374872"></A>Enter D2 or D3</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374874"></A>Enter S3, Wake</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374876"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374878"></A>3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374880"></A>N/A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374882"></A>Enter D2</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374884"></A>Enter S3, Wake</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374886"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374888"></A>3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374890"></A>3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374892"></A>Enter D2 or D3</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374894"></A>Enter S3, Wake</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374896"></A>N/A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374898"></A>3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374900"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374902"></A>Enter D0, D1 or D2</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1374920"></A><A NAME="_Toc489256099"></A><A NAME="_Toc489268023"></A><A NAME="_Toc489272576"></A><A NAME="RSVD_S4D"></A><A NAME="_Toc202341573"></A><A NAME="_Toc258262322"></A>_S4D (S4 Device State)<A NAME="marker-1374918"></A><A NAME="marker-1374919"></A></H3>
+<P CLASS="Body">
+<A NAME="pgfId-1374921"></A>This object evaluates to an integer that conveys to OSPM the shallowest D-state supported by this device in the S4 system sleeping state. _S4D must return the same integer each time it is evaluated. This value overrides an S-state to D-state mapping OSPM may ascertain from the device&#8217;s power resource declarations. See Table 7-3 for valid return values.</P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374922"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374923"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1374924"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1374925"></A>An Integer containing the shallowest D-state supported in state S4</P>
+<P CLASS="Body">
+<A NAME="pgfId-1374926"></A>If the device can wake the system from the S4 system sleeping state (see _PRW) then the device must support wake in the D-state returned by this object. However, OSPM cannot assume wake from the S4 system sleeping state is supported in any deeper D-state unless specified by a corresponding _S4W object. The table below provides a mapping from Desired Actions to Resultant D-state entered based on the values returned from the _S4D, _PRW, and _S4W objects if they exist . (D/C means Don&#8217;t Care - evaluation is irrelevant, and N/A means Non Applicable - object does not exist).</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1374927"></A>S4 Action / Result Table</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1374930"></A>Desired Action</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1374932"></A>_S4D</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1374934"></A>_PRW</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1374936"></A>_S4W</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1374938"></A>Resultant D-state</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374940"></A>Enter S4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374942"></A>N/A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374944"></A>D/C</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374946"></A>N/A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374948"></A>OSPM decides</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374950"></A>Enter S4, No Wake</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374952"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374954"></A>D/C</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374956"></A>D/C</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374958"></A>Enter D2 or D3</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374960"></A>Enter S4, Wake</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374962"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374964"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374966"></A>N/A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374968"></A>Enter D2</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374970"></A>Enter S4, Wake</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374972"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374974"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374976"></A>3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374978"></A>Enter D2 or D3</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374980"></A>Enter S4, Wake</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374982"></A>N/A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374984"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374986"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374988"></A>Enter D0, D1 or D2</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1374998"></A><A NAME="RSVD_S0W"></A><A NAME="_Toc202341575"></A><A NAME="_Toc258262323"></A>_S0W (S0 Device Wake State)</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1374999"></A>This object evaluates to an integer that conveys to OSPM the deepest D-state supported by this device in the S0 system sleeping state where the device can wake itself.</P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1375000"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1375001"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1375002"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1375003"></A>An Integer containing the deepest D-state that supports wake in state S0. If OSPM has not indicated that it supports _PR3 through the OSPM Platform-Wide Capabilities (see <A HREF="Device_Configuration.htm#73116" CLASS="XRef">See Platform-Wide OSPM Capabilities.</A>), then the value &quot;3&quot; corresponds to D3.  If it has indicated _PR3 support, the value &quot;3&quot; represents D3hot and the value &quot;4&quot; represents D3cold.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1375004"></A>_S0W must return the same integer each time it is evaluated. This value allows OSPM to choose the deepest power D-state and still achieve wake functionality. If object evaluates to zero, then the device cannot wake itself from any deeper D state.</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1375009"></A><A NAME="RSVD_S1W"></A><A NAME="_Toc202341576"></A><A NAME="_Toc258262324"></A>_S1W (S1 Device Wake State)</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1375010"></A>This object evaluates to an integer that conveys to OSPM the deepest D-state supported by this device in the S1 system sleeping state that can wake the system. </P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1375011"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1375012"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1375013"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1422512"></A>An Integer containing the deepest D-state that supports wake in state S1. If OSPM has not indicated that it supports _PR3 through the OSPM Platform-Wide Capabilities (see <A HREF="Device_Configuration.htm#73116" CLASS="XRef">See Platform-Wide OSPM Capabilities.</A>), then the value &quot;3&quot; corresponds to D3.  If it has indicated _PR3 support, the value &quot;3&quot; represents D3hot and the value &quot;4&quot; represents D3cold.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1375015"></A>_S1W must return the same integer each time it is evaluated. This value allows OSPM to choose a deeper S-state to D-state mapping than specified by _S1D. This value must always be greater than or equal to _S1D, if _S1D is present.</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1375020"></A><A NAME="RSVD_S2W"></A><A NAME="_Toc202341577"></A><A NAME="_Toc258262325"></A>_S2W (S2 Device Wake State)</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1375021"></A>This object evaluates to an integer that conveys to OSPM the deepest D-state supported by this device in the S2 system sleeping state that can wake the system. </P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1375022"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1375023"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1375024"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1422529"></A>An Integer containing the deepest D-state that supports wake in state S2. If OSPM has not indicated that it supports _PR3 through the OSPM Platform-Wide Capabilities (see <A HREF="Device_Configuration.htm#73116" CLASS="XRef">See Platform-Wide OSPM Capabilities.</A>), then the value &quot;3&quot; corresponds to D3.  If it has indicated _PR3 support, the value &quot;3&quot; represents D3hot and the value &quot;4&quot; represents D3cold.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1375026"></A>_S2W must return the same integer each time it is evaluated. This value allows OSPM to choose a deeper S-state to D-state mapping than specified by _S2D. This value must always be greater than or equal to _S2D, if _S2D is present.</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1375027"></A><A NAME="RSVD_S3W"></A><A NAME="_Toc202341578"></A><A NAME="_Toc258262326"></A>_S3W (S3 Device Wake State)</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1375032"></A>This object evaluates to an integer that conveys to OSPM the deepest D-state supported by this device in the S3 system sleeping state that can wake the system. </P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1375033"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1375034"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1375035"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1422546"></A>An Integer containing the deepest D-state that supports wake in state S3. If OSPM has not indicated that it supports _PR3 through the OSPM Platform-Wide Capabilities (see <A HREF="Device_Configuration.htm#73116" CLASS="XRef">See Platform-Wide OSPM Capabilities.</A>), then the value &quot;3&quot; corresponds to D3.  If it has indicated _PR3 support, the value &quot;3&quot; represents D3hot and the value &quot;4&quot; represents D3cold.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1375037"></A>_S3W must return the same integer each time it is evaluated. This value allows OSPM to choose a deeper S-state to D-state mapping than specified by _S3D. This value must always be greater than or equal to _S3D, if _S3D is present.</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1375038"></A><A NAME="RSVD_S4W"></A><A NAME="_Toc202341579"></A><A NAME="_Toc258262327"></A>_S4W (S4 Device Wake State)</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1375043"></A>This object evaluates to an integer that conveys to OSPM the deepest D-state supported by this device in the S4 system sleeping state that can wake the system. </P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1375044"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1375045"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1375046"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1422563"></A>An Integer containing the deepest D-state that supports wake in state S4. If OSPM has not indicated that it supports _PR3 through the OSPM Platform-Wide Capabilities (see <A HREF="Device_Configuration.htm#73116" CLASS="XRef">See Platform-Wide OSPM Capabilities.</A>), then the value &quot;3&quot; corresponds to D3.  If it has indicated _PR3 support, the value &quot;3&quot; represents D3hot and the value &quot;4&quot; represents D3cold.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1375048"></A>_S4W must return the same integer each time it is evaluated. This value allows OSPM to choose a deeper S-state to D-state mapping than specified by _S4D. This value must always be greater than or equal to _S4D, if _S4D is present.</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1424392"></A><A NAME="33922"></A>_RST (Device Reset)</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1424393"></A>This object executes a reset on the associated device or devices. If included in a device context, the reset must not affect any other ACPI-described devices; if included in a power resource for reset (_PRR, <A HREF="Power_and_Performance_Mgmt.htm#57989" CLASS="XRef">See _PRR (Power Resource for Reset).</A>) the reset must affect all ACPI-described devices that reference it.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1424394"></A>When this object is described in a device context, it executes a function level reset that only affects the device it is associated with; neither parent nor children should be affected by the execution of this reset. Executing this must only result in this device resetting without the device appearing as if it has been removed from the bus altogether, to prevent OSPM re-enumeration of devices on hot-pluggable buses (e.g. USB). </P>
+<P CLASS="Body">
+<A NAME="pgfId-1424395"></A>If a device reset is supported by the platform, but cannot meet the function level and bus requirement, the device should instead implement a _PRR (<A HREF="Power_and_Performance_Mgmt.htm#57989" CLASS="XRef">See _PRR (Power Resource for Reset).</A>). </P>
+<P CLASS="Body">
+<A NAME="pgfId-1424396"></A>Devices can define both a _RST and a _PRR if supported by the hardware.	</P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1424397"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1424398"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1424399"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1424400"></A>None</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1424401"></A><A NAME="57989"></A>_PRR (Power Resource for Reset)</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1424402"></A>This object evaluates to a single reference to a power resource. The power resource that this references must implement a _RST method (<A HREF="Power_and_Performance_Mgmt.htm#33922" CLASS="XRef">See _RST (Device Reset).</A>). </P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1424403"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1424404"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1424405"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1424406"></A>A single element Package containing a Reference to the power reset resource.</P>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1375080"></A><A NAME="_Toc489256100"></A><A NAME="_Toc489268024"></A><A NAME="_Toc489272577"></A><A NAME="_Toc202341580"></A><A NAME="_Toc258262328"></A>OEM-Supplied System-Level Control Methods<A NAME="marker-1375078"></A><A NAME="marker-1375079"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1375081"></A>An OEM-supplied Definition Block provides some number of controls appropriate for system-level management. These are used by OSPM to integrate to the OEM-provided features. The following table lists the defined OEM system controls that can be provided.</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1423952"></A>BIOS-Supplied Control Methods for System-Level Functions</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1423913"></A>Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1423915"></A>Description</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423917"></A>&#92;_PTS</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423919"></A>Control method used to notify the platform of impending sleep transition.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423921"></A>&#92;_S0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423923"></A>Package that defines system &#92;_S0 state mode.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423925"></A>&#92;_S1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423927"></A>Package that defines system &#92;_S1 state mode.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423929"></A>&#92;_S2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423931"></A>Package that defines system &#92;_S2 state mode.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423933"></A>&#92;_S3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423935"></A>Package that defines system &#92;_S3 state mode.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423937"></A>&#92;_S4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423939"></A>Package that defines system &#92;_S4 state mode.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423941"></A>&#92;_S5</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423943"></A>Package that defines system &#92;_S5 state mode.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423945"></A>&#92;_TTS</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423947"></A>Control method used to prepare to sleep and run once awakened</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423949"></A>&#92;_WAK</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1423951"></A>Control method run once awakened.</P>
+</TD>
+</TR>
+</TABLE>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1423965"></A>Compatibility issue: The _BFS (Back From Sleep) and _GTS (Going To Sleep) methods were deprecated in ACPI 5.0A.</LI>
+</UL>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1423974"></A><A NAME="_Toc489256102"></A><A NAME="_Toc489268026"></A><A NAME="_Toc489272579"></A><A NAME="RSVD_PTS"></A><A NAME="_Toc202341585"></A><A NAME="_Toc258262330"></A>&#92;_PTS (Prepare To Sleep)<A NAME="marker-1423972"></A><A NAME="marker-1423973"></A></H3>
+<P CLASS="Body">
+<A NAME="pgfId-1375182"></A>The _PTS control method is executed by the OS during the sleep transition process for S1, S2, S3, S4, and for orderly S5 shutdown. The sleeping state value (For example, 1, 2, 3, 4 or 5 for the S5 soft-off state) is passed to the _PTS control method. This method is called after OSPM has notified native device drivers of the sleep state transition and before the OSPM has had a chance to fully prepare the system for a sleep state transition. Thus, this control method can be executed a relatively long time before actually entering the desired sleeping state. If OSPM aborts the sleep state transition, OSPM should run the _WAK method to indicate this condition to the platform.</P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1375183"></A>Arguments (1):</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1375184"></A>Arg0 - An Integer containing the value of the sleeping state (1 for S1, 2 for S2, etc.)</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1375185"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1375186"></A>None</P>
+<P CLASS="Body">
+<A NAME="pgfId-1375187"></A>The _PTS control method cannot modify the current configuration or power state of any device in the system. For example, _PTS would simply store the sleep type in the embedded controller in sequencing the system into a sleep state when the SLP_EN bit is set. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1375188"></A>The platform must not make any assumptions about the state of the machine when _PTS is called. For example, operation region accesses that require devices to be configured and enabled may not succeed, as these devices may be in a non-decoding state due to plug and play or power management operations.</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1375229"></A><A NAME="46800"></A>&#92;_S<EM CLASS="Style-ACPIHeading-3-Italic-Char">
+x</EM>
+ (System States)</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1375230"></A>All system states supported by the system must provide a package containing the DWORD value of the following format in the static Definition Block. The system states, known as S0-S5, are referenced in the namespace as &#92;_S0-&#92;_S5 and for clarity the short Sx names are used unless specifically referring to the named &#92;_Sx object. For each Sx state, there is a defined system behavior.</P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1375231"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1375232"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1375233"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1375234"></A>A Package containing an Integer containing register values for sleeping</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1375236"></A>System State Package</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1375239"></A>Byte Length</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1375241"></A>Byte Offset</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1375243"></A><BR>
+Description</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375245"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375247"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375249"></A>Value for PM1a_CNT.SLP_TYP register to enter this system state. On HW-reduced platforms, this is the HW-reduced Sleep Type value for SLEEP_CONTROL_REG.SLP_TYP.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375251"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375253"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375255"></A>Value for PM1b_CNT.SLP_TYP register to enter this system state. To enter any given state, OSPM must write the PM1a_CNT.SLP_TYP register before the PM1b_CNT.SLP_TYP register. On HW-reduced platforms, this value is ignored.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375257"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375259"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375261"></A><EM CLASS="Italic">
+Reserved</EM>
+</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1375264"></A>States S1-S4 represent some system sleeping state. The S0 state is the system working state. Transition into the S0 state from some other system state (such as sleeping) is automatic, and, by virtue that instructions are being executed, OSPM assumes the system to be in the S0 state. Transition into any system sleeping state is only accomplished by the operating software directing the hardware to enter the appropriate state, and the operating software can only do this within the requirements defined in the Power Resource and Bus/Device Package objects.<A NAME="marker-1375265"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1375266"></A>All run-time system state transitions (for example, to and from the S0 state), except S4 and S5, are done similarly such that the code sequence to do this is the following:<A NAME="marker-1375267"></A><A NAME="marker-1375268"></A><A NAME="marker-1375269"></A></P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1416787"></A><A NAME="_Toc354805331"></A><A NAME="_Toc357859056"></A><A NAME="_Toc369097109"></A><A NAME="_Toc369679825"></A>/*</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1416788"></A> *    Intel Architecture SetSleepingState example</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1416789"></A> */</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375278"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375279"></A>    ULONG</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375280"></A>    SetSystemSleeping (</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375281"></A>        IN    ULONG    NewState</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375282"></A>    )</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375283"></A>    {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375284"></A>    PROCESSOR_CONTEXT   Context;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375285"></A>    ULONG               PowerSeqeunce;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375286"></A>    BOOLEAN             FlushCaches;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375287"></A>    USHORT              SlpTyp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375288"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375289"></A>// Required environment: Executing on the system boot</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375290"></A>// processor. All other processors stopped.  Interrupts </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375291"></A>// disabled.  All  Power Resources (and devices) are in</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375292"></A>// corresponding device state to support NewState.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375293"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375294"></A>        // Get h/w attributes for this system state</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375295"></A>        FlushCaches   = SleepType[NewState].FlushCache;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375296"></A>        SlpTyp        = SleepType[NewState].SlpTyp &amp; SLP_TYP_MASK;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375297"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375298"></A>        _asm {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375299"></A>        lea     eax, OsResumeContext</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375300"></A>        push    eax                      ; Build real mode handler the resume </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375301"></A>        push    offset    sp50           ; context, with eip = sp50</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375302"></A>        call    SaveProcessorState</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375303"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375304"></A>        mov     eax, ResumeVector        ; set firmware&#8217;s resume vector</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375305"></A>        mov     [eax], offset OsRealModeResumeCode</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375306"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375307"></A>        mov     edx, PM1a_STS            ; Make sure wake status is clear</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375308"></A>        mov     ax, WAK_STS              ; (cleared by asserting the bit </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375309"></A>        out     dx, ax                   ; in the status register)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375310"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375311"></A>        mov     edx, PM1b_STS            ; </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375312"></A>        out     dx, ax                   ;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375313"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375314"></A>        and     eax, not SLP_TYP_MASK </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375315"></A>        or      eax, SlpTyp              ; set SLP_TYP</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375316"></A>        or      ax, SLP_EN               ; set SLP_EN</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375317"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375318"></A>        cmp     FlushCaches, 0</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375319"></A>        jz      short sp10               ; If needed, ensure no dirty data in </P>
+<P CLASS="Body">
+<A NAME="pgfId-1375320"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375321"></A>        call    FlushProcessorCaches     ; the caches while sleeping</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375322"></A>                                    </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375323"></A>sp10:    mov    edx, PM1a_SLP_TYP        ; get address for PM1a_SLP_TYP</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375324"></A>        out     dx, ax                   ; start h/w sequencing</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375325"></A>        mov     edx, PM1b_SLP_TYP        ; get address for PM1b_SLP_TYP</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375326"></A>        out     dx, ax                   ; start h/w sequencing</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375327"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375328"></A>        mov     edx, PM1a_STS            ; get address for PM1x_STS</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375329"></A>        mov     ecx, PM1b_STS</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375330"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375331"></A>sp20:    in     ax, dx                    ; wait for WAK status</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375332"></A>        xchg    edx, ecx</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375333"></A>        test    ax, WAK_STS</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375334"></A>        jz      short sp20</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375335"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375336"></A>sp50:    </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375337"></A>}</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375338"></A>        // Done..</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375339"></A>        *ResumeVector = NULL;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375340"></A>        return 0;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375341"></A>        }</P>
+<P CLASS="Body">
+<A NAME="pgfId-1422738"></A>On HW-reduced ACPI platforms all run-time system state transitions (for example, to and from the S0 state) are done similarly, but include the following instead of PM1*_BLK register bit manipulation:</P>
+<P CLASS="BulletPara">
+<A NAME="pgfId-1422739"></A>After ensuring that any desired wake-capable interrupts are enabled, OSPM writes the HW-reduced Sleep Type value to the Sleep Control Register and spins waiting for the WAK_STS bit of the Sleep Status Register to be set, indicating a platform transition to the Working state.</P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-4">
+<A NAME="pgfId-1375359"></A><A NAME="marker-1375358"></A><A NAME="75313"></A>System &#92;_S0 State (Working)</H5>
+<P CLASS="Body">
+<A NAME="pgfId-1375362"></A>While the system is in the S0 state, it is in the system working state. The behavior of this state is defined as:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375363"></A>The processors are either running, or in a C-state, or in an LPI state. The processor-complex context is maintained and instructions are executed as defined by any of these processor states.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375364"></A>Dynamic RAM context is maintained and is read/write by the processors.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375365"></A>Devices states are individually managed by the operating software and can be in any device state (D0, D1, D2, D3hot, or D3).</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375366"></A>Power Resources are in a state compatible with the current device states.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1375367"></A>Transition into the S0 state from some system sleeping state is automatic, and by virtue that instructions are being executed OSPM, assumes the system to be in the S0 state.</P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-4">
+<A NAME="pgfId-1375383"></A>S<A NAME="RSVD_S1"></A>ystem &#92;_S1 State (Sleeping with Processor Context Maintained)</H5>
+<P CLASS="Body">
+<A NAME="pgfId-1375386"></A>While the system is in the S1 sleeping state, its behavior is the following:<A NAME="marker-1375384"></A><A NAME="marker-1375385"></A></P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375387"></A>The processors are not executing instructions. The processor-complex context is maintained.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375388"></A>Dynamic RAM context is maintained.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375389"></A>Power Resources are in a state compatible with the system S1 state. All Power Resources that supply a System-Level reference of S0 are in the OFF state.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375390"></A>Devices states are compatible with the current Power Resource states. Only devices that solely reference Power Resources that are in the ON state for a given device state can be in that device state. In all other cases, the device is in the D3 (off) state<A HREF="#pgfId-1375393" CLASS="footnote">1</A>.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375394"></A>Devices that are enabled to wake the system and that can do so from their current device state can initiate a hardware event that transitions the system state to S0. This transition causes the processor to continue execution where it left off. </LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1375395"></A>To transition into the S1 state, the OSPM must flush all processor caches.</P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-4">
+<A NAME="pgfId-1375413"></A>S<A NAME="RSVD_S2"></A>ystem &#92;_S2 State<A NAME="marker-1375412"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1375414"></A>The S2 sleeping state is logically deeper than the S1 state and is assumed to conserve more power. The behavior of this state is defined as:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375415"></A>The processors are not executing instructions. The processor-complex context is not maintained.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375416"></A>Dynamic RAM context is maintained.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375417"></A>Power Resources are in a state compatible with the system S2 state. All Power Resources that supply a System-Level reference of S0 or S1 are in the OFF state.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375418"></A>Devices states are compatible with the current Power Resource states. Only devices that solely reference Power Resources that are in the ON state for a given device state can be in that device state. In all other cases, the device is in the D3 (off) state.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375419"></A>Devices that are enabled to wake the system and that can do so from their current device state can initiate a hardware event that transitions the system state to S0. This transition causes the processor to begin execution at its boot location. The platform runtime firmware performs initialization of core functions as needed to exit an S2 state and passes control to the firmware resume vector. See <A HREF="Waking_and_Sleeping.htm#_Toc489256130" CLASS="XRef">See Platform Boot Firmware Initialization of Memory.</A> for more details on platform firmware initialization.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1375420"></A>Because the processor context can be lost while in the S2 state, the transition to the S2 state requires that the operating software flush all dirty cache to dynamic RAM (DRAM).</P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-4">
+<A NAME="pgfId-1375444"></A><A NAME="marker-1375441"></A><A NAME="85330"></A>System &#92;_S3 State</H5>
+<P CLASS="Body">
+<A NAME="pgfId-1375445"></A>The S3 state is logically deeper than the S2 state and is assumed to conserve more power. The behavior of this state is defined as follows:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375446"></A>The processors are not executing instructions. The processor-complex context is not maintained.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375447"></A>Dynamic RAM context is maintained. </LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375448"></A>Power Resources are in a state compatible with the system S3 state. All Power Resources that supply a System-Level reference of S0, S1, or S2 are in the OFF state.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375449"></A>Devices states are compatible with the current Power Resource states. Only devices that solely reference Power Resources that are in the ON state for a given device state can be in that device state. In all other cases, the device is in the D3 (off) state.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1380784"></A>Devices that are enabled to wake the system and that can do so from their current device state can initiate a hardware event that transitions the system state to S0. This transition causes the processor to begin execution at its boot location. The platform runtime firmware performs initialization of core functions as necessary to exit an S3 state and passes control to the firmware resume vector. See <A HREF="Waking_and_Sleeping.htm#_Toc489256130" CLASS="XRef">See Platform Boot Firmware Initialization of Memory.</A> for more details on platform firmware initialization.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1380785"></A>From the software viewpoint, this state is functionally the same as the S2 state. The operational difference can be that some Power Resources that could be left ON to be in the S2 state might not be available to the S3 state. As such, additional devices may need to be in a deeper state for S3 than S2. Similarly, some device wake events can function in S2 but not S3.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1375452"></A>Because the processor context can be lost while in the S3 state, the transition to the S3 state requires that the operating software flush all dirty cache to DRAM.</P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-4">
+<A NAME="pgfId-1375470"></A>S<A NAME="RSVD_S4"></A>ystem &#92;_S4 State<A NAME="marker-1375469"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1375471"></A>While the system is in this state, it is in the system S4 sleeping state. The state is logically deeper than the S3 state and is assumed to conserve more power. The behavior of this state is defined as follows:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375472"></A>The processors are not executing instructions. The processor-complex context is not maintained. </LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375473"></A>DRAM context is not maintained. </LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375474"></A>Power Resources are in a state compatible with the system S4 state. All Power Resources that supply a System-Level reference of S0, S1, S2, or S3 are in the OFF state.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375475"></A>Devices states are compatible with the current Power Resource states. In other words, all devices are in the D3 state when the system state is S4.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375476"></A>Devices that are enabled to wake the system and that can do so from their device state in S4 can initiate a hardware event that transitions the system state to S0. This transition causes the processor to begin execution at its boot location. </LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1428012"></A>After OSPM has executed the _PTS control method and has put the entire system state into main memory, there are two ways that OSPM may handle the next phase of the S4 state transition; saving and restoring main memory. The first way is to use the operating system's drivers to access the disks and file system structures to save a copy of memory to disk and then initiate the hardware S4 sequence by setting the SLP_EN register bit. When the system wakes, the firmware performs a normal boot process and transfers control to the OS via the firmware_waking_vector loader. The OS then restores the system's memory and resumes execution.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1428013"></A>The alternate method for entering the S4 state is to utilize the platform runtime firmware via the S4BIOS transition. The platform runtime firmware uses firmware to save a copy of memory to disk and then initiates the hardware S4 sequence. When the system wakes, the firmware restores memory from disk and wakes OSPM by transferring control to the FACS waking vector.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1428014"></A>The S4BIOS transition is optional, but any system that supports this mechanism must support entering the S4 state via the direct OS mechanism. Thus the preferred mechanism for S4 support is the direct OS mechanism as it provides broader platform support. The alternate S4BIOS transition provides a way to achieve S4 support on operating systems that do not have support for the direct method.</P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-4">
+<A NAME="pgfId-1378355"></A><A NAME="marker-1428004"></A><A NAME="88338"></A>System &#92;_S5 State (Soft Off)</H5>
+<P CLASS="Body">
+<A NAME="pgfId-1378356"></A> The S5 state is similar to the S4 state except that OSPM does not save any context. The system is in the soft off state and requires a complete boot when awakened (platform boot firmware and OS). Software uses a different state value to distinguish between this state and the S4 state to allow for initial boot operations within the platform boot firmware to distinguish whether or not the boot is going to wake from a saved memory image. OSPM does not disable wake events before setting the SLP_EN bit when entering the S5 system state. This provides support for remote management initiatives by enabling Remote Start capability. An ACPI-compliant OS must provide an end user accessible mechanism for disabling all wake devices, with the exception of the system power button, from a single point in the user interface.</P>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1375511"></A><EM CLASS="Strong">
+_SWS (System Wake Source)</EM>
+<A NAME="_Toc202341592"></A><A NAME="_Toc258262333"></A></H3>
+<P CLASS="Body">
+<A NAME="pgfId-1375512"></A>This object provides a means for OSPM to definitively determine the source of an event that caused the system to enter the S0 state. General-purpose event and fixed-feature hardware registers containing wake event sources information are insufficient for this purpose as the source event information may not be available after transitions to the S0 state from all other system states (S1-S5). </P>
+<P CLASS="Body">
+<A NAME="pgfId-1375513"></A>To determine the source event that caused the system to transition to the S0 state, OSPM will evaluate the _SWS object, when it exists, under the &#92;_GPE scope (for all fixed-feature general-purpose events from the GPE Blocks), under the &#92;_SB scope (for fixed-feature hardware events), and within the scope of a GPE Block device (for GPE events from this device). _SWS objects may exist in any or all of these locations as necessary for the platform to determine the source event that caused the system to transition to the S0 state. </P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1375514"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1375515"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1375516"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1375517"></A>An Integer containing the Source Event as described below</P>
+<P CLASS="Body">
+<A NAME="pgfId-1375518"></A>The value of the Source Event is dependent on the location of the _SWS object:</P>
+<DIV>
+<H6 CLASS="StepNumList-1">
+<A NAME="pgfId-1375519"></A>If _SWS is evaluated under the &#92;_GPE scope, Source Event is the index of the GPE that caused the system to transition to S0.</H6>
+<OL>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1375520"></A>If _SWS is evaluated within the scope of a GPE block device, Source Event is the index of the GPE that caused the system to transition to S0. In this case, the index is relative to the GPE block device and is not unique system-wide.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1375522"></A>If _SWS is evaluated under the &#92;_SB scope, Source Event is the the index in the PM1 status register that caused the system to transition to S0.</LI>
+</OL>
+<P CLASS="Body">
+<A NAME="pgfId-1375524"></A>In all cases above, if the cause of the S0 transition cannot be determined, _SWS returns Ones (-1).</P>
+<P CLASS="Body">
+<A NAME="pgfId-1375525"></A>To enable OSPM to determine the source of the S0 state transition via the _SWS object,the hardware or firmware should detect and save the event that caused the transition so that it can be returned during _SWS object evaluation. The single wake source for the system may be latched in hardware during the transition so that no false wake events can be returned by _SWS. An implementation that does not use hardware to latch a single wake source for the system and instead uses firmware to save the wake source must do so as quickly as possible after the wakeup event occurs, so that _SWS does not return values that correspond to events that occurred after the sleep-to-wake transition. Such an implementation must also take care to ensure that events that occur subsequent to the wakeup source being saved do not overwrite the original wakeup source. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1375526"></A>The source event data returned by _SWS must be determined for each transition into the S0 state. The value returned by _SWS must also be persistent during the system&#8217;s residency in the S0 state as OSPM may evaluate _SWS multiple times. In this case, the platform must return the same source event information for each invocation.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1375527"></A>After evaluating an _SWS object within the &#92;_GPE scope or within the scope of a GPE block device, OSPM will invoke the _Wxx control method corresponding to the GPE index returned by _SWS if it exists. This allows the platform to further determine source event if the GPE is shared among multiple devices. See <A HREF="ACPI_Software_Programming_Model.htm#RSVD_Wxx" CLASS="XRef">See Determining the System Wake Source Using _Wxx Control Methods.</A> for details.</P>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1375546"></A><A NAME="RSVD_TTS"></A><A NAME="_Toc202341593"></A><A NAME="_Toc258262334"></A>&#92;_TTS (Transition To State)</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1375547"></A>The _TTS control method is executed by the OSPM at the beginning of the sleep transition process for S1, S2, S3, S4, and orderly S5 shutdown. OSPM will invoke _TTS before it has notified any native mode device drivers of the sleep state transition. The sleeping state value (For example, 1, 2, 3, 4 or 5 for the S5 soft-off state) is passed to the _TTS control method.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1375548"></A>The _TTS control method is also executed by the OSPM at the end of any sleep transition process when the system transitions to S0 from S1, S2, S3, or S4. OSPM will invoke _TTS after it has notified any native mode device drivers of the end of the sleep state transition. The working state value (0) is passed to the _TTS control method.</P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1375549"></A>Arguments: (1)</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1375550"></A>Arg0 - An Integer containing the value of the sleeping state (1 for S1, 2 for S2, etc.)</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1375551"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1375552"></A>None</P>
+<P CLASS="Body">
+<A NAME="pgfId-1375553"></A>If OSPM aborts the sleep transition process, OSPM will still run _TTS for an S0 transition to indicate the OSPM has returned to the S0 state. The platform must assume that if OSPM invokes the _TTS control method for an S1, S2, S3, or S4 transition, that OSPM will invoke _TTS control method for an S0 transition before returning to the S0 state.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1375554"></A>The platform must not make any assumptions about the state of the machine when _TTS is called. For example, operation region accesses that require devices to be configured and enabled may not succeed, as these devices may be in a non-decoding state due to plug and play or power management operations.</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1375569"></A><A NAME="_Toc489256105"></A><A NAME="_Toc489268029"></A><A NAME="_Toc489272582"></A><A NAME="_Ref42575213"></A><A NAME="RSVD_WAK"></A><A NAME="_Toc202341596"></A><A NAME="_Toc258262335"></A>&#92;_WAK (System Wake)<A NAME="marker-1375566"></A><A NAME="marker-1375567"></A><A NAME="marker-1375568"></A></H3>
+<P CLASS="Body">
+<A NAME="pgfId-1375570"></A>After the system wakes from a sleeping state, it will invoke the &#92;_WAK method and pass the sleeping state value that has ended. This operation occurs asynchronously with other driver notifications in the system and is not the first action to be taken when the system wakes. The AML code for this control method issues device, thermal, and other notifications to ensure that OSPM checks the state of devices, thermal zones, and so on, that could not be maintained during the system sleeping state. For example, if the system cannot determine whether a device was inserted or removed from a bus while in the S2 state, the _WAK method would issue a devicecheck type of notification for that bus when issued with the sleeping state value of 2 (for more information about types of notifications, see <A HREF="ACPI_Software_Programming_Model.htm#_Toc489256030" CLASS="XRef">See Device Object Notifications.</A>, &#8220;Device Object Notifications&#8221;). Notice that a device check notification from the &#92;_SB node will cause OSPM to re-enumerate the entire tree<A HREF="#pgfId-1375573" CLASS="footnote">2</A>.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1375574"></A>Hardware is not obligated to track the state needed to supply the resulting status; however, this method must return status concerning the last sleep operation initiated by OSPM. The return values can be used to provide additional information to OSPM or user. </P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1375575"></A>Arguments: (1)</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1375576"></A>Arg0 - An Integer containing the value of the sleeping state (1 for S1, 2 for S2, etc.)</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1375577"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1375578"></A>A Package containing two Integers containing status and the power supply S-state</P>
+</DIV>
+<DIV>
+<H4 CLASS="SubHeading">
+<A NAME="pgfId-1375579"></A>Return Value Information</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1375580"></A>_WAK returns a package with the following format:</P>
+<P CLASS="Body">
+<A NAME="pgfId-1375581"></A>Element 0 - An Integer containing a bitfield that represents conditions that occurred during sleep.</P>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1375582"></A>0x00000000 -	Wake was signaled and was successful</P>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1375583"></A>0x00000001 -	Wake was signaled but failed due to lack of power</P>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1375584"></A>0x00000002 -	Wake was signaled but failed due to thermal condition</P>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1375585"></A>Other values -	Reserved</P>
+<P CLASS="Body">
+<A NAME="pgfId-1375586"></A>Element 1 - An Integer containing the power supply S-state.</P>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1375587"></A>If non-zero, this is the effective S-state the power supply that was actually entered. This value is used to detect when the targeted S-state was not entered because of too much current being drawn from the power supply. For example, this might occur when some active device&#8217;s current consumption pushes the system&#8217;s power requirements over the low power supply mark, thus preventing the deeper system sleeping state from being entered as desired.</P>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1423660"></A><A NAME="_Toc202341597"></A><A NAME="_Toc258262336"></A>OSPM usage of _PTS, _TTS, and _WAK</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1423661"></A>OSPM will invoke  _PTS, _TTS,and _WAK in the following order:</P>
+<DIV>
+<H6 CLASS="StepNumList-1">
+<A NAME="pgfId-1423662"></A>OSPM decides (through a policy scheme) to place the system into a sleeping state</H6>
+<OL>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1375594"></A>_TTS(Sx) is run, where Sx is the desired sleep state to enter</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1375595"></A>OSPM notifies all native device drivers of the sleep state transition</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1375596"></A>_PTS is run</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1375597"></A>OSPM readies system for the sleep state transition</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1375599"></A>OSPM writes the sleep vector and the system enters the specified Sx sleep state</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1375600"></A>System Wakes up</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1378502"></A>OSPM readies system for the return from the sleep state transition</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1375603"></A> _WAK is run</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1375604"></A> OSPM notifies all native device drivers of the return from the sleep state transition</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1423710"></A> _TTS(0) is run to indicate the return to the S0 state</LI>
+</OL>
+</DIV>
+<DIV>
+<H6 CLASS="Normal-Indent">
+<A NAME="pgfId-1432364"></A>&nbsp;</H6>
+</DIV>
+<DIV>
+<H6 CLASS="Normal-Indent">
+<A NAME="pgfId-1423714"></A>&nbsp;</H6>
+<DIV>
+<IMG SRC="Power_and_Performance_Mgmt-2.gif" ALT="">
+</DIV>
+<DIV>
+<H6 CLASS="FigureTitle">
+<A NAME="pgfId-1354807"></A>Working / Sleeping State object evaluation flow<A NAME="marker-1432498"></A></H6>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+<HR>
+<DIV CLASS="footnotes">
+<DIV CLASS="footnote">
+<P CLASS="footnote-text">
+<SPAN CLASS="footnoteNumber">
+1.</SPAN>
+<A NAME="pgfId-1375393"></A> Or it is at least assumed to be in the D3 state by its device driver. For example, if the device doesn&#8217;t explicitly describe how it can stay in some non-off state while the system is in a sleeping state, the operating software must assume that the device can lose its power and state.</P>
+</DIV>
+<DIV CLASS="footnote">
+<P CLASS="ACPINormal">
+<SPAN CLASS="footnoteNumber">
+2.</SPAN>
+<A NAME="pgfId-1375573"></A> Only buses that support hardware-defined enumeration methods are done automatically at run-time. This would include ACPI-enumerated devices.</P>
+</DIV>
+</DIV>
+</BODY>
+</HTML>

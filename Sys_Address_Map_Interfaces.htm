@@ -1,0 +1,1276 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2016/HTML Export Filter">
+<LINK REL="STYLESHEET" HREF="Sys_Address_Map_Interfaces.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE> 15 System Address Map Interfaces</TITLE></HEAD>
+<BODY>
+<DIV>
+<H1 CLASS="Heading-1">
+<A NAME="pgfId-1348554"></A><A NAME="68313"></A>System Address Map Interfaces<DIV>
+<IMG SRC="Sys_Address_Map_Interfaces-1.gif" ALT="">
+</DIV>
+</H1>
+<P CLASS="Body">
+<A NAME="pgfId-1348583"></A><A NAME="_Toc305392219"></A><A NAME="_Toc305392822"></A><A NAME="_Toc305399692"></A><A NAME="_Toc305471029"></A><A NAME="_Toc305471476"></A><A NAME="_Toc307044392"></A><A NAME="_Toc307044555"></A>This section explains how an ACPI-compatible system conveys its memory resources/type mappings to OSPM. There are three ways for the system to convey memory resources /mappings to OSPM. The first is an INT 15 BIOS interface that is used in IA-PC-based systems to convey the system&#8217;s initial memory map. UEFI enabled systems use the UEFI GetMemoryMap() boot services function to convey memory resources to the OS loader. These resources must then be conveyed by the OS loader to OSPM. See the UEFI Specification for more information on UEFI services.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348584"></A>Lastly, if memory resources may be added or removed dynamically, memory devices are defined in the ACPI Namespace conveying the resource information described by the memory device (see <A HREF="ACPIdefined_Devices_and_DeviceSpecificObjects.htm#30870" CLASS="XRef">See Memory Devices.</A>, &#8220;Memory Devices&#8221;).</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348585"></A>ACPI defines the following address range types.</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1348587"></A><A NAME="17616"></A>Address Range Types<A NAME="marker-1373190"></A></H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1374221"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1374223"></A>Mnemonic</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1374717"></A>Save in S4</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1374225"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374227"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374229"></A>AddressRangeMemory</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374719"></A>Yes</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374231"></A>This range is available RAM usable by the operating system.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374233"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374235"></A>AddressRangeReserved</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374721"></A>No</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374237"></A>This range of addresses is in use or reserved by the system and is not to be included in the allocatable memory pool of the operating system's memory manager.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374239"></A>3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374241"></A>AddressRangeACPI</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374723"></A>Yes</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374243"></A>ACPI Reclaim Memory. This range is available RAM usable by the OS after it reads the ACPI tables. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374245"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374247"></A>AddressRangeNVS</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374725"></A>Yes</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374249"></A>ACPI NVS Memory. This range of addresses is in use or reserved by the system and must not be used by the operating system. This range is required to be saved and restored across an NVS sleep.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374251"></A>5</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374253"></A>AddressRangeUnusable</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374727"></A>No</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374255"></A>This range of addresses contains memory in which errors have been detected. This range must not be used by OSPM.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374257"></A>6</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374259"></A>AddressRangeDisabled</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374729"></A>No</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374261"></A>This range of addresses contains memory that is not enabled.  This range must not be used by OSPM.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374263"></A>7</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374265"></A>AddressRangePersistentMemory</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374731"></A>No</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374267"></A>OSPM must comprehend this memory as having non-volatile attributes and handle distinct from conventional volatile memory. The memory region supports byte-addressable non-volatility.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1374268"></A>&nbsp;</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1374269"></A>NOTE: Extended Attributes (see <A HREF="Sys_Address_Map_Interfaces.htm#99396" CLASS="XRef">See Extended Attributes for Address Range Descriptor Structure.</A>) for the memory reported using AddressRangePersistentMemory should set Bit [0] to 1. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374271"></A>8 - 11</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374273"></A>Undefined</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374733"></A>No</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374275"></A>Reserved for future use. OSPM must treat any range of this type as if the type returned was <EM CLASS="Italic">
+AddressRangeReserved</EM>
+. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374277"></A>12 </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374279"></A>OEM defined</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374735"></A>No</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374281"></A>An OS should not use a memory type in the vendor-defined range because collisions may occur between different vendors.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374283"></A>13 to 0xEFFFFFFF</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374285"></A>Undefined</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374737"></A>No</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374287"></A>Reserved for future use. OSPM must treat any range of this type as if the type returned was <EM CLASS="Italic">
+AddressRangeReserved</EM>
+.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374289"></A>0xF0000000 to 0xFFFFFFFF</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374291"></A>OEM defined</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374739"></A>No</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374327"></A>An OS should not use a memory type in the vendor-defined range because collisions may occur between different vendors.</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1348639"></A>Platform runtime firmware can use the AddressRangeReserved address range type to block out various addresses as not suitable for use by a programmable device. Some of the reasons a platform runtime firmware would do this are:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348641"></A>The address range contains system ROM.<A NAME="marker-1348640"></A><A NAME="marker-1348642"></A></LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348645"></A>The address range contains RAM in use by the ROM.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348646"></A>The address range is in use by a memory-mapped system device.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348647"></A>The address range is, for whatever reason, unsuitable for a standard device to use as a device memory space.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348648"></A>The address range is within an NVRAM device where reads and writes to memory locations are no longer successful, that is, the device was worn out.</LI>
+<LI CLASS="Note">
+<A NAME="pgfId-1374193"></A>OSPM will not save or restore memory reported as AddressRangeReserved, AddressRangeUnusable, AddressRangeDisabled, or AddressRangePersistentMemory when transitioning to or from the S4 sleeping state.</LI>
+<LI CLASS="Note">
+<A NAME="pgfId-1372974"></A>Platform boot firmware must ensure that contents of memory that is reported as AddressRangePersistentMemory is retained after a system reset or a power cycle event.</LI>
+</UL>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1348677"></A><A NAME="_Toc489267397"></A><A NAME="_Toc489267751"></A><A NAME="_Toc489272725"></A><A NAME="_Toc202341910"></A><A NAME="_Toc258262529"></A>INT 15H, E820H - Query System Address Map<A NAME="marker-1348672"></A><A NAME="marker-1348673"></A><A NAME="marker-1348674"></A><A NAME="marker-1348675"></A><A NAME="marker-1348676"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1348678"></A>This interface is used in real mode only on IA-PC-based systems and provides a memory map for all of the installed RAM, and of physical memory ranges reserved by the BIOS. The address map is returned through successive invocations of this interface; each returning information on a single range of physical addresses. Each range includes a type that indicates how the range of physical addresses is to be treated by the OSPM.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348679"></A>If the information returned from E820 in some way differs from INT-15 88 or INT-15 E801, the information returned from E820 supersedes the information returned from INT-15 88 or INT-15 E801. This replacement allows the BIOS to return any information that it requires from INT-15 88 or INT-15 E801 for compatibility reasons. For compatibility reasons, if E820 returns any AddressRangeACPI or AddressRangeNVS memory ranges below 16 MiB, the INT-15 88 and INT-15 E801 functions must return the top of memory below the AddressRangeACPI and AddressRangeNVS memory ranges.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350059"></A>The memory map conveyed by this interface is not required to reflect any changes in available physical memory that have occurred after the BIOS has initially passed control to the operating system. For example, if memory is added dynamically, this interface is not required to reflect the new system memory configuration.</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1348688"></A>Input to the INT 15h E820h Call</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348691"></A>Register</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348693"></A>Contents</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348695"></A>Description</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348697"></A>EAX</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348699"></A>Function Code</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348701"></A>E820h</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348703"></A>EBX</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348705"></A>Continuation</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348707"></A>Contains the continuation value to get the next range of physical memory. This is the value returned by a previous call to this routine. If this is the first call, EBX must contain zero.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348709"></A>ES:DI</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348711"></A>Buffer Pointer </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348713"></A>Pointer to an Address Range Descriptor structure that the BIOS fills in. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348715"></A>ECX</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348717"></A>Buffer Size</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348719"></A>The length in bytes of the structure passed to the BIOS. The BIOS fills in the number of bytes of the structure indicated in the ECX register, maximum, or whatever amount of the structure the BIOS implements. The minimum size that must be supported by both the BIOS and the caller is 20 bytes. Future implementations might extend this structure.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348721"></A>EDX </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348723"></A>Signature</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348725"></A>&#8216;SMAP&#8217; Used by the BIOS to verify the caller is requesting the system map information to be returned in ES:DI.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1348729"></A>Output from the INT 15h E820h Call<A NAME="_Toc345359219"></A></H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348732"></A>Register</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348734"></A>Contents</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348736"></A>Description</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348738"></A>CF</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348740"></A>Carry Flag</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348742"></A>Non-Carry - Indicates No Error</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348744"></A>EAX</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348746"></A>Signature</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348748"></A>&#8216;SMAP.&#8217; Signature to verify correct BIOS revision. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348750"></A>ES:DI</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348752"></A>Buffer Pointer</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348754"></A>Returned Address Range Descriptor pointer. Same value as on input.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348756"></A>ECX</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348758"></A>Buffer Size</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348760"></A>Number of bytes returned by the BIOS in the address range descriptor. The minimum size structure returned by the BIOS is 20 bytes.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348762"></A>EBX</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348764"></A>Continuation</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348766"></A>Contains the continuation value to get the next address range descriptor. The actual significance of the continuation value is up to the discretion of the BIOS. The caller must pass the continuation value unchanged as input to the next iteration of the E820 call in order to get the next Address Range Descriptor. A return value of zero means that this is the last descriptor.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348767"></A>Note: the BIOS can also indicate that the last descriptor has already been returned during previous iterations by returning the carry flag set. The caller will ignore any other information returned by the BIOS when the carry flag is set. </P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1348772"></A>Address Range Descriptor Structure</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348775"></A>Offset in Bytes</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348777"></A>Name</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348779"></A>Description</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348781"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348783"></A>BaseAddrLow</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348785"></A>Low 32 Bits of Base Address</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348787"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348789"></A>BaseAddrHigh</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348791"></A>High 32 Bits of Base Address</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348793"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348795"></A>LengthLow</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348797"></A>Low 32 Bits of Length in Bytes</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348799"></A>12</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348801"></A>LengthHigh</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348803"></A>High 32 Bits of Length in Bytes</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348805"></A>16</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348807"></A>Type</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348809"></A>Address type of this range</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348811"></A>20</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348813"></A>Extended Attributes</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348815"></A>See <A HREF="Sys_Address_Map_Interfaces.htm#99396" CLASS="XRef">See Extended Attributes for Address Range Descriptor Structure.</A></P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1348824"></A>The BaseAddrLow and BaseAddrHigh together are the 64-bit base address of this range. The base address is the physical address of the start of the range being specified.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348825"></A>The LengthLow and LengthHigh together are the 64-bit length of this range. The length is the physical contiguous length in bytes of a range being specified.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348826"></A>The Type field describes the usage of the described address range as defined in  <A HREF="Sys_Address_Map_Interfaces.htm#17616" CLASS="XRef">See Address Range Types.</A>.</P>
+</DIV>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1348827"></A><A NAME="99396"></A>Extended Attributes for Address Range Descriptor Structure</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1370712"></A>Bit</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1370714"></A>Mnemonic</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1370716"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348836"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348838"></A><EM CLASS="Italic">
+Reserved</EM>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348840"></A>Reserved, must be set to 1.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378577"></A>2:1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378579"></A>Reserved</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378581"></A>Reserved, must be set to 0. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348854"></A>3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348856"></A>AddressRangeErrorLog</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348858"></A>If set, the address range descriptor represents memory used for logging hardware errors.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348860"></A>31:4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348862"></A><EM CLASS="Italic">
+Reserved</EM>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348864"></A>Reserved for future use.</P>
+</TD>
+</TR>
+</TABLE>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1372634"></A>Bit [1] and [2] were deprecated as of ACPI 6.1. Bit [3] is used only on PC-AT BIOS systems to pinpoint the error log in memory. On UEFI-based systems, either UEFI Hardware Error Record HwErrRec#### runtime UEFI variable interface or the Error Record Serialization Actions 0xD, 0xE and 0xF for the APEI ERST  interface must be implemented for the error logs.</LI>
+</UL>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1348896"></A><A NAME="_Toc489267398"></A><A NAME="_Toc489267752"></A><A NAME="_Toc489272726"></A><A NAME="_Toc202341911"></A><A NAME="_Toc258262530"></A>E820 Assumptions and Limitations</H2>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348897"></A>The platform boot firmware returns address ranges describing baseboard memory.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348898"></A>The platform boot firmware does not return a range description for the memory mapping of PCI devices, ISA Option ROMs, and ISA Plug and Play cards because the OS has mechanisms available to detect them.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348899"></A>The platform boot firmware returns chip set-defined address holes that are not being used by devices as reserved.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348900"></A>Address ranges defined for baseboard memory-mapped I/O devices, such as APICs, are returned as reserved.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348901"></A>All occurrences of the system platform boot firmware are mapped as reserved, including the areas below 1 MB, at 16 MB (if present), and at end of the 4-GB address space.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348902"></A>Standard PC address ranges are not reported. For example, video memory at A0000 to BFFFF physical addresses are not described by this function. The range from E0000 to EFFFF is specific to the baseboard and is reported as it applies to that baseboard.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348903"></A>All of lower memory is reported as normal memory. The OS must handle standard RAM locations that are reserved for specific uses, such as the interrupt vector table (0:0) and the platform boot firmware data area (40:0).</LI>
+</UL>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1348915"></A><A NAME="_Toc489267399"></A><A NAME="_Toc489267753"></A><A NAME="_Toc489272727"></A><A NAME="_Toc202341912"></A><A NAME="_Toc258262531"></A>UEFI GetMemoryMap() Boot Services Function<A NAME="marker-1348912"></A><A NAME="marker-1348913"></A><A NAME="marker-1348914"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1348916"></A>EFI enabled systems use the UEFI <EM CLASS="CodeCharacter">
+GetMemoryMap()</EM>
+ boot services function to convey memory resources to the OS loader. These resources must then be conveyed by the OS loader to OSPM.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348917"></A>The GetMemoryMap interface is only available at boot services time. It is not available as a run-time service after OSPM is loaded. The OS or its loader initiates the transition from boot services to run-time services by calling <EM CLASS="CodeCharacter">
+ExitBootServices()</EM>
+. After the call to <EM CLASS="CodeCharacter">
+ExitBootServices()</EM>
+ all system memory map information must be derived from objects in the ACPI Namespace.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1373708"></A>The <EM CLASS="CodeCharacter">
+GetMemoryMap()</EM>
+interface returns an array of UEFI memory descriptors. These memory descriptors define a system memory map of all the installed RAM, and of physical memory ranges reserved by the firmware. Each descriptor contains a type field that dictates how the physical address range is to be treated by the operating system. <A HREF="Sys_Address_Map_Interfaces.htm#56299" CLASS="XRef">See UEFI Memory Types and mapping to ACPI address range types.</A> defines the mapping from UEFI memory types (see UEFI Specification) to ACPI address range types (see <A HREF="Sys_Address_Map_Interfaces.htm#17616" CLASS="XRef">See Address Range Types.</A>) that: </P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1373709"></A>Platform boot firmware shall follow if describing the memory range in both UEFI and legacy BIOS modes; and</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1373710"></A>an OS loader should use if it conveys that information to the OS using an ACPI E820h system address map table.</LI>
+</UL>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1348921"></A><A NAME="56299"></A>UEFI Memory Types and mapping to ACPI address range types</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1373587"></A>Type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1373589"></A>Mnemonic</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1373591"></A>ACPI Address Range Type</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373593"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373595"></A>EfiReservedMemoryType</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373597"></A>AddressRangeReserved</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373599"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373601"></A>EfiLoaderCode</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373603"></A>AddressRangeMemory</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373605"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373607"></A>EfiLoaderData</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373609"></A>AddressRangeMemory</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373611"></A>3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373613"></A>EfiBootServicesCode</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373615"></A>AddressRangeMemory</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373617"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373619"></A>EfiBootServicesData</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373621"></A>AddressRangeMemory</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373623"></A>5</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373625"></A>EfiRuntimeServiceCode</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373627"></A>AddressRangeReserved</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373629"></A>6</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373631"></A>EfiRuntimeServicesData</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373633"></A>AddressRangeReserved</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373635"></A>7</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373637"></A>EfiConventionalMemory</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373639"></A>AddressRangeMemory</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373641"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373643"></A>EfiUnusableMemory</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373645"></A>AddressRangeReserved</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373647"></A>9</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373649"></A>EfiACPIReclaimMemory</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373651"></A>AddressRangeACPI</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373653"></A>10</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373655"></A>EfiACPIMemoryNVS</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373657"></A>AddressRangeNVS</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373659"></A>11</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373661"></A>EfiMemoryMappedIO</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373663"></A>AddressRangeReserved</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373665"></A>12</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373667"></A>EfiMemoryMappedIOPortSpace</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373669"></A>AddressRangeReserved</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373671"></A>13</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373673"></A>EfiPalCode</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373675"></A>AddressRangeReserved</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373677"></A>14</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373679"></A>EfiPersistentMemory</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373681"></A>AddressRangePersistentMemory</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373683"></A>15 to 0x6FFFFFFF</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373685"></A>Reserved.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373687"></A>AddressRangeReserved</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373987"></A>0x70000000 to 0x7FFFFFFF</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373989"></A>Reserved for OEM used</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374341"></A>An OS should not use a memory type in the vendor-defined range because collisions may occur between different vendors.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373981"></A>0x80000000 to 0xFFFFFFFF</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373983"></A>Reserved for use by UEFI OS loaders that are provided by operating system vendors</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373985"></A>OSV defined</P>
+</TD>
+</TR>
+</TABLE>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1373560"></A><A HREF="Sys_Address_Map_Interfaces.htm#56299" CLASS="XRef">See UEFI Memory Types and mapping to ACPI address range types.</A> applies to system firmware that supports legacy BIOS mode plus UEFI mode, and OS loaders.</LI>
+</UL>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1349055"></A><A NAME="_Toc489267400"></A><A NAME="_Toc489267754"></A><A NAME="_Toc489272728"></A><A NAME="_Toc202341913"></A><A NAME="_Toc258262532"></A>UEFI Assumptions and Limitations</H2>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1349056"></A>The firmware returns address ranges describing the current system memory configuration.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1349057"></A>The firmware does not return a range description for the memory mapping of PCI devices, ISA Option ROMs, and ISA Plug and Play cards because the OS has mechanisms available to detect them.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1349058"></A>The firmware does not return a range description for address space regions that are not backed by physical hardware except those mentioned above. Regions that are backed by physical hardware, but are not supposed to be accessed by the OS, must be returned as reserved.  Herein 'reserved' is the definition of the term as noted by the ACPI specification as ACPI address range reserved. OS may use addresses of memory ranges that are not described in the memory map at its own discretion</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1349059"></A>Address ranges defined for baseboard memory-mapped I/O devices, such as APICs, are returned as reserved.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1349060"></A>All occurrences of the system firmware are mapped as reserved, including the areas below 1 MB, at 16 MB (if present), and at end of the 4-GB address space. This can include PAL code on Itanium&#8482; Processor Family (IPF)- based platforms.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1349061"></A>Standard PC address ranges are not reported. For example, video memory at A0000 to BFFFF physical addresses are not described by this function. The range from E0000 to EFFFF is specific to the baseboard and is reported as it applies to that baseboard.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1349062"></A>All of lower memory is reported as normal memory. The OS must handle standard RAM locations that are reserved for specific uses, such as the interrupt vector table (0:0) and the platform boot firmware data area (40:0). To preserve backward compatibility, platform should avoid using persistent memory to materialize the lower memory. If persistent memory is used for lower memory, platform boot firmware must report the lower memory address range using AddressRangeMemory and must not report using AddressRangePersistentMemory. </LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1349063"></A>EFI contains descriptors for memory mapped I/O and memory mapped I/O port space to allow for virtual mode calls to UEFI run-time functions. The OS must never use these regions.</LI>
+</UL>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1349096"></A><A NAME="_Toc489267401"></A><A NAME="_Toc489267755"></A><A NAME="_Toc489272729"></A><A NAME="_Toc202341914"></A><A NAME="_Toc258262533"></A>Example Address Map<A NAME="marker-1349093"></A><A NAME="marker-1349094"></A><A NAME="marker-1349095"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1349097"></A>This sample address map (for an Intel processor-based system) describes a machine that has 128 MiB of RAM, 640 KiB of base memory and 127 MiB of extended memory. The base memory has 639 KiB available for the user and 1 KiB for an extended BIOS data area. A 4-MiB Linear Frame Buffer (LFB) is based at 12 MiB. The memory hole created by the chip set is from 8 MiB to 16 MiB. Memory-mapped APIC devices are in the system. The I/O Unit is at FEC00000 and the Local Unit is at FEE00000. The system BIOS is remapped to 1 GB-64 KiB.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1349098"></A>The 639-KiB endpoint of the first memory range is also the base memory size reported in the BIOS data segment at 40:13. The following table shows the memory map of a typical system.</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1349100"></A><A NAME="52428"></A>Sample Memory Map</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372446"></A>Base (Hex)</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372448"></A>Length</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372450"></A>Type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372452"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349111"></A>0000 0000</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349113"></A>639 KiB</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349115"></A>AddressRangeMemory</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349117"></A>Available Base memory. Typically the same value as is returned using the INT 12 function.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349119"></A>0009 FC00</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349121"></A>1 KiB</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349123"></A>AddressRangeReserved</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349125"></A>Memory reserved for use by the BIOS(s). This area typically includes the Extended BIOS data area.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349127"></A>000F 0000</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349129"></A>64 KiB</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349131"></A>AddressRangeReserved</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349133"></A>System BIOS</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349135"></A>0010 0000</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349137"></A>7 MiB</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349139"></A>AddressRangeMemory</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349141"></A>Extended memory, which is not limited to the 64-MiB address range.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349143"></A>0080 0000</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349145"></A>4 MiB</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349147"></A>AddressRangeReserved</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349149"></A>Chip set memory hole required to support the LFB mapping at 12 MiB.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349151"></A>0100 0000</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349153"></A>60 MiB</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349155"></A>AddressRangeMemory</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349157"></A>Baseboard RAM relocated above a chip set memory hole.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373057"></A>04C0 0000</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373079"></A>60 MiB</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373061"></A>AddressRangePersistentMemory</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1373063"></A>Persistent memory that has non-volatile attributes located in this region.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349159"></A>FEC0 0000 </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349161"></A>4 KiB</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349163"></A>AddressRangeReserved</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349165"></A>I/O APIC memory mapped I/O at FEC00000.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349167"></A>FEE0 0000 </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349169"></A>4 KiB</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349171"></A>AddressRangeReserved</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349173"></A>Local APIC memory mapped I/O at FEE00000.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349175"></A>FFFF 0000</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349177"></A>64 KiB</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349179"></A>AddressRangeReserved</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349181"></A>Remapped System BIOS at end of address space.</P>
+</TD>
+</TR>
+</TABLE>
+<DIV>
+<H6 CLASS="Pb">
+<A NAME="pgfId-1349219"></A>&nbsp;</H6>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1349221"></A><A NAME="marker-1349220"></A>Example: Operating System Usage</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1349222"></A>The following code segment illustrates the algorithm to be used when calling the Query System Address Map function. It is an implementation example and uses non-standard mechanisms.</P>
+<P CLASS="code-Ex-CODE-PRE-CITE">
+<A NAME="pgfId-1349223"></A>    </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349224"></A>E820Present = FALSE;<BR>
+    Reg.ebx = 0;<BR>
+    do {<BR>
+        Reg.eax = 0xE820;<BR>
+        Reg.es  = SEGMENT (&amp;Descriptor);<BR>
+        Reg.di  = OFFSET  (&amp;Descriptor);<BR>
+        Reg.ecx = sizeof  (Descriptor);<BR>
+        Reg.edx = 'SMAP';<BR>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1372514"></A>        _int( 15, regs );<BR>
+<BR>
+        if ((Regs.eflags &amp; EFLAG_CARRY)  ||  Regs.eax != 'SMAP') {<BR>
+            break;<BR>
+        }<BR>
+<BR>
+        if (Regs.ecx &lt; 20  ||  Reg.ecx &gt; sizeof (Descriptor) ) {<BR>
+            // bug in bios - all returned descriptors must be<BR>
+            // at least 20 bytes long, and cannot be larger then <BR>
+            // the input buffer.<BR>
+<BR>
+            break;<BR>
+        }<BR>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1372525"></A>        E820Present = TRUE;<BR>
+            .<BR>
+            .<BR>
+            .<BR>
+        Add address range Descriptor.BaseAddress through <BR>
+        Descriptor.BaseAddress + Descriptor.Length<BR>
+        as type Descriptor.Type<BR>
+            .<BR>
+            .<BR>
+            .<BR>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1372532"></A>    } while (Regs.ebx != 0);<BR>
+</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1372539"></A>    if (!E820Present) {<BR>
+        .<BR>
+        .<BR>
+        .<BR>
+    call INT-15 88 and/or INT-15 E801 to obtain old style <BR>
+    memory information<BR>
+        .<BR>
+        .<BR>
+        .<BR>
+    }</P>
+<P CLASS="Body">
+<A NAME="pgfId-1346798"></A>.</P>
+</DIV>
+</DIV>
+</BODY>
+</HTML>

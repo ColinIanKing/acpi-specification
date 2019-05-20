@@ -1,0 +1,976 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2016/HTML Export Filter">
+<LINK REL="STYLESHEET" HREF="ACPI_Concepts.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE> 3 ACPI Concepts</TITLE></HEAD>
+<BODY>
+<DIV>
+<H1 CLASS="Heading-1">
+<A NAME="pgfId-1348528"></A><A NAME="32302"></A>ACPI Concepts<DIV>
+<IMG SRC="ACPI_Concepts-1.gif" ALT="">
+</DIV>
+</H1>
+<P CLASS="Body">
+<A NAME="pgfId-1348538"></A><A NAME="OLE_LINK7"></A><A NAME="OLE_LINK8"></A>Platforms compliant with the ACPI specification provide OSPM with direct and exclusive control over the power management and motherboard device configuration functions of a computer. During OS initialization, OSPM takes over these functions from legacy implementations such as the APM BIOS, SMM-based firmware, legacy applications, and the PNPBIOS. Having done this, OSPM is responsible for handling motherboard device configuration events as well as for controlling the power, performance, and thermal status of the system based on user preference, application requests and <A NAME="OLE_LINK9"></A><A NAME="OLE_LINK10"></A>OS imposed Quality of Service (QOS) / usability goals. ACPI provides low-level interfaces that allow OSPM to perform these functions. The functional areas covered by the ACPI specification are:<A NAME="marker-1348541"></A><A NAME="marker-1348542"></A><A NAME="marker-1348543"></A><A NAME="marker-1348544"></A><A NAME="marker-1348545"></A><A NAME="marker-1348546"></A><A NAME="marker-1348547"></A></P>
+<DIV>
+<H5 CLASS="GlossTerm">
+<A NAME="pgfId-1348548"></A>System power management</H5>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1350594"></A>ACPI defines mechanisms for putting the computer as a whole in and out of system sleeping states. It also provides a general mechanism for any device to wake the computer.</P>
+</DIV>
+<DIV>
+<H5 CLASS="GlossTerm">
+<A NAME="pgfId-1348549"></A>Device power management </H5>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1350605"></A>ACPI tables describe motherboard devices, their power states, the power planes the devices are connected to, and controls for putting devices into different power states. This enables the OS to put devices into low-power states based on application usage.</P>
+</DIV>
+<DIV>
+<H5 CLASS="GlossTerm">
+<A NAME="pgfId-1348550"></A>Processor power management</H5>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1350612"></A>While the OS is idle but not sleeping, it will use commands described by ACPI to put processors in low-power states.</P>
+</DIV>
+<DIV>
+<H5 CLASS="GlossTerm">
+<A NAME="pgfId-1348551"></A>Device and processor performance management</H5>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1350619"></A> While the system is active, OSPM will transition devices and processors into different performance states, defined by ACPI, to achieve a desirable balance between performance and energy conservation goals as well as other environmental requirements (for example, visibility and acoustics).</P>
+</DIV>
+<DIV>
+<H5 CLASS="GlossTerm">
+<A NAME="pgfId-1348552"></A>Configuration / Plug and Play</H5>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1350626"></A>ACPI specifies information used to enumerate and configure motherboard devices. This information is arranged hierarchically so when events such as docking and undocking take place, the OS has precise, a priori knowledge of which devices are affected by the event.</P>
+</DIV>
+<DIV>
+<H5 CLASS="GlossTerm">
+<A NAME="pgfId-1348553"></A>System Events</H5>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1350633"></A>ACPI provides a general event mechanism that can be used for system events such as thermal events, power management events, docking, device insertion and removal, and so on. This mechanism is very flexible in that it does not define specifically how events are routed to the core logic chip set.</P>
+</DIV>
+<DIV>
+<H5 CLASS="GlossTerm">
+<A NAME="pgfId-1348554"></A>Battery management</H5>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1350640"></A>Battery management policy moves from the APM BIOS to the ACPI OS. An ACPI-compatible battery device needs either a Smart Battery subsystem interface, which is controlled by the OS directly through the embedded controller interface, or a Control Method Battery interface. A Control Method Battery interface is completely defined by AML control methods, allowing an OEM to choose any type of the battery and any kind of communication interface supported by ACPI. The battery must comply with the requirements of its interface, as described either herein or in other applicable standards. The OS may choose to alter the behavior of the battery, for example, by adjusting the Low Battery or Battery Warning trip point. When there are multiple batteries present, the battery subsystem is not required to perform any synthesis of a &#8220;composite battery&#8221; from the data of the separate batteries. In cases where the battery subsystem does not synthesize a &#8220;composite battery&#8221; from the separate battery&#8217;s data, the OS must provide that synthesis.</P>
+</DIV>
+<DIV>
+<H5 CLASS="GlossTerm">
+<A NAME="pgfId-1348555"></A>Thermal management</H5>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1350685"></A>Since the OS controls the power and performance states of devices and processors, ACPI also addresses system thermal management. It provides a simple, scalable model that allows OEMs to define thermal zones, thermal indicators, and methods for cooling thermal zones.</P>
+</DIV>
+<DIV>
+<H5 CLASS="GlossTerm">
+<A NAME="pgfId-1348562"></A>Embedded Controller</H5>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1350647"></A>ACPI defines a standard hardware and software communications interface between an OS bus enumerator and an embedded controller. This allows any OS to provide a standard bus enumerator that can directly communicate with an embedded controller in the system, thus allowing other drivers within the system to communicate with and use the resources of system embedded controllers. This in turn enables the OEM to provide platform features that the OS and applications can use.</P>
+</DIV>
+<DIV>
+<H5 CLASS="GlossTerm">
+<A NAME="pgfId-1348563"></A>SMBus Controller</H5>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1350654"></A>ACPI defines a standard hardware and software communications interface between an OS bus driver and an SMBus Controller. This allows any OS to provide a standard bus driver that can directly communicate with SMBus devices in the system. This in turn enables the OEM to provide platform features that the OS and applications can use.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348566"></A><A NAME="OLE_LINK11"></A><A NAME="OLE_LINK12"></A>OSPM&#8217;s mission is to optimally configure the platform and to optimally manage the system&#8217;s power, performance, and thermal status given the user&#8217;s preferences and while supporting OS imposed Quality of Service (QOS) / usability goals. To achieve these goals, ACPI requires that once an ACPI compliant platform is in ACPI mode, the platform&#8217;s hardware, firmware, or other non-OS software must not manipulate the platform&#8217;s configuration, power, performance, and thermal control interfaces independently of OSPM. OSPM alone is responsible for coordinating the configuration, power management, performance management, and thermal control policy of the system. Manipulation of these interfaces independently of OSPM undermines the purpose of OSPM/ACPI and may adversely impact the system&#8217;s configuration, power, performance, and thermal policy goals. There are two exceptions to this requirement. The first is in the case of the possibility of damage to a system from an excessive thermal conditions where an ACPI compatible OS is present and OSPM latency is insufficient to remedy an adverse thermal condition. In this case, the platform may exercise a failsafe thermal control mechanism that reduces the performance of a system component to avoid damage. If this occurs, the platform must notify OSPM of the performance reduction if the reduction is of significant duration (in other words, if the duration of reduced performance could adversely impact OSPM&#8217;s power or performance control policy - operating system vendors can provide guidance in this area).<A NAME="marker-1348567"></A><A NAME="marker-1348568"></A> The second exception is the case where the platform contains Active cooling devices but does not contain Passive cooling temperature trip points or controls,. In this case, a hardware based Active cooling mechanism may be implemented without impacting OSPM&#8217;s goals. Any platform that requires both active and passive cooling must allow OSPM to manage the platform thermals via ACPI defined active and passive cooling interfaces. </P>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1348589"></A><A NAME="_Toc489255955"></A><A NAME="_Toc489267879"></A><A NAME="_Toc489272432"></A><A NAME="_Toc202340478"></A><A NAME="_Toc258262159"></A>System Power Management<A NAME="marker-1348587"></A><A NAME="marker-1348588"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1348590"></A>Under OSPM, the OS directs all system and device power state transitions. Employing user preferences and knowledge of how devices are being used by applications, the OS puts devices in and out of low-power states. Devices that are not being used can be turned off. Similarly, the OS uses information from applications and user settings to put the system as a whole into a low- power state. The OS uses ACPI to control power state transitions in hardware.</P>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1350725"></A>Power States<A NAME="marker-1348619"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1348529"></A>From a user-visible level, the system can be thought of as being in one of the states in the following diagram: </P>
+<DIV>
+<IMG SRC="ACPI_Concepts-2.gif" ALT="">
+</DIV>
+<DIV>
+<H6 CLASS="FigureTitle">
+<A NAME="pgfId-1348669"></A>Global System Power States and Transitions<A NAME="marker-1348664"></A><A NAME="marker-1348665"></A><A NAME="marker-1348666"></A><A NAME="marker-1348667"></A><A NAME="marker-1348668"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348670"></A>See <A HREF="Definition_of_Terms.htm#91173" CLASS="XRef">See Global System State Definitions.</A>, &#8220;Global System State Definitions,&#8221; for detailed definitions of these states.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348671"></A>In general use, computers alternate between the Working and Sleeping states. In the Working state, the computer is used to do work. User-mode application threads are dispatched and running. Individual devices can be in low-power (Dx) states and processors can be in low-power (Cx) states if they are not being used. Any device the system turns off because it is not actively in use can be turned on with short latency. (What &#8220;short&#8221; means depends on the device. An LCD display needs to come on in sub-second times, while it is generally acceptable to wait a few seconds for a printer to wake.)</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348672"></A>The net effect of this is that the entire machine is functional in the Working state. Various Working sub-states differ in speed of computation, power used, heat produced, and noise produced. Tuning within the Working state is largely about trade-offs among speed, power, heat, and noise.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348679"></A>When the computer is idle or the user has pressed the power button, the OS will put the computer into one of the sleeping (Sx) states. No user-visible computation occurs in a sleeping state. The sleeping sub-states differ in what events can arouse the system to a Working state, and how long this takes. When the machine must awaken to all possible events or do so very quickly, it can enter only the sub-states that achieve a partial reduction of system power consumption. However, if the only event of interest is a user pushing on a switch and a latency of minutes is allowed, the OS could save all system context into an NVS file and transition the hardware into the S4 sleeping state. In this state, the machine draws almost zero power and retains system context for an arbitrary period of time (years or decades if needed).</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348680"></A>The other states are used less often. Computers that support legacy BIOS power management interfaces boot in the Legacy state and transition to the Working state when an ACPI OS loads. A system without legacy support (for example, a RISC system) transitions directly from the Mechanical Off state to the Working state. Users typically put computers into the Mechanical Off state by flipping the computer&#8217;s mechanical switch or by unplugging the computer.<A NAME="marker-1348681"></A><A NAME="marker-1348682"></A><A NAME="marker-1348683"></A></P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1348704"></A><A NAME="_Toc489255957"></A><A NAME="_Toc489267881"></A><A NAME="_Toc489272434"></A><A NAME="_Toc202340480"></A><A NAME="_Toc258262161"></A>Power Button<A NAME="marker-1348703"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348705"></A>In legacy systems, the power button typically either forces the machine into Soft Off or Mechanical Off or, on a laptop, forces it to some sleeping state. No allowance is made for user policy (such as the user wants the machine to &#8220;come on&#8221; in less than 1 second with all context as it was when the user turned the machine &#8220;off&#8221;), system alert functions (such as the system being used as an answering machine or fax machine), or application function (such as saving a user file).<A NAME="marker-1348706"></A><A NAME="marker-1348707"></A><A NAME="marker-1348708"></A><A NAME="marker-1348709"></A><A NAME="marker-1348710"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1348711"></A>In an OSPM system, there are two switches. One is to transition the system to the Mechanical Off state. A mechanism to stop current flow is required for legal reasons in some jurisdictions (for example, in some European countries). The other is the &#8220;main&#8221; power button. This is in some obvious place (for example, beside the keyboard on a laptop). Unlike legacy on/off buttons, all it does is send a request to the system. What the system does with this request depends on policy issues derived from user preferences, user function requests, and application data. </P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1348730"></A><A NAME="_Toc489255958"></A><A NAME="_Toc489267882"></A><A NAME="_Toc489272435"></A><A NAME="_Toc202340481"></A><A NAME="_Toc258262162"></A>Platform Power Management Characteristics</H6>
+</DIV>
+<DIV>
+<H4 CLASS="ACPIHeading-4">
+<A NAME="pgfId-1348741"></A>Mobile PC</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1348746"></A>Mobile<A NAME="marker-1348744"></A><A NAME="marker-1348745"></A> PCs will continue to have aggressive power management functionality. Going to OSPM/ACPI will allow enhanced power savings techniques and more refined user policies. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1348747"></A>Aspects of mobile PC power management in the ACPI specification are thermal management (see <A HREF="Thermal_management.htm#54593" CLASS="XRef">See Thermal Management.</A>, &#8220;Thermal Management&#8221;) and the embedded controller interface (see <A HREF="ACPI_Embedded_Controller_Interface_Specification.htm#71995" CLASS="XRef">See ACPI Embedded Controller Interface Specification.</A>, &#8220;ACPI Embedded Controller Interface Specification&#8221;).<A NAME="marker-1348766"></A></P>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1348769"></A>Desktop PCs</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348770"></A>Power-managed desktops will be of two types, though the first type will migrate to the second over time.</P>
+</DIV>
+<DIV>
+<H5 CLASS="GlossTerm">
+<A NAME="pgfId-1348771"></A>Ordinary &#8220;Green PC&#8221; </H5>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1350786"></A>Here, new appliance functions are not the issue. The machine is really only used for productivity computations. At least initially, such machines can get by with very minimal function. In particular, they need the normal ACPI timers and controls, but don&#8217;t need to support elaborate sleeping states, and so on. They, however, do need to allow the OS to put as many of their devices/resources as possible into device standby and device off states, as independently as possible (to allow for maximum compute speed with minimum power wasted on unused devices). Such PCs will also need to support wake from the sleeping state by means of a timer, because this allows administrators to force them to turn on just before people are to show up for work.<A NAME="marker-1348772"></A><A NAME="marker-1348773"></A></P>
+</DIV>
+<DIV>
+<H5 CLASS="GlossTerm">
+<A NAME="pgfId-1348776"></A>Home PC </H5>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1350793"></A>Computers are moving into home environments where they are used in entertainment centers and to perform tasks like answering the phone. A home PC needs all of the functionality of the ordinary green PC. In fact, it has all of the ACPI power functionality of a laptop except for docking and lid events (and need not have any legacy power management). Note that there is also a thermal management aspect to a home PC, as a home PC user wants the system to run as quietly as possible, often in a thermally constrained environment.</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="ACPIHeading-4">
+<A NAME="pgfId-1348788"></A> Multiprocessor and Server PC<A NAME="marker-1348787"></A>s<A NAME="marker-1348789"></A><A NAME="marker-1348790"></A><A NAME="marker-1348791"></A></H4>
+<P CLASS="Body">
+<A NAME="pgfId-1348794"></A>Perhaps surprisingly, server machines often get the largest absolute power savings. Why? Because they have the largest hardware configurations and because it&#8217;s not practical for somebody to hit the off switch when they leave at night.</P>
+<DIV>
+<H5 CLASS="GlossTerm">
+<A NAME="pgfId-1348795"></A>Day Mode</H5>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1350818"></A> In day mode, servers are power-managed much like a corporate ordinary green PC, staying in the Working state all the time, but putting unused devices into low-power states whenever possible. Because servers can be very large and have, for example, many disk spindles, power management can result in large savings. OSPM allows careful tuning of when to do this, thus making it workable.<A NAME="marker-1348796"></A></P>
+</DIV>
+<DIV>
+<H5 CLASS="GlossTerm">
+<A NAME="pgfId-1348799"></A>Night Mode </H5>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1350825"></A>In night mode, servers look like home PCs. They sleep as deeply as they can and are still able to wake and answer service requests coming in over the network, phone links, and so on, within specified latencies. So, for example, a print server might go into deep sleep until it receives a print job at 3 A.M., at which point it wakes in perhaps less than 30 seconds, prints the job, and then goes back to sleep. If the print request comes over the LAN, then this scenario depends on an intelligent LAN adapter that can wake the system in response to an interesting received packet.</P>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1348821"></A><A NAME="_Toc489255959"></A><A NAME="_Toc489267883"></A><A NAME="_Toc489272436"></A><A NAME="_Toc202340482"></A><A NAME="_Toc258262163"></A>Device Power Management<A NAME="marker-1348819"></A><A NAME="marker-1348820"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1348822"></A>This section describes ACPI-compatible device power management. The ACPI device power states are introduced, the controls and information an ACPI-compatible OS needs to perform device power management are discussed, the wake operation devices use to wake the computer from a sleeping state is described, and an example of ACPI-compatible device management using a modem is given</P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1372175"></A><A NAME="85090"></A>Device Power Management Model </H6>
+<P CLASS="Body">
+<A NAME="pgfId-1372176"></A>ACPI Device Power Management is based on an integrated model consisting of:</P>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1372177"></A>Distributed device power state policy</H3>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1372218"></A>For each hardware device on the system, there is a Power Policy Owner in the Operating System that is responsible for continuously determining the best power state for the device. The best device power state is the one that, at any point in time, minimizes the consumption of power by the device consistent with the usage requirements of the device by the system and its user. Policy is typically defined for a class of devices, and incorporates application activity, user scenarios and other operating state as necessary. It is applied to all devices of a given class.</P>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1372178"></A>Layered device power state control</H3>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1372221"></A>Once power state decisions are made for a device, they must be carried-out by device drivers.  The model partitions the control functionality between the device, bus and platform layers. Device drivers at each layer perform control using mechanisms available at that level, coordinated by OSPM. In general, the ordering proceeds from Device/Class level, to Bus level, to Platform level when a device is powering down, and the inverse when powering-up. </P>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1372179"></A>For instance, a device-level driver has access, via the device programming interface, to settings and control registers that invoke specific, sometimes proprietary, power control features in the device. The device driver uses these controls as appropriate for the target ACPI-defined power state determined by the policy owner. Similarly, classes of devices may have standardized power features, invoked in standardized ways that Class Drivers might use when entering a target power state.</P>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1372180"></A>At the bus level, power management standards come into play to provide bus-specific controls that work for every device connected to the bus, regardless of device class. PCI, for instance, defines fields in the device Configuration Space for setting the device&#8217;s power state (D0-D3). Bus-level drivers utilize these standards to perform control in addition to that applied by the device-specific or device class driver. Bus-specific mechanisms also enable additional power savings in the system by enabling the bus infrastructure hardware itself to enter lower power states, as defined in the bus standard.</P>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1372181"></A>Finally, for platform-level power state control, ACPI defines mechanisms (_PRx, _PSx, _ON, _OFF) for putting a device into a given power state. The Operating System&#8217;s ACPI software (&#8220;OSPM&#8221;) utilizes these mechanisms to execute the lowest-level, platform-specific control for a given device, such as turning off and on power rails and clocks, resetting HW, etc.</P>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1372168"></A>Operating System coordination</H3>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1372224"></A>Finally, ACPI defines information and behavior requirements that enable OSPM to inform the Power Policy Owner about supported state and wake-up capabilities, and to coordinate the actions of the various levels of device drivers in controlling power. OSPM, in this role, is responsible for ensuring that device power management is coordinated with System Power Management such as entering sleep states (S1-S4) or Low-power Idle states (LPI). Integrated with device power state policy and control, wake-up policy and control are also coordinated by OSPM. Power Policy Owners, which decide when the device might be needed to wake the system, ensure that only device power states that the device can wake from are selected when the platform enters a Sleep or LPI state. Enabling of wake-up hardware is also performed at the device, bus and platform levels and coordinated by OSPM. OSPM ensures further that the Sleep or LPI state selected for the system is compatible with the device state and wake-up capabilities of all the devices currently enabled for wake.</P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1372166"></A>Power Management Standards</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348860"></A><A NAME="marker-1348856"></A>To manage power of all the devices in the system, the OS needs standard methods for sending commands to a device. These standards define the operations used to manage power of devices on a particular I/O interconnect and the power states that devices can be put into. Defining these standards for each I/O interconnect creates a baseline level of power management support the OS can utilize. Independent Hardware Vendors (IHVs) do not have to spend extra time writing software to manage power of their hardware, because simply adhering to the standard gains them direct OS support. For OS vendors, the I/O interconnect standards allow the power management code to be centralized in the driver for each I/O interconnect. Finally, I/O interconnect-driven power management allows the OS to track the states of all devices on a given I/O interconnect. When all the devices are in a given state (or example, D3 - off), the OS can put the entire I/O interconnect into the power supply mode appropriate for that state (for example, D3 - off). </P>
+<P CLASS="Body">
+<A NAME="pgfId-1348861"></A>I/O interconnect-level power management specifications are written for a number of buses including: </P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348862"></A>PCI</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348863"></A>PCI Express</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348864"></A>CardBus</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348865"></A>USB</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348866"></A>IEEE 1394</LI>
+</UL>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1348888"></A><A NAME="_Toc489255961"></A><A NAME="_Toc489267885"></A><A NAME="_Toc489272438"></A><A NAME="_Toc202340484"></A><A NAME="_Toc258262165"></A>Device Power States</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348889"></A>To unify nomenclature and provide consistent behavior across devices, standard definitions are used for the power states of devices. Generally, these states are defined in terms of the following criteria:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348890"></A>Power consumption--How much power the device uses.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348891"></A>Device context--How much of the context of the device is retained by the hardware. </LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348892"></A>Device driver--What the device driver must do to restore the device to fully on.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348893"></A>Restore latency--How long it takes to restore the device to fully on.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1348894"></A>More specifically, power management specifications for each class of device (for example, modem, network adapter, hard disk, and so on) more precisely define the power states and power policy for the class. See <A HREF="Definition_of_Terms.htm#_Toc489255950" CLASS="XRef">See Device Power State Definitions.</A>, &#8220;Device Power State Definitions,&#8221; for the detailed description of the general device power states (D0-D3). </P>
+<P CLASS="Body">
+<A NAME="pgfId-1372268"></A>&nbsp;</P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1348916"></A><A NAME="_Toc489255962"></A><A NAME="_Toc489267886"></A><A NAME="_Toc489272439"></A><A NAME="_Toc202340485"></A><A NAME="_Toc258262166"></A>Device Power State Definitions<A NAME="marker-1348914"></A><A NAME="marker-1348915"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348917"></A>The device power state definitions are device-independent, but classes of devices on a bus must support some consistent set of power-related characteristics. For example, when the bus-specific mechanism to set the device power state to a given level is invoked, the actions a device might take and the specific sorts of behaviors the OS can assume while the device is in that state will vary from device type to device type. For a fully integrated device power management system, these class-specific power characteristics must also be standardized:</P>
+</DIV>
+<DIV>
+<H5 CLASS="GlossTerm">
+<A NAME="pgfId-1348918"></A>Device Power State Characteristics</H5>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1350941"></A>Each class of device has a standard definition of target power consumption levels, state-change latencies, and context loss. </P>
+</DIV>
+<DIV>
+<H5 CLASS="GlossTerm">
+<A NAME="pgfId-1348919"></A>Minimum Device Power Capabilities</H5>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1350948"></A>Each class of device has a minimum standard set of power capabilities.</P>
+</DIV>
+<DIV>
+<H5 CLASS="GlossTerm">
+<A NAME="pgfId-1348920"></A>Device Functional Characteristics</H5>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1350955"></A>Each class of device has a standard definition of what subset of device functionality or features is available in each power state (for example, the net card can receive, but cannot transmit; the sound card is fully functional except that the power amps are off, and so on).</P>
+</DIV>
+<DIV>
+<H5 CLASS="GlossTerm">
+<A NAME="pgfId-1348921"></A>Device Wakeup Characteristics</H5>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1350962"></A>Each class of device has a standard definition of its wake policy.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348922"></A>The Device Class Power Management specifications define these power state characteristics for each class of device. See <A HREF="Apx_A_Device_Class_Specifications.htm#92338" CLASS="XRef">See Device Class Specifications.</A>.<A NAME="marker-1348923"></A><A NAME="marker-1348924"></A></P>
+<P CLASS="Pb">
+<A NAME="pgfId-1348950"></A><A NAME="marker-1348949"></A>&nbsp;</P>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1348952"></A><A NAME="86287"></A>Controlling Device Power</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1348953"></A>ACPI interfaces provide the control methods and information needed to manage device power. OSPM leverages these interfaces to perform tasks like determining the capabilities of a device, executing methods to set a device's power state or get its status, and enabling a device to wake the machine.</P>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1348954"></A>Other buses enumerate some devices on the main board. For example, PCI devices are reported through the standard PCI enumeration mechanisms. Power management of these devices is handled through their own bus specification (in this case, PCI). All other devices on the main board are handled through ACPI. Specifically, the ACPI table lists legacy devices that cannot be reported through their own bus specification, the root of each bus in the system, and devices that have additional power management or configuration options not covered by their own bus specification. </LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1348955"></A>For more detailed information see <A HREF="Power_and_Performance_Mgmt.htm#84676" CLASS="XRef">See Power and Performance Management.</A>, &#8220;Power and Performance Management.&#8221;</P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1348975"></A><A NAME="_Toc489255964"></A><A NAME="_Toc489267888"></A><A NAME="_Toc489272441"></A><A NAME="_Toc202340487"></A><A NAME="_Toc258262168"></A>Getting Device Power Capabilities</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348976"></A>As the OS enumerates devices in the system, it gets information about the power management features that the device supports. The Differentiated Definition Block given to the OS by the platform boot firmware describes every device handled by ACPI. This description contains the following information:<A NAME="marker-1348977"></A></P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348978"></A>A description of what power resources (power planes and clock sources) the device needs in each power state that the device supports. For example, a device might need a high power bus and a clock in the D0 state but only a low-power bus and no clock in the D2 state. </LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348981"></A>A description of what power resources a device needs in order to wake the machine (or none to indicate that the device does not support wake). The OS can use this information to infer what device and system power states from which the device can support wake.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348982"></A>The optional control method the OS can use to set the power state of the device and to get and set resources. </LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1351049"></A>In addition to describing the devices handled by ACPI, the table lists the power planes and clock sources themselves and the control methods for turning them on and off. For detailed information, see <A HREF="Power_and_Performance_Mgmt.htm#84676" CLASS="XRef">See Power and Performance Management.</A>, &#8220;Power and Performance Management.&#8221;</P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1351071"></A><A NAME="_Toc489255965"></A><A NAME="_Toc489267889"></A><A NAME="_Toc489272442"></A><A NAME="_Toc202340488"></A><A NAME="_Toc258262169"></A>Setting Device Power States<A NAME="marker-1351069"></A><A NAME="marker-1351070"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1351046"></A>OSPM uses the Set Power State operation to put a device into one of the four power states. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1349007"></A>When a device is put in a lower power state, it configures itself to draw as little power from the bus as possible. The OS tracks the state of all devices on the bus, and will put the bus in the best power state based on the current device requirements on that bus. For example, if all devices on a bus are in the D3 state, the OS will send a command to the bus control chip set to remove power from the bus (thus putting the bus in the D3 state). If a particular bus supports a low-power supply state, the OS puts the bus in that state if all devices are in the D1 or D2 state. Whatever power state a device is in, the OS must be able to issue a Set Power State command to resume the device. <A NAME="marker-1349008"></A><A NAME="marker-1349009"></A></P>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1349010"></A>The device does not need to have power to do this. The OS must turn on power to the device before it can send commands to the device.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1349011"></A>OSPM also uses the Set Power State operation to enable power management features such as wake (described in <A HREF="Power_and_Performance_Mgmt.htm#84676" CLASS="XRef">See Power and Performance Management.</A>, &#8220;Power and Performance Management.&#8221;). </P>
+<P CLASS="Body">
+<A NAME="pgfId-1349022"></A>For power-down operations (transitions from Dx to some deeper Dy), OSPM first evaluates the appropriate control method for the target state (_PSx), then turns-off any unused power resources. Notice that this might not mean that power is actually removed from the device. If other active devices are sharing a power resource, the power resource will remain on. In the power-up case (transitions from some Dx back to the shallower D0), the power resources required for D0 are first turned on, and then the control method (_PS0) is evaluated.</P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1349042"></A><A NAME="_Toc489255966"></A><A NAME="_Toc489267890"></A><A NAME="_Toc489272443"></A><A NAME="_Toc202340489"></A><A NAME="_Toc258262170"></A>Getting Device Power Status</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1372311"></A>OSPM uses the Get Power Status operation to determine the current power configuration (states and features), as well as the status of any batteries supported by the device. The device can signal an SCI to inform the OS of changes in power status. For example, a device can trigger an interrupt to inform the OS that the battery has reached low power level. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1372312"></A>Devices use the ACPI event model to signal power status changes (for example, battery status changes) to OSPM. The platform signals events to the OS via an interrupt, either SCI, or GPIO. An interrupt status bit is set to indicate the event to the OS. The OS runs the control method associated with the event. This control method signals to the OS which device has changed.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1349051"></A>ACPI supports two types of batteries: batteries that report only basic battery status information and batteries that support the Smart Battery System Implementers Forum <EM CLASS="Italic">
+Smart Battery Specification</EM>
+. For batteries that report only basic battery status information (such as total capacity and remaining capacity), the OS uses control methods from the battery&#8217;s description table to read this information. To read status information for Smart Batteries, the OS can use a standard Smart Battery driver that directly interfaces to Smart Batteries through the appropriate bus enumerator.<A NAME="marker-1349052"></A><A NAME="marker-1349053"></A><A NAME="marker-1349054"></A></P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1349076"></A><A NAME="_Toc489255967"></A><A NAME="_Toc489267891"></A><A NAME="_Toc489272444"></A><A NAME="_Toc202340490"></A><A NAME="_Toc258262171"></A>Waking the System<A NAME="marker-1349074"></A><A NAME="marker-1349075"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1372332"></A>The wake operation enables devices to wake the system from a sleeping or low-power idle state. This operation must not depend on the CPU because the CPU will not be executing instructions. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1372333"></A>The OS ensures any bridges between the device and the core logic are in the lowest power state in which they can still forward the wake signal. When a device with wake enabled decides to wake the system, it sends the defined signal on its bus. Bus bridges must forward this signal to upstream bridges using the appropriate signal for that bus. Thus, the signal eventually reaches the core chip set (for example, an ACPI chip set), which in turn wakes the system.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1372334"></A>Before putting the system in a sleeping power state, the OS determines which devices are needed to wake the system based on application requests, and then enables wake on those devices in a device and bus specific manner. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1372335"></A>The OS enables the wake feature on devices by setting that device's SCI Enable bit or unmasking its wake interrupt. The location of this control is listed in the device's entry in the description table. Only devices that have their wake feature enabled can wake the system. The OS keeps track of the power states that the wake devices support, and keeps the system in a power state in which the wake can still wake the system (based on capabilities reported in the description table).</P>
+<P CLASS="Body">
+<A NAME="pgfId-1372336"></A>When the system is in a Sleeping or low-power idle state and a wake device decides to wake the system, it signals to the core logic. The status bit corresponding to the device waking the system is set, and the core logic resumes the system. After the OS is running again, it determines the device responsible for the wake event by either running a control method (for wake events) or processing the device's ISR (for wake interrupts). </P>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1349094"></A>Besides using ACPI mechanism to enable a particular device to wake the system, an ACPI platform must also be able to record and report the wake source to OSPM. When a system is woken from certain states (such as the S4 state), it may start out in non-ACPI mode. In this case, the SCI status bit may be cleared when ACPI mode is re-entered. However the platform must still attempt to record the wake source for retrieval by OSPM at a later point.</LI>
+<LI CLASS="Note">
+<A NAME="pgfId-1349095"></A>Although the above description explains how a device can wake the system, note that a device can also be put into a low power state during the S0 system state, and that this device may generate a wake signal in the S0 state as the following example illustrates.<A NAME="_Toc357858902"></A><A NAME="_Toc369556098"></A><A NAME="_Toc369679677"></A><A NAME="_Toc369801287"></A><A NAME="_Toc369936057"></A><A NAME="_Toc370017147"></A><A NAME="_Toc374114589"></A><A NAME="_Toc375244223"></A><A NAME="_Toc375924619"></A><A NAME="_Toc423759830"></A><A NAME="_Toc475523536"></A><A NAME="_Toc486665327"></A></LI>
+</UL>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1349117"></A><A NAME="_Toc489255968"></A><A NAME="_Toc489267892"></A><A NAME="_Toc489272445"></A><A NAME="_Toc202340491"></A><A NAME="_Toc258262172"></A>Example: Modem Device Power Management<A NAME="marker-1349114"></A><A NAME="marker-1349115"></A><A NAME="marker-1349116"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1352450"></A>To illustrate how these power management methods function in ACPI, consider an integrated modem. (This example is greatly simplified for the purposes of this discussion.) The power states of a modem are defined as follows (this is an excerpt from the Modem Device Class Power Management Specification):</P>
+</DIV>
+<DIV>
+<H5 CLASS="GlossTerm">
+<A NAME="pgfId-1352451"></A>D0	</H5>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1351150"></A>Modem controller on<BR>
+Phone interface on<BR>
+Speaker on<BR>
+Can be on hook or off hook<BR>
+Can be waiting for answer</P>
+</DIV>
+<DIV>
+<H5 CLASS="GlossTerm">
+<A NAME="pgfId-1349120"></A>D1	</H5>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1351157"></A>Modem controller in low-power mode (context retained by device)<BR>
+Phone interface powered by phone line or in low-power mode<BR>
+Speaker off<BR>
+Must be on hook</P>
+</DIV>
+<DIV>
+<H5 CLASS="GlossTerm">
+<A NAME="pgfId-1349121"></A>D2	</H5>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1351164"></A>Same as D3</P>
+</DIV>
+<DIV>
+<H5 CLASS="GlossTerm">
+<A NAME="pgfId-1349122"></A>D3	</H5>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1351171"></A>Modem controller off (context lost)<BR>
+Phone interface powered by phone line or off<BR>
+Speaker off<BR>
+On hook</P>
+<P CLASS="Body">
+<A NAME="pgfId-1349126"></A>The power policy for the modem is defined as follows:<A NAME="marker-1349123"></A><A NAME="marker-1349124"></A><A NAME="marker-1349125"></A></P>
+</DIV>
+<DIV>
+<H5 CLASS="GlossTerm">
+<A NAME="pgfId-1349127"></A>D3    D0	</H5>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1352464"></A>COM port opened</P>
+</DIV>
+<DIV>
+<H5 CLASS="GlossTerm">
+<A NAME="pgfId-1349128"></A>D0, D1    D3	</H5>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1352471"></A>COM port closed</P>
+</DIV>
+<DIV>
+<H5 CLASS="GlossTerm">
+<A NAME="pgfId-1349129"></A>D0    D1	</H5>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1352478"></A>Modem put in answer mode</P>
+</DIV>
+<DIV>
+<H5 CLASS="GlossTerm">
+<A NAME="pgfId-1349130"></A>D1    D0	</H5>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1352485"></A>Application requests dial or the phone rings while the modem is in answer mode</P>
+<P CLASS="Body">
+<A NAME="pgfId-1349131"></A>The wake policy for the modem is very simple: When the phone rings and wake is enabled, wake the system. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1349134"></A>Based on that policy, the modem and the COM port to which it is attached can be implemented in hardware as shown in Figure 3-2. This is just an example for illustrating features of ACPI. This example is not intended to describe how OEMs should build hardware.</P>
+<DIV>
+<H6 CLASS="spacing">
+<A NAME="pgfId-1349135"></A>&nbsp;</H6>
+</DIV>
+<DIV>
+<H6 CLASS="Art">
+<A NAME="pgfId-1349139"></A><IMG SRC="ACPI_Concepts-3.gif" ALIGN="BASELINE" ALT="">
+&nbsp;</H6>
+<DIV>
+<H6 CLASS="FigureTitle">
+<A NAME="pgfId-1349141"></A>Example Modem and COM Port Hardware</H6>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1349142"></A>Although not shown above, each discrete part has some isolation logic so that the part is isolated when power is removed from it. Isolation logic controls are implemented as power resources in the ACPI Differentiated Description Block so that devices are isolated as power planes are sequenced off.<A NAME="marker-1349143"></A><A NAME="marker-1349144"></A><A NAME="marker-1349145"></A></LI>
+</UL>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1349157"></A>Obtaining the Modem Capabilities</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349158"></A>The OS determines the capabilities of this modem when it enumerates the modem by reading the modem&#8217;s entry in the Differentiated Definition Block. In this case, the entry for the modem would report:<A NAME="marker-1349159"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1349160"></A>The device supports D0, D1, and D3:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1349161"></A>D0 requires PWR1 and PWR2 as power resources<BR>
+D1 requires PWR1 as a power resource<BR>
+(D3 implicitly requires no power resources)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1349162"></A>To wake the system, the modem needs no power resources (implying it can wake the system from D0, D1, and D3)</LI>
+</UL>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H5 CLASS="GlossTerm">
+<A NAME="pgfId-1349163"></A>Control methods for setting power state and resources</H5>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1349175"></A> Setting the Modem Power State</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1372351"></A>While the OS is running (G0 state), it switches the modem to different power states according to the power policy defined for modems. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1372352"></A>When an application opens the COM port, the OS turns on the modem by putting it in the D0 state. Then if the application puts the modem in answer mode, the OS puts the modem in the D1 state to wait for the call. To make this power-down transition, OSPM first runs a control method (_PS1) provided in the modem's entry to put the device in the D1 state. In this example, this control method asserts the MDM_D1 signal that tells the modem controller to go into a low-power mode. OSPM then checks to see what power resources are no longer needed by the modem device. In this case, PWR2 is no longer needed. Then it checks to make sure no other device in the system requires the use of the PWR2 power resource. If the resource is no longer needed, the OSPM uses the _OFF control method associated with that power resource in the Differentiated Definition Block to turn off the PWR2 power plane. This control method sends the appropriate commands to the core chip set to stop asserting the PWR2_EN line. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1372354"></A>OSPM does not always turn off power resources when a given device is put in a lower power state. For example, assume that the PWR1 power plane also powers an active line printer (LPT) port. Suppose the user terminates the modem application, causing the COM port to be closed, and therefore causing the modem to be shut off (state D3). As always, OSPM begins the state transition process by running the modem's control method to switch the device to the D3 power state. The control method causes the MDM_D3 line to be asserted. Notice that these registers might not be in the device itself. For example, the control method could read the register that controls MDM_D3.The modem controller now turns off all its major functions so that it draws little power, if any, from the PWR1 line. OSPM continues by checking to see which power resources are no longer needed. Because the LPT port is still active, PWR1 is in use. OSPM does not turn off the PWR1 resource. Because the COM port is closed, the same sequence of events take place to put it in the D3 state, but the power resource is not turned off due to the LPT dependency.<A NAME="marker-1349179"></A><A NAME="marker-1349180"></A><A NAME="marker-1349181"></A></P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1349194"></A>Obtaining the Modem Power Status</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349195"></A>Integrated modems have no batteries; the only power status information for the device is the power state of the modem. To determine the modem&#8217;s current power state (D0-D3), OSPM runs a control method (_PSC) supplied in the modem&#8217;s entry in the Differentiated Definition Block. This control method reads from the necessary registers to determine the modem&#8217;s power state. </P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1349207"></A> Waking the System</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1372372"></A>As indicated in the modem capabilities, this modem can wake the machine from any device power state. Before putting the system in a Sleep or LPI state, the OS enables wake on any devices that applications have requested to be able to wake the system. Then, it chooses the deepest sleeping or LPI state that can still provide the power resources necessary to allow all enabled wake devices to wake the system. Next, the OS puts each of those devices in the appropriate power state. In this case, the OS puts the modem in the D3 state because it supports wake from that state. Finally, the OS puts the system into a sleep or LPI state. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1372373"></A>Waking the system via modem starts with the modem's phone interface asserting its ring indicate (RI) line when it detects a ring on the phone line. This line is routed to the core logic to generate a wake event. The chipset then wakes the system and the hardware will eventually pass control back to the OS (the wake mechanism differs depending on the sleeping state, or LPI). After the OS is running, it puts the device in the D0 state and begins handling interrupts from the modem to process the event.<A NAME="marker-1349243"></A></P>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1351305"></A>Processor Power Management</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1349247"></A>To further save power in the Working state, the OS puts the CPU into low-power states (C1, C2, and C3) when the OS is idle. In these low-power states, the CPU does not run any instructions, and wakes when an interrupt, such as the OS scheduler&#8217;s timer interrupt, occurs. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1349248"></A>The OS determines how much time is being spent in its idle loop by reading the ACPI Power Management Timer. This timer runs at a known, fixed frequency and allows the OS to precisely determine idle time. Depending on this idle time estimate, the OS will put the CPU into different quality low-power states (which vary in power and latency) when it enters its idle loop.<A NAME="marker-1349249"></A><A NAME="marker-1349250"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1349252"></A>The CPU states are defined in detail in <A HREF="Processor_Configuration_and_Control.htm#48288" CLASS="XRef">See Processor Configuration and Control.</A>, &#8220;Processor Configuration and Control.&#8221;<A NAME="marker-1349251"></A></P>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1349275"></A><A NAME="_Toc489255970"></A><A NAME="_Toc489267894"></A><A NAME="_Toc489272447"></A><A NAME="_Toc202340493"></A><A NAME="_Toc258262174"></A>Device and Processor Performance States<A NAME="marker-1349271"></A><A NAME="marker-1349272"></A><A NAME="marker-1349273"></A><A NAME="marker-1349274"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1349276"></A>This section describes the concept of device and processor performance states. Device and processor performance states (Px states) are power consumption and capability states within the active/executing states, C0 for processors and D0 for devices. Performance states allow OSPM to make tradeoffs between performance and energy conservation. Device and processor performance states have the greatest impact when the states invoke different device and processor efficiency levels as opposed to a linear scaling of performance and energy consumption. Since performance state transitions occur in the active/executing device states, care must be taken to ensure that performance state transitions do not adversely impact the system.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1349277"></A>Examples of device performance states include:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1349278"></A>A hard drive that provides levels of maximum throughput that correspond to levels of power consumption.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1349279"></A>An LCD panel that supports multiple brightness levels that correspond to levels of power consumption.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1349280"></A>A graphics component that scales performance between 2D and 3D drawing modes that corresponds to levels of power consumption.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1349281"></A>An audio subsystem that provides multiple levels of maximum volume that correspond to levels of maximum power consumption.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1349282"></A>A Direct-RDRAMTM controller that provides multiple levels of memory throughput performance, corresponding to multiple levels of power consumption, by adjusting the maximum bandwidth throttles.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1349283"></A>Processor performance states are described in <A HREF="Processor_Configuration_and_Control.htm#48288" CLASS="XRef">See Processor Configuration and Control.</A>, &#8220;Processor Configuration and Control.&#8221;</P>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1349297"></A><A NAME="_Toc489255971"></A><A NAME="_Toc489267895"></A><A NAME="_Toc489272448"></A><A NAME="_Ref46237991"></A><A NAME="_Ref46238250"></A><A NAME="_Toc202340494"></A><A NAME="_Toc258262175"></A>Configuration and &#8220;Plug and Play&#8221;<A NAME="marker-1349295"></A><A NAME="marker-1349296"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1349298"></A>In addition to power management, ACPI interfaces provide controls and information that enable OSPM to configure the required resources of motherboard devices along with their dynamic insertion and removal. ACPI Definition Blocks, including the Differentiated System Description Table (DSDT) and Secondary System Description Tables (SSDTs), describe motherboard devices in a hierarchical format called the ACPI namespace. The OS enumerates motherboard devices simply by reading through the ACPI Namespace looking for devices with hardware IDs.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1349299"></A>Each device enumerated by ACPI includes ACPI-defined objects in the ACPI Namespace that report the hardware resources that the device could occupy, an object that reports the resources that are currently used by the device, and objects for configuring those resources. The information is used by the Plug and Play OS (OSPM) to configure the devices.</P>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1349313"></A><A NAME="marker-1349309"></A>When preparing to boot a system, the platform boot firmware only needs to configure boot devices. This includes boot devices described in the ACPI system description tables as well as devices that are controlled through other standards.<A NAME="marker-1349314"></A><A NAME="marker-1349315"></A><A NAME="marker-1349316"></A></LI>
+</UL>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1349337"></A><A NAME="_Toc489255972"></A><A NAME="_Toc489267896"></A><A NAME="_Toc489272449"></A><A NAME="_Toc202340495"></A><A NAME="_Toc258262176"></A>Device Configuration Example: Configuring the Modem<A NAME="marker-1349335"></A><A NAME="marker-1349336"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349338"></A>Returning to the modem device example above, the OS will find the modem and load a driver for it when the OS finds it in the DSDT. This table will have control methods that give the OS the following information:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1349339"></A>The device can use IRQ 3, I/O 3F8-3FF or IRQ 4, I/O 2E8-2EF</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1349340"></A>The device is currently using IRQ 3, I/O 3F8-3FF</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1349341"></A>The OS configures the modem&#8217;s hardware resources using Plug and Play algorithms. It chooses one of the supported configurations that does not conflict with any other devices. Then, OSPM configures the device for those resources by running a control method supplied in the modem&#8217;s section of the Differentiated Definition Block. This control method will write to any I/O ports or memory addresses necessary to configure the device to the given resources.</P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1349345"></A><A NAME="_Toc202340496"></A><A NAME="_Toc258262177"></A>NUMA Nodes</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349348"></A><A NAME="OLE_LINK27"></A><A NAME="OLE_LINK28"></A>Systems employing a Non Uniform Memory Access (NUMA) architecture contain collections of hardware resources including processors, memory, and I/O buses, that comprise what is commonly known as a &#8220;NUMA node&#8221;. Processor accesses to memory or I/O resources within the local NUMA node is generally faster than processor accesses to memory or I/O resources outside of the local NUMA node. ACPI defines interfaces that allow the platform to convey NUMA node topology information to OSPM both statically at boot time and dynamically at run time as resources are added or removed from the system.</P>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1349372"></A><A NAME="_Toc489255973"></A><A NAME="_Toc489267897"></A><A NAME="_Toc489272450"></A><A NAME="_Toc202340497"></A><A NAME="_Toc258262178"></A>System Events<A NAME="marker-1349367"></A><A NAME="marker-1349368"></A><A NAME="marker-1349369"></A><A NAME="marker-1349370"></A><A NAME="marker-1349371"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1349373"></A>ACPI includes a general event model used for Plug and Play, Thermal, and Power Management events. There are two registers that make up the event model: an event status register and an event enable register. <A NAME="marker-1349374"></A><A NAME="marker-1349375"></A><A NAME="marker-1349376"></A><A NAME="marker-1349377"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1349378"></A>When an event occurs, the core logic sets a bit in the status register to indicate the event. If the corresponding bit in the enable register is set, the core logic will assert the SCI to signal the OS. When the OS receives this interrupt, it will run the control methods corresponding to any bits set in the event status register. These control methods use AML commands to tell the OS what event occurred.<A NAME="marker-1349379"></A><A NAME="marker-1349380"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1349381"></A>For example, assume a machine has all of its Plug and Play, Thermal, and Power Management events connected to the same pin in the core logic. The event status and event enable registers would only have one bit each: the bit corresponding to the event pin. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1349382"></A>When the system is docked, the core logic sets the status bit and signals the SCI. The OS, seeing the status bit set, runs the control method for that bit. The control method checks the hardware and determines the event was a docking event (for example). It then signals to the OS that a docking event has occurred, and can tell the OS specifically where in the device hierarchy the new devices will appear. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1351373"></A>Since the event model registers are generalized, they can describe many different platform implementations. The single pin model above is just one example. Another design might have Plug and Play, Thermal, and Power Management events wired to three different pins so there would be three status bits (and three enable bits). Yet another design might have every individual event wired to its own pin and status bit. This design, at the opposite extreme from the single pin design, allows very complex hardware, yet very simple control methods. Countless variations in wiring up events are possible. However, note that care must be taken to ensure that if events share a signal that the event that generated the signal can be determined in the corresponding event handling control method allowing the proper device notification to be sent. <A NAME="marker-1349383"></A><A NAME="marker-1349390"></A><A NAME="_Toc369556107"></A><A NAME="_Toc369679686"></A><A NAME="_Toc369801296"></A><A NAME="_Toc369936066"></A><A NAME="_Toc370017156"></A><A NAME="_Toc374114598"></A><A NAME="_Toc375244232"></A><A NAME="_Toc375924628"></A><A NAME="_Toc423759839"></A><A NAME="_Toc475523543"></A><A NAME="_Toc486665333"></A></P>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1349413"></A><A NAME="_Toc489255974"></A><A NAME="_Toc489267898"></A><A NAME="_Toc489272451"></A><A NAME="_Toc202340498"></A><A NAME="_Toc258262179"></A>Battery Management<A NAME="marker-1349412"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1349414"></A>Battery management policy moves from the APM BIOS to the ACPI-compatible OS. Batteries must comply with the requirements of their associated interfaces, as described either herein or in other applicable standards. The OS may choose to alter the behavior of the battery, for example, by adjusting the Low Battery or Battery Warning trip point. When there are multiple batteries present, the battery subsystem is not required to perform any synthesis of a &#8220;composite battery&#8221; from the data of the separate batteries. In cases where the battery subsystem does not synthesize a &#8220;composite battery&#8221; from the separate battery's data, the OS must provide that synthesis.<A NAME="marker-1349415"></A><A NAME="marker-1349416"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1349417"></A>An ACPI-compatible battery device needs either a Smart Battery subsystem interface or a Control Method Battery interface.<A NAME="marker-1349418"></A><A NAME="marker-1349419"></A><A NAME="marker-1349420"></A></P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1349421"></A>Smart Battery is controlled by the OS directly through the embedded controller (EC). For more information about the ACPI Embedded Controller SMBus interface, see <A HREF="ACPI_Embedded_Controller_Interface_Specification.htm#37345" CLASS="XRef">See  SMBus Host Controller Interface via Embedded Controller.</A>, &#8220;SMBus Host Controller Interface via Embedded Controller.&#8221; For additional information about the Smart Battery subsystem interface, see <A HREF="Power_Source_and_Power_Meter_Devices.htm#_Toc489267273" CLASS="XRef">See Smart Battery Subsystems.</A>, &#8220;Smart Battery Subsystems.&#8221;</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1349422"></A>Control Method Battery is completely accessed by AML code control methods, allowing the OEM to choose any type of battery and any kind of communication interface supported by ACPI. For more information about the Control Method Battery Interface, see <A HREF="Power_Source_and_Power_Meter_Devices.htm#_Toc489267283" CLASS="XRef">See Control Method Batteries.</A>, &#8220;Control Method Batteries.&#8221; </LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1349423"></A>This section describes concepts common to all battery types.</P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1349442"></A><A NAME="_Toc489255975"></A><A NAME="_Toc489267899"></A><A NAME="_Toc489272452"></A><A NAME="_Toc202340499"></A><A NAME="_Toc258262180"></A>Battery Communications</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349443"></A>Both the Smart Battery and Control Method Battery interfaces provide a mechanism for the OS to query information from the platform&#8217;s battery system. This information may include full charged capacity, present battery capacity, rate of discharge, and other measures of the battery&#8217;s condition. All battery system types must provide notification to the OS when there is a change such as inserting or removing a battery, or when a battery starts or stops discharging. Smart Batteries and some Control Method Batteries are also able to give notifications based on changes in capacity. Smart batteries provide extra information such as estimated run-time, information about how much power the battery is able to provide, and what the run-time would be at a predetermined rate of consumption.<A NAME="marker-1349470"></A></P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1349473"></A>Battery Capacity</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349474"></A>Each battery must report its designed capacity, latest full-charged capacity, and present remaining capacity. Remaining capacity decreases during usage, and it also changes depending on the environment. Therefore, the OS must use latest full-charged capacity to calculate the battery percentage. In addition the battery system must report warning and low battery levels at which the user must be notified and the system transitioned to a sleeping state. See <A HREF="ACPI_Concepts.htm#50050" CLASS="XRef">See Reporting Battery Capacity.</A> for the relation of these five values.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1349475"></A>A system may use either rate and capacity [mA/mAh] or power and energy [mW/mWh] for the unit of battery information calculation and reporting. Mixing [mA] and [mW] is not allowed on a system.</P>
+<DIV>
+<H6 CLASS="spacing">
+<A NAME="pgfId-1349476"></A>&nbsp;</H6>
+</DIV>
+</DIV>
+<DIV>
+<H6 CLASS="Art">
+<A NAME="pgfId-1349480"></A><IMG SRC="ACPI_Concepts-4.gif" ALIGN="BASELINE" ALT="">
+&nbsp;</H6>
+<DIV>
+<H6 CLASS="FigureTitle">
+<A NAME="pgfId-1349481"></A><A NAME="50050"></A>Reporting Battery Capacity</H6>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1349500"></A><A NAME="_Toc489255977"></A><A NAME="_Toc489267901"></A><A NAME="_Toc489272454"></A><A NAME="_Toc202340501"></A><A NAME="_Toc258262182"></A>Battery Gas Gauge</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349502"></A>At the most basic level, the OS calculates Remaining Battery Percentage [%] using the following formula:<A NAME="marker-1349501"></A></P>
+</DIV>
+</DIV>
+<DIV>
+<H6 CLASS="Art">
+<A NAME="pgfId-1349506"></A><IMG SRC="ACPI_Concepts-5.gif" ALIGN="BASELINE" ALT="">
+&nbsp;</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1352566"></A>Control Method Battery also reports the Present Drain Rate [mA or mW] for calculating the remaining battery life. At the most basic level, Remaining Battery life is calculated by following formula:<A NAME="marker-1352567"></A></P>
+</DIV>
+<DIV>
+<H6 CLASS="Art">
+<A NAME="pgfId-1352591"></A><IMG SRC="ACPI_Concepts-6.gif" ALIGN="BASELINE" ALT="">
+ &nbsp;</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349513"></A>Smart Batteries also report the present rate of drain, but since they can directly report the estimated run-time, this function should be used instead as it can more accurately account for variations specific to the battery.<A NAME="marker-1349514"></A></P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1349526"></A><A NAME="_Toc489255978"></A><A NAME="_Toc489267902"></A><A NAME="_Toc489272455"></A><A NAME="_Toc202340502"></A><A NAME="_Toc258262183"></A>Low Battery Levels<A NAME="marker-1349523"></A><A NAME="marker-1349524"></A><A NAME="marker-1349525"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349527"></A>A system has an OEM-designed initial capacity for warning, initial capacity for low, and a critical battery level or flag. The values for warning and low represent the amount of energy or battery capacity needed by the system to take certain actions. The critical battery level or flag is used to indicate when the batteries in the system are completely drained. OSPM can determine independent warning and low battery capacity values based on the OEM-designed levels, but cannot set these values lower than the OEM-designed values, as shown in the figure below</P>
+</DIV>
+</DIV>
+<DIV>
+<H6 CLASS="Art">
+<A NAME="pgfId-1349531"></A><IMG SRC="ACPI_Concepts-7.gif" ALIGN="BASELINE" ALT="">
+ &nbsp;</H6>
+<DIV>
+<H6 CLASS="FigureTitle">
+<A NAME="pgfId-1349532"></A>Low Battery and Warning</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1352629"></A>Each Control Method Battery in a system reports the OEM-designed initial warning capacity and OEM-designed initial low capacity as well as a flag to report when that battery has reached or is below its critical energy level. Unlike Control Method Batteries, Smart Batteries are not necessarily specific to one particular machine type, so the OEM-designed warning, low, and critical levels are reported separately in a Smart Battery Table described in <A HREF="ACPI_Software_Programming_Model.htm#_Toc489256016" CLASS="XRef">See Smart Battery Table (SBST).</A>.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1352633"></A>The table below describes how these values should be set by the OEM and interpreted by the OS.</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1352658"></A>Low Battery Levels<A NAME="marker-1352634"></A></H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1369340"></A>Level</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1369342"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1369344"></A>Warning</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1369346"></A>When the total available energy (mWh) or capacity (mAh) in the batteries falls below this level, the OS will notify the user through the UI. This value should allow for a few minutes of run-time before the &#8220;Low&#8221; level is encountered so the user has time to wrap up any important work, change the battery, or find a power outlet to plug the system in.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1369348"></A>Low</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1369350"></A>This value is an estimation of the amount of energy or battery capacity required by the system to transition to any supported sleeping state. When the OS detects that the total available battery capacity is less than this value, it will transition the system to a user defined system state (S1-S4). In most situations this should be S4 so that system state is not lost if the battery eventually becomes completely empty. The design of the OS should consider that users of a multiple battery system may remove one or more of the batteries in an attempt replace or charge it. This might result in the remaining capacity falling below the &#8220;Low&#8221; level not leaving sufficient battery capacity for the OS to safely transition the system into the sleeping state. Therefore, if the batteries are discharging simultaneously, the action might need to be initiated at the point when both batteries reach this level.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1369352"></A><A NAME="marker-1369351"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1369355"></A>Critical<A NAME="marker-1369354"></A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1369356"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1369358"></A>The Critical battery state indicates that all available batteries are discharged and do not appear to be able to supply power to run the system any longer. When this occurs, the OS must attempt to perform an emergency shutdown as described below.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1369359"></A>For a smart battery system, this would typically occur when all batteries reach a capacity of 0, but an OEM may choose to put a larger value in the Smart Battery Table to provide an extra margin of safely.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1369360"></A>For a Control Method Battery system with multiple batteries, the flag is reported per battery. If any battery in the system is in a critically low state and is still providing power to the system (in other words, the battery is discharging), the system is considered to be in a critical energy state. The _BST control method is required to return the Critical flag on a discharging battery only when all batteries have reached a critical state; the ACPI system firmware is otherwise required to switch to a non-critical battery.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1349571"></A>Emergency Shutdown<A NAME="marker-1349570"></A><A NAME="marker-1349572"></A><A NAME="marker-1349573"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349576"></A>Running until all batteries in a system are critical is not a situation that should be encountered normally, since the system should be put into a sleeping state when the battery becomes low. In the case that this does occur, the OS should take steps to minimize any damage to system integrity. The emergency shutdown procedure should be designed to minimize bad effects based on the assumption that power may be lost at any time. For example, if a hard disk is spun down, the OS should not try to spin it up to write any data, since spinning up the disk and attempting to write data could potentially corrupt files if the write were not completed. Even if a disk is spun up, the decision to attempt to save even system settings data before shutting down would have to be evaluated since reverting to previous settings might be less harmful than having the potential to corrupt the settings if power was lost halfway through the write operation.</P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1349580"></A><A NAME="_Toc202340503"></A><A NAME="_Toc258262184"></A>Battery Calibration</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349581"></A>The reported capacity of many batteries generally degrade over time, providing less run time for the user. However, it is possible with many battery systems to provide more usable runtime on an old battery if a calibration or conditioning cycle is run occasionally. The user has typically been able to perform a calibration cycle either by going into the platform boot firmware setup menu, or by running a custom driver and calibration application provided by the OEM. The calibration process typically takes several hours, and the laptop must be plugged in during this time. Ideally the application that controls this should make this as good of a user experience as possible, for example allowing the user to schedule the system to wake up and perform the calibration at some time when the system will not be in use. Since the calibration user experience does not need to be different from system to system it makes sense for this service to be provided by the OSPM. In this way OSPM can provide a common experience for end users and eliminate the need for OEMs to develop custom battery calibration software.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1349582"></A>In order for OSPM to perform generic battery calibration, generic interfaces to control the two basic calibration functions are required. These functions are defined in  <A HREF="Power_Source_and_Power_Meter_Devices.htm#40939" CLASS="XRef">See _BMS (Battery Measurement Sampling Time).</A> and <A HREF="Power_Source_and_Power_Meter_Devices.htm#_Toc489267287" CLASS="XRef">See _BST (Battery Status).</A>. First, there is a means to detect when it would be beneficial to calibrate the battery. Second there is a means to perform that calibration cycle. Both of those functions may be implemented by dedicated hardware such as a battery controller chip, by firmware in the embedded controller, by the platform firmware, or by OSPM. From here on any function implemented through AML, whether or not the AML code relies on hardware, will be referred to as &#8220;AML controlled&#8221; since the interface is the same whether the AML passes control to the hardware or not.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1349583"></A>Detection of when calibration is necessary can be implemented by hardware or AML code and be reported through the _BMD method. Alternately, the _BMD method may simply report the number of cycles before calibration should be performed and let the OS attempt to count the cycles. A counter implemented by the hardware or the platform firmware will generally be more accurate since the batteries can be used without the OS running, but in some cases, a system designer may opt to simplify the hardware or firmware implementation.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1371631"></A>When calibration is desirable and the user has scheduled the calibration to occur, the calibration cycle can be AML controlled or OSPM controlled. OSPM can only implement a very simple algorithm since it doesn&#8217;t have knowledge of the specifics of the battery system. It will simply discharge the battery until it quits discharging, then charge it until it quits charging. In the case where the AC adapter cannot be controlled through the _BMC, it will prompt the user to unplug the AC adapter and reattach it after the system powers off. If the calibration cycle is controlled by AML, the OS will initiate the calibration cycle by calling _BMC. That method will either give control to the hardware, or will control the calibration cycle itself. If the control of the calibration cycle is implemented entirely in AML code, the platform runtime firmware may avoid continuously running AML code by having the initial call to _BMC start the cycle, set some state flags, and then exit. Control of later parts of the cycle can be accomplished by putting code that checks these state flags in the battery event handler (_Qxx, _Lxx, or _Exx).</P>
+<P CLASS="Body">
+<A NAME="pgfId-1371650"></A>Details of the control methods for this interface are defined in <A HREF="Power_Source_and_Power_Meter_Devices.htm#_Toc489267283" CLASS="XRef">See Control Method Batteries.</A>.<A NAME="marker-1371647"></A><A NAME="marker-1371648"></A><A NAME="marker-1371649"></A></P>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1371653"></A><A NAME="marker-1371651"></A><A NAME="65135"></A>Thermal Management</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1371654"></A>ACPI allows the OS to play a role in the thermal management of the system while maintaining the platform&#8217;s ability to mandate cooling actions as necessary. In the passive cooling mode, OSPM can make cooling decisions based on application load on the CPU as well as the thermal heuristics of the system. OSPM can also gracefully shutdown the computer in case of high temperature emergencies. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1349622"></A>The ACPI thermal design is based around regions called thermal zones. Generally, the entire PC is one large thermal zone, but an OEM can partition the system into several logical thermal zones if necessary. <A HREF="ACPI_Concepts.htm#93270" CLASS="XRef">See Thermal Zone.</A> is an example mobile PC diagram that depicts a single thermal zone with a central processor as the thermal-coupled device. In this example, the whole notebook is covered as one large thermal zone. This notebook uses one fan for active cooling and the CPU for passive cooling. <A NAME="marker-1349623"></A><A NAME="marker-1349624"></A><A NAME="marker-1349625"></A></P>
+<P CLASS="Art-Caption">
+<A NAME="pgfId-1370342"></A><IMG SRC="ACPI_Concepts-8.gif" ALIGN="BASELINE" ALT="">
+<A NAME="_Ref368052676"></A>&nbsp;</P>
+<DIV>
+<H6 CLASS="FigureTitle">
+<A NAME="pgfId-1370344"></A><A NAME="93270"></A>Thermal Zone</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1370345"></A>The following sections are an overview of the thermal control and cooling characteristics of a computer. For some thermal implementation examples on an ACPI platform, see <A HREF="Thermal_management.htm#_Toc489267323" CLASS="XRef">See Thermal Zone Interface Requirements.</A>, &#8220;Thermal Zone Interface Requirements.&#8221; <A NAME="marker-1370349"></A><A NAME="marker-1370350"></A></P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1349659"></A><A NAME="_Toc489255980"></A><A NAME="_Toc489267904"></A><A NAME="_Toc489272457"></A><A NAME="_Toc202340505"></A><A NAME="_Toc258262186"></A>Active and Passive Cooling Modes</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349661"></A>ACPI defines two cooling modes, Active and Passive:<A NAME="marker-1349660"></A></P>
+</DIV>
+<DIV>
+<H5 CLASS="GlossTerm">
+<A NAME="pgfId-1349662"></A>Passive cooling </H5>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1351541"></A>OS reduces the power consumption of devices at the cost of system performance to reduce the temperature of the system. <A NAME="marker-1349663"></A></P>
+</DIV>
+<DIV>
+<H5 CLASS="GlossTerm">
+<A NAME="pgfId-1349666"></A>Active cooling </H5>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1351552"></A>OS increases the power consumption of the system (for example, by turning on a fan) to reduce the temperature of the system. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1351574"></A>These two cooling modes are inversely related to each other. Active cooling requires increased power to reduce the heat within the system while Passive cooling requires reduced power to decrease the temperature. The effect of this relationship is that Active cooling allows maximum system performance, but it may create undesirable fan noise, while Passive cooling reduces system performance, but is inherently quiet. <A NAME="_Toc369556115"></A><A NAME="_Toc369679693"></A><A NAME="_Toc369801303"></A><A NAME="_Toc369936073"></A><A NAME="_Toc370017163"></A><A NAME="_Toc374114605"></A><A NAME="_Toc375244239"></A><A NAME="_Toc375924635"></A><A NAME="_Toc423759846"></A><A NAME="marker-1349680"></A><A NAME="marker-1349681"></A></P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1349691"></A><A NAME="_Toc489255981"></A><A NAME="_Toc489267905"></A><A NAME="_Toc489272458"></A><A NAME="_Toc202340506"></A><A NAME="_Toc258262187"></A>Performance vs. Energy Conservation </H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349692"></A>A robust OSPM implementation provides the means for the end user to convey to OSPM a preference (or a level of preference) for either performance or energy conservation. Allowing the end user to choose this preference is most critical to mobile system users where maximizing system run-time on a battery charge often has higher priority over realizing maximum system performance. <A NAME="marker-1349693"></A><A NAME="marker-1349694"></A><A NAME="marker-1349695"></A><A NAME="marker-1349696"></A><A NAME="marker-1349697"></A><A NAME="marker-1349698"></A><A NAME="marker-1349699"></A><A NAME="marker-1349700"></A><A NAME="marker-1349701"></A><A NAME="marker-1349702"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1349703"></A>A user&#8217;s preference for performance corresponds to the Active cooling mode while a user&#8217;s preference for energy conservation corresponds to the Passive cooling mode. ACPI defines an interface to convey the cooling mode to the platform. Active cooling can be performed with minimal OSPM thermal policy intervention. For example, the platform indicates through thermal zone parameters that crossing a thermal trip point requires a fan to be turned on. Passive cooling requires OSPM thermal policy to manipulate device interfaces that reduce performance to reduce thermal zone temperature.<A NAME="marker-1349704"></A><A NAME="marker-1349705"></A><A NAME="marker-1349706"></A></P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1349718"></A><A NAME="_Toc489255982"></A><A NAME="_Toc489267906"></A><A NAME="_Toc489272459"></A><A NAME="_Toc202340507"></A><A NAME="_Toc258262188"></A>Acoustics (Noise)<A NAME="marker-1349716"></A><A NAME="marker-1349717"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349719"></A>Active cooling mode generally implies that fans will be used to cool the system and fans vary in their audible output. Fan noise can be quite undesirable given the loudness of the fan and the ambient noise environment. In this case, the end user&#8217;s physical requirement for fan silence may override the preference for either performance or energy conservation.<A NAME="marker-1349720"></A> </P>
+<P CLASS="Body">
+<A NAME="pgfId-1349721"></A>A user&#8217;s desire for fan silence corresponds to the Passive cooling mode. Accordingly, a user&#8217;s desire for fan silence also means a preference for energy conservation.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1349722"></A>For more information on thermal management and examples of platform settings for active and passive cooling, see <A HREF="Thermal_management.htm#54593" CLASS="XRef">See Thermal Management.</A>, &#8220;Thermal Management.&#8221;</P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1349741"></A><A NAME="_Toc489255983"></A><A NAME="_Toc489267907"></A><A NAME="_Toc489272460"></A><A NAME="_Toc202340508"></A><A NAME="_Toc258262189"></A>Multiple Thermal Zones</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349742"></A>The basic thermal management model defines one thermal zone, but in order to provide extended thermal control in a complex system, ACPI specifies a multiple thermal zone implementation. Under a multiple thermal zone model, OSPM will independently manage several thermal-coupled devices and a designated thermal zone for each thermal-coupled device, using Active and/or Passive cooling methods available to each thermal zone. Each thermal zone can have more than one Passive and Active cooling device. Furthermore, each zone might have unique or shared cooling resources. In a multiple thermal zone configuration, if one zone reaches a critical state then OSPM must shut down the entire system. </P>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1371202"></A>Flexible Platform Architecture Support</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1371208"></A>ACPI defines mechanisms and models to accommodate platform architectures that deviate from the traditional PC. ACPI provides support for platform technologies that enable lower-power, lower cost, more design flexibility and more device diversity. This support is described in the following sections, and detailed in later chapters.</P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1371321"></A>Hardware-reduced ACPI</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1371210"></A>ACPI offers an alternative platform interface model that removes ACPI hardware requirements for platforms that do not implement the PC Architecture. In the Hardware-reduced ACPI model, the Fixed hardware interface requirements of Chapter 4 are removed, and Generic hardware interfaces are used instead. This provides the level of flexibility needed to innovate and differentiate in low-power hardware designs while enabling support by multiple Operating Systems.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1371211"></A>Hardware-reduced ACPI has the following requirements:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1371212"></A>UEFI firmware interface for boot (Legacy BIOS is not supported).</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1371214"></A>Boot in ACPI mode only (ACPI Enable, ACPI Disable, SMI_CMD and Legacy mode are not supported)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1371215"></A>No  hardware resource sharing between OSPM and other asynchronous operating environments, such as UEFI Runtime Services or System Management Mode. (The Global Lock is not supported)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1371217"></A>No dependence on OS-support for maintaining  cache coherency across processor sleep states (Bus Master Reload and Arbiter Disable are not supported)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1371864"></A>GPE block devices are not supported</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1371218"></A>Systems that do not meet the above requirements must implement the ACPI Fixed Hardware interface.</P>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1371219"></A><A NAME="17187"></A> Interrupt-based Wake Events</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1371220"></A>On HW-reduced ACPI platforms, wakeup is an attribute of connected interrupts. Interrupts that are designed to wake the processor or the entire platform are defined as wake-capable. Wake-capable interrupts, when enabled by OSPM, wake the system when they assert.</P>
+</DIV>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1371221"></A>Low-Power Idle</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1371222"></A>Platform architectures may support hardware power management models other than the traditional ACPI Sleep/Resume model. These are typically implemented in proprietary hardware and are capable of delivering low-latency, connected idle while saving as much energy as ACPI Sleep states. To support the diversity of hardware implementations, ACPI provides a mechanism for the platform to indicate to OSPM that such capability is available.</P>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1371223"></A>Low Power S0 Idle Capable Flag</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1371224"></A>This flag in the FADT informs OSPM whether a platform has advanced idle power capabilities such that S0 idle achieves savings similar to or better than those typically achieved in S3.  With this flag, OSPM can keep the system in S0 idle for its low-latency response and its connectedness rather than transitioning to a system sleep state which has neither. The flag enables support for a diversity of platform implementations: traditional Sleep/Resume systems, systems with advanced idle power, systems that support neither, and systems that can support both, depending on the capabilities of the installed OS.</P>
+</DIV>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1371486"></A><A NAME="39141"></A>Connection Resources</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1371487"></A>General-purpose I/O (GPIO) and Simple Peripheral Bus (SPB) controllers are hardware resources provided in silicon solutions to enable flexible configuration of a broad range of system designs. These controllers can provide input, output, interrupt and serial communication connections to arbitrary devices in a system. The function to which one of these connections is put depends on the specific device involved and the needs of the platform design. In order to support these platform technologies, ACPI defines a general abstraction for flexible connections.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1371488"></A>In order to maintain compatibility with existing software models, ACPI abstracts these connections as hardware resources.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1371610"></A>The Connection Resource abstraction mirrors the hardware functionality of GPIO and SPB controllers. Like other resources, these connections are allocated and configured before use. With the resources described by the platform, OSPM abstracts the underlying configuration from device drivers. Drivers, then, can be written for the device's function only, and reused with that functional hardware regardless of how it is integrated into a given system.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1371611"></A>&nbsp;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1371612"></A>The key aspects of the Connection Resource abstraction are:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1371492"></A>GPIO and SPB controllers are enumerated as devices in the ACPI Namespace.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1371493"></A>GPIO Connection and SPB Connection resource types are defined.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1371494"></A>Namespace devices that are connected to GPIO or SPB controllers use Resource Template Macros to add Connection Resources to their resource methods (_CRS, _SRS, etc.).</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1371495"></A>GPIO Connection Resources can be designated by the platform for use as GPIO-signaled ACPI Events.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1371496"></A>Connection Resources can be used by AML methods to access pins and peripherals through GPIO and SPB operation regions.</LI>
+</UL>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1371226"></A>Supported Platforms</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1371227"></A>The HW-reduced ACPI and Low power S0 Idle Capable flags combine to represent 4 platform types that can be implemented. The following table enumerates these, as well as the intended OSPM behavior and specific platform requirements.</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1371280"></A>Implementable Platform Types</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1371464"></A>Low Power S0 Idle Capable</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1371466"></A>Hardware-reduced ACPI</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1371468"></A>OSPM Behavior</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1371470"></A>Platform Implementation</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1371414"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1371416"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1371418"></A>Fixed hardware interface accessed for features, events and system power management.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1371419"></A>Traditional Sleep/Resume power management.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1371421"></A>Implement Fixed-feature hardware interface.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1371423"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1371425"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1371427"></A>Fixed-feature hardware interface not accessed.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1371428"></A>Sleep/Resume Power Management using FADT SLEEP_*_REG fields and Interrupt-based wake signaling. </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1371430"></A>Implement GPIO-signaled ACPI Events;</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1371431"></A>Implement software alternatives to any ACPI fixed features, including the Sleep registers.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1371432"></A>Implement wake-capable interrupts for wake events.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1371434"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1371436"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1371438"></A>Fixed hardware interface accessed for features and events.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1371439"></A>Platform-specific Low-power Idle power management.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1371441"></A>Implement Fixed-feature hardware interface.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1371442"></A>Implement low-power hardware such that the platform achieves power savings in S0 similar to or better than those typically achieved in S3. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1371444"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1371446"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1371448"></A>Fixed-feature hardware interface not accessed.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1371449"></A>Platform-specific Low-power Idle power management.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1371451"></A>Implement GPIO-signaled ACPI Events;</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1371452"></A>Implement software alternatives to any ACPI fixed features desired;</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1371453"></A>Implement wake-capable interrupts for any wake events.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1371454"></A>Implement low-power hardware such that the platform achieves power savings in S0 similar to or better than those typically achieved in S3.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H6 CLASS="ACPINormal">
+<A NAME="pgfId-1371281"></A>&nbsp;</H6>
+</DIV>
+</DIV>
+</DIV>
+</BODY>
+</HTML>

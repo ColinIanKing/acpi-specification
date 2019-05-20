@@ -1,0 +1,2710 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2016/HTML Export Filter">
+<LINK REL="STYLESHEET" HREF="Front Matter.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE> Revision History</TITLE></HEAD>
+<BODY>
+<P CLASS="VersionTitle">
+<A NAME="pgfId-1093304"></A>&nbsp;</P>
+<P CLASS="VersionTitle">
+<A NAME="pgfId-1093306"></A>&nbsp;</P>
+<P CLASS="VersionTitle">
+<A NAME="pgfId-1093308"></A>&nbsp;</P>
+<P CLASS="VersionTitle">
+<A NAME="pgfId-1093310"></A>&nbsp;</P>
+<P CLASS="VersionTitle">
+<A NAME="pgfId-1093312"></A>&nbsp;</P>
+<P CLASS="VersionTitle">
+<A NAME="pgfId-1089649"></A>&nbsp;</P>
+<DIV>
+<IMG SRC="Front Matter-1.gif" ALT="">
+</DIV>
+<P CLASS="ChapterTitle">
+<A NAME="pgfId-1089650"></A>Advanced Configuration and Power Interface (ACPI) Specification</P>
+<P CLASS="VersionTitle">
+<A NAME="pgfId-1089651"></A>&nbsp;</P>
+<P CLASS="VersionTitle">
+<A NAME="pgfId-1089652"></A>&nbsp;</P>
+<P CLASS="VersionTitle">
+<A NAME="pgfId-1089655"></A>&nbsp;</P>
+<P CLASS="VersionTitle">
+<A NAME="pgfId-1089659"></A>Version 6.3</P>
+<P CLASS="VersionTitle">
+<A NAME="pgfId-1089663"></A>January 2019</P>
+<P CLASS="Disclaimer">
+<A NAME="pgfId-1089665"></A>Acknowledgements</P>
+<P CLASS="Disclaimer">
+<A NAME="pgfId-1089666"></A>&nbsp;</P>
+<P CLASS="Disclaimer">
+<A NAME="pgfId-1089667"></A>&nbsp;</P>
+<P CLASS="Disclaimer">
+<A NAME="pgfId-1089668"></A>&nbsp;</P>
+<P CLASS="Disclaimer">
+<A NAME="pgfId-1089669"></A>&nbsp;</P>
+<P CLASS="Disclaimer">
+<A NAME="pgfId-1089670"></A>&nbsp;</P>
+<P CLASS="Disclaimer">
+<A NAME="pgfId-1089671"></A>&nbsp;</P>
+<P CLASS="Disclaimer">
+<A NAME="pgfId-1089672"></A>&nbsp;</P>
+<P CLASS="Disclaimer">
+<A NAME="pgfId-1089673"></A>&nbsp;</P>
+<P CLASS="Disclaimer">
+<A NAME="pgfId-1089674"></A>&nbsp;</P>
+<P CLASS="Disclaimer">
+<A NAME="pgfId-1089675"></A>&nbsp;</P>
+<P CLASS="Disclaimer">
+<A NAME="pgfId-1089676"></A>The material contained herein is not a license, either expressly or impliedly, to any intellectual property owned or controlled by any of the authors or developers of this material or to any contribution thereto. The material contained herein is provided on an &quot;AS IS&quot; basis and, to the maximum extent permitted by applicable law, this information is provided AS IS AND WITH ALL FAULTS, and the authors and developers of this material hereby disclaim all other warranties and conditions, either express, implied or statutory, including, but not limited to, any (if any) implied warranties, duties or conditions of merchantability, of fitness for a particular purpose, of accuracy or completeness of responses, of results, of workmanlike effort, of lack of viruses and of lack of negligence, all with regard to this material and any contribution thereto. Designers must not rely on the absence or characteristics of any features or instructions marked &quot;reserved&quot; or &quot;undefined.&quot; The Unified EFI Forum, Inc. reserves any features or instructions so marked for future definition and shall have no responsibility whatsoever for conflicts or incompatibilities arising from future changes to them. ALSO, THERE IS NO WARRANTY OR CONDITION OF TITLE, QUIET ENJOYMENT, QUIET POSSESSION, CORRESPONDENCE TO DESCRIPTION OR NON-INFRINGEMENT WITH REGARD TO THE SPECIFICATION AND ANY CONTRIBUTION THERETO. </P>
+<P CLASS="Disclaimer">
+<A NAME="pgfId-1089677"></A>&nbsp;</P>
+<P CLASS="Disclaimer">
+<A NAME="pgfId-1089678"></A>IN NO EVENT WILL ANY AUTHOR OR DEVELOPER OF THIS MATERIAL OR ANY CONTRIBUTION THERETO BE LIABLE TO ANY OTHER PARTY FOR THE COST OF PROCURING SUBSTITUTE GOODS OR SERVICES, LOST PROFITS, LOSS OF USE, LOSS OF DATA, OR ANY INCIDENTAL, CONSEQUENTIAL, DIRECT, INDIRECT, OR SPECIAL DAMAGES WHETHER UNDER CONTRACT, TORT, WARRANTY, OR OTHERWISE, ARISING IN ANY WAY OUT OF THIS OR ANY OTHER AGREEMENT RELATING TO THIS DOCUMENT, WHETHER OR NOT SUCH PARTY HAD ADVANCE NOTICE OF THE POSSIBILITY OF SUCH DAMAGES. </P>
+<P CLASS="Disclaimer">
+<A NAME="pgfId-1089679"></A>&nbsp;</P>
+<P CLASS="Disclaimer">
+<A NAME="pgfId-1089680"></A>Copyright &#169; 2018, Unified Extensible Firmware Interface (UEFI) Forum, Inc. All Rights Reserved. The UEFI Forum is the owner of all rights and title in and to this work, including all copyright rights that may exist, and all rights to use and reproduce this work. Further to such rights, permission is hereby granted to any person implementing this specification to maintain an electronic version of this work accessible by its internal personnel, and to print a copy of this specification in hard copy form, in whole or in part, in each case solely for use by that person in connection with the implementation of this Specification, provided no modification is made to the Specification.</P>
+<P CLASS="Disclaimer">
+<A NAME="pgfId-1089681"></A>&nbsp;</P>
+<P CLASS="Disclaimer">
+<A NAME="pgfId-1089682"></A>&nbsp;</P>
+<DIV>
+<H1 CLASS="TOCHeading">
+<A NAME="pgfId-1093109"></A><A NAME="57962"></A>Revision History<DIV>
+<IMG SRC="Front Matter-2.gif" ALT="">
+</DIV>
+</H1>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1089686"></A>ACPI Revision</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1089688"></A>Mantis Number / Description</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089690"></A>Affected Sections</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093349"></A>6.3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093351"></A>1851 Extend GTDT to describe ARMv8.1 architected CNTHV timer</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093353"></A><A HREF="../ACPI_Software_Programming_Model.htm#44426" CLASS="XRef">See Generic Timer Description Table (GTDT).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093355"></A>6.3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093357"></A>1855 ARS Error Inject</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093359"></A><A HREF="../ACPIdefined_Devices_and_DeviceSpecificObjects.htm#41412" CLASS="XRef">See NVDIMM Root Device Function Index.</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1094896"></A><A HREF="../ACPIdefined_Devices_and_DeviceSpecificObjects.htm#70930" CLASS="XRef">See Function Index 4 - Clear Uncorrectable Error.</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1094902"></A><A HREF="../ACPIdefined_Devices_and_DeviceSpecificObjects.htm#_Toc459707590" CLASS="XRef">See Input (Arg3).</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1094908"></A><A HREF="../ACPIdefined_Devices_and_DeviceSpecificObjects.htm#43041" CLASS="XRef">See Function Index 0xA - Query ARS Error Inject Capabilities.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093440"></A>6.3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093442"></A>1867 Add Trigger order to PCC Identifier structure within PDTT</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093444"></A><A HREF="../ACPI_Software_Programming_Model.htm#16209" CLASS="XRef">See Platform Debug Trigger Table (PDTT).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093446"></A>6.3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093448"></A>1873 Peripheral-attached Memory</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093450"></A><A HREF="../ACPI_Software_Programming_Model.htm#61049" CLASS="XRef">See SPA Range Structure.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093452"></A>6.3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093454"></A>1883 Reserve the table names &quot;CRAT&quot; and &quot;CDIT&quot;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093456"></A><A HREF="http://uefi.org/acpi" CLASS="URL"><A HREF="http://uefi.org/acpi" CLASS="URL">http://uefi.org/acpi </A></A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093458"></A>6.3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093460"></A>1893 New NVDIMM Device methods _NCH and _NBS</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093462"></A><A HREF="../ACPIdefined_Devices_and_DeviceSpecificObjects.htm#38144" CLASS="XRef">See _NCH (Get NVDIMM Current Health Information).</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1094946"></A><A HREF="../ACPIdefined_Devices_and_DeviceSpecificObjects.htm#14711" CLASS="XRef">See _NBS (Get NVDIMM Boot Status).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093464"></A>6.3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093466"></A>1898 PCC Operation Region</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1094977"></A><A HREF="../ACPI_Software_Programming_Model.htm#42812" CLASS="XRef">See Access to Operation Regions.</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1094983"></A><A HREF="../Device_Configuration.htm#_Toc489256074" CLASS="XRef">See _REG (Region).</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1093468"></A><A HREF="../ACPI_Source_Language_Reference.htm#_Toc202341944" CLASS="XRef">See ASL Parameter Keyword Terms.</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1094962"></A><A HREF="../ACPI_Source_Language_Reference.htm#_Toc202341954" CLASS="XRef">See ASL Operator Reference.</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1094968"></A><A HREF="../ACPI_Machine_Language_Specification.htm#_Toc489267550" CLASS="XRef">See Named Objects Encoding.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093470"></A>6.3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093472"></A>1900 I3C host controller support</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1095001"></A><A HREF="../Device_Configuration.htm#78816" CLASS="XRef">See ADR Object Address Encodings.</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1093474"></A><A HREF="../Device_Configuration.htm#56408" CLASS="XRef">See I2C Serial Bus Connection Descriptor.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093476"></A>6.3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093478"></A>1904 Generic Initiator Affinity Structure</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093480"></A><A HREF="../ACPI_Software_Programming_Model.htm#_Toc202340544" CLASS="XRef">See System Resource Affinity Table (SRAT).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093482"></A>6.3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093484"></A>1910 NVDIMM Address Range Scrubbing (ARS) interface update</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093486"></A><A HREF="../ACPI_Software_Programming_Model.htm#_Toc489256030" CLASS="XRef">See Device Object Notifications.</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1095037"></A><A HREF="../ACPIdefined_Devices_and_DeviceSpecificObjects.htm#88893" CLASS="XRef">See NVDIMM Root Device _DSMs.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093488"></A>6.3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093490"></A>1911 _PRD object in Table 6-186 has no definition</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093492"></A>Appendix C</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093494"></A>6.3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093496"></A>1913 New NVDIMM Device methods for Health Error Injection</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093498"></A><A HREF="../ACPI_Software_Programming_Model.htm#_Toc489256030" CLASS="XRef">See Device Object Notifications.</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1095069"></A><A HREF="../ACPIdefined_Devices_and_DeviceSpecificObjects.htm#27370" CLASS="XRef">See NVDIMM Device Methods.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093500"></A>6.3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093502"></A>1914 HMAT Enhancements</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1095181"></A><A HREF="../ACPI_Software_Programming_Model.htm#54307" CLASS="XRef">See Heterogeneous Memory Attribute Table (HMAT).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093506"></A>6.3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093508"></A>1922 _HPX Enhancements</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093510"></A><A HREF="../Device_Configuration.htm#RSVD_HPX" CLASS="XRef">See _HPX (Hot Plug Parameter Extensions).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093361"></A>6.3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093363"></A>1930 ASL: Make some arguments to ASL operators optional</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1095198"></A><A HREF="../ACPI_Source_Language_Reference.htm#_Toc489267419" CLASS="XRef">See BankField (Declare Bank/Data Field).</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1093365"></A><A HREF="../ACPI_Source_Language_Reference.htm#_Toc489267429" CLASS="XRef">See Field (Declare Field Objects).</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1095204"></A><A HREF="../ACPI_Source_Language_Reference.htm#_Ref369783633" CLASS="XRef">See Interrupt (Interrupt Resource Descriptor Macro).</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1095210"></A><A HREF="../ACPI_Source_Language_Reference.htm#_Toc489267446" CLASS="XRef">See Name (Declare Named Object).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093367"></A>6.3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093369"></A>1931 ASL: extend Load() operator to allow table load from an ASL buffer</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093371"></A><A HREF="../ACPI_Source_Language_Reference.htm#_Toc489267499" CLASS="XRef">See LoadTable (Load Definition Block From XSDT).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093373"></A>6.3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093375"></A>1932 ASL: deprecate Unload operator</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093377"></A><A HREF="../ACPI_Source_Language_Reference.htm#83985" CLASS="XRef">See {deprec ated} Unload (Unload Definition Block).</A> <BR>
+and related references</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093379"></A>6.3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093381"></A>1934 SPE support for ARM</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093383"></A><A HREF="../ACPI_Software_Programming_Model.htm#81013" CLASS="XRef">See GIC CPU Interface (GICC) Structure.</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1095258"></A><A HREF="../ACPI_Software_Programming_Model.htm#64610" CLASS="XRef">See Processor Structure Flags.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093385"></A>6.3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093387"></A>1939 Error Disconnect Recover Notification</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093389"></A><A HREF="../ACPI_Software_Programming_Model.htm#84987" CLASS="XRef">See Device Object Notification Values.</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1095273"></A><A HREF="../Device_Configuration.htm#RSVD_OST" CLASS="XRef">See _OST (OSPM Status Indication).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093391"></A>6.3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093393"></A>1944 Outdated copied text from PCI Firmware Spec</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093395"></A><A HREF="../Device_Configuration.htm#68424" CLASS="XRef">See {deprecated} OSC Implementation Example for PCI Host Bridge Devices.</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1095308"></A><A HREF="../Device_Configuration.htm#47126" CLASS="XRef">See {deprecated} ASL Example.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093397"></A>6.3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093399"></A>1946 Generic Initiator _OSC Bit</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093401"></A><A HREF="../ACPI_Software_Programming_Model.htm#_Toc202340545" CLASS="XRef">See Generic Initiator Affinity Structure.</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1095317"></A><A HREF="../Device_Configuration.htm#21183" CLASS="XRef">See Platform-Wide _OSC Capabilities DWORD 2.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093403"></A>6.3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093405"></A>1948  Adds a &#8220;Hot-plug Capable&#8221; flag to the Local APIC and x2APIC structures in MADT</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093407"></A><A HREF="../ACPI_Software_Programming_Model.htm#49510" CLASS="XRef">See Multiple APIC Flags.</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1095332"></A><A HREF="../ACPI_Software_Programming_Model.htm#34770" CLASS="XRef">See Local APIC Flags.</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1095343"></A><A HREF="../ACPI_Software_Programming_Model.htm#84052" CLASS="XRef">See Processor Local x2APIC Structure.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093409"></A>6.3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093411"></A>1958 PCC Operation Region Updates</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093413"></A><A HREF="../ACPI_Software_Programming_Model.htm#42812" CLASS="XRef">See Access to Operation Regions.</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1095374"></A><A HREF="../ACPI_Source_Language_Reference.htm#_Toc202341944" CLASS="XRef">See ASL Parameter Keyword Terms.</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1095357"></A><A HREF="../ACPI_Source_Language_Reference.htm#93789" CLASS="XRef">See Object Storing and Copying Rules.</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1095359"></A><A HREF="../ACPI_Machine_Language_Specification.htm#_Toc489267550" CLASS="XRef">See Named Objects Encoding.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093415"></A>6.3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093417"></A>1959 Update to ECR 1914 </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093419"></A><A HREF="../ACPI_Software_Programming_Model.htm#83301" CLASS="XRef">See System Locality Latency and Bandwidth Information Structure.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1094440"></A>6.3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1094442"></A>1978 GT Block Timers table - update the Timer Interrupt Mode description</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1094444"></A><A HREF="../ACPI_Software_Programming_Model.htm#36950" CLASS="XRef">See Flag Definitions: GT Block Physical Timers and Virtual Timers.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1094434"></A>6.3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1094436"></A>1979 ACPI version change from 6.2 to 6.3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1094438"></A><A HREF="../ACPI_Software_Programming_Model.htm#66696" CLASS="XRef">See FADT Format.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1094428"></A>6.3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1094430"></A>1980 Fix link to local APIC flags in the Processor Local APIC Structure table</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1094432"></A><A HREF="../ACPI_Software_Programming_Model.htm#_Ref374118641" CLASS="XRef">See Processor Local APIC Structure.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093421"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093423"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1093425"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089692"></A>6.2 B</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089694"></A>1819 Errata: remove support for multiple GICD structures</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089699"></A><A HREF="../ACPI_Software_Programming_Model.htm#_Ref374118614" CLASS="XRef">See Multiple APIC Description Table (MADT) Format.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089701"></A>6.2 B</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089704"></A><A HREF="https://mantis.uefi.org/mantis/view.php?id=1852" CLASS="URL">1852 Fix Inconsistent TranslateType Language</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089709"></A><A HREF="../ACPI_Source_Language_Reference.htm#_Toc489267657" CLASS="XRef">See DWordIO (DWord IO Resource Descriptor Macro).</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1089713"></A><A HREF="../ACPI_Source_Language_Reference.htm#ASL_DWORDMemory" CLASS="XRef">See DWordMemory (DWord Memory Resource Descriptor Macro).</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1089717"></A><A HREF="../ACPI_Source_Language_Reference.htm#_Toc202341993" CLASS="XRef">See ExtendedIO (Extended IO Resource Descriptor Macro).</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1089721"></A><A HREF="../ACPI_Source_Language_Reference.htm#_Toc202341994" CLASS="XRef">See ExtendedMemory (Extended Memory Resource Descriptor Macro).</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1089725"></A><A HREF="../ACPI_Source_Language_Reference.htm#ASL_QWordIO" CLASS="XRef">See QWordIO (QWord IO Resource Descriptor Macro).</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1089729"></A><A HREF="../ACPI_Source_Language_Reference.htm#ASL_QWordMemory" CLASS="XRef">See QWordMemory (QWord Memory Resource Descriptor Macro).</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1089733"></A><A HREF="../ACPI_Source_Language_Reference.htm#ASL_WordIO" CLASS="XRef">See WordIO (Word IO Resource Descriptor Macro).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089735"></A>6.2 B</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089737"></A>1870 PPTT Clarifications</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089742"></A><A HREF="../ACPI_Software_Programming_Model.htm#64795" CLASS="XRef">See Processor hierarchy node structure (Type 0).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089744"></A>6.2 B</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089747"></A><A HREF="https://mantis.uefi.org/mantis/view.php?id=1881" CLASS="URL">1881 Incorrect reference &quot;Memory Devices&quot; in &quot;5.2.21.10 Interaction with Memory Hot Plug&quot;</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089752"></A><A HREF="../ACPI_Software_Programming_Model.htm#90816" CLASS="XRef">See Interaction with Memory Hot Plug.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089754"></A>6.2 B</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089757"></A><A HREF="https://mantis.uefi.org/mantis/view.php?id=1882" CLASS="URL">1882 Incorrect EINJ table references/link</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089762"></A><A HREF="../ACPI_PLatform_Error_Interfaces.htm#86632" CLASS="XRef">See Error Injection Actions.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089764"></A>6.2 B</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089766"></A>1894 SRAT GICC Flags Field Definition Errata</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089771"></A><A HREF="../ACPI_Software_Programming_Model.htm#47256" CLASS="XRef">See Flags - GICC Affinity Structure.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089773"></A>6.2 B</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089775"></A>1905 Missing description in 6.1.9 title in ACPI 6.2a</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089780"></A><A HREF="../Device_Configuration.htm#RSVD_STR" CLASS="XRef">See _SUB (Subsystem ID).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089782"></A>6.2 B</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089784"></A>1909 Update NFIT SPA Range Structure</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089789"></A><A HREF="../ACPI_Software_Programming_Model.htm#61049" CLASS="XRef">See SPA Range Structure.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089791"></A>6.2 B</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089793"></A>1929 Miscellaneous Errata</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089798"></A><A HREF="../ACPI_Source_Language_Reference.htm#ASL_ElseIf" CLASS="XRef">See ElseIf (Alternate/Conditional Execution).</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1089802"></A><A HREF="../ACPI_Source_Language_Reference.htm#_Toc489267483" CLASS="XRef">See FromBCD (Convert BCD To Integer).</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1089806"></A><A HREF="../ACPI_Source_Language_Reference.htm#74939" CLASS="XRef">See Function (Declare Control Method).</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1089807"></A>Removed redundant Interrupt section (now <A HREF="../ACPI_Source_Language_Reference.htm#_Ref369783633" CLASS="XRef">See Interrupt (Interrupt Resource Descriptor Macro).</A>). </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089812"></A>6.2 B</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089814"></A>1945 NFIT_SPA_ECR</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089819"></A><A HREF="../ACPI_Software_Programming_Model.htm#46965" CLASS="XRef">See System Physical Address (SPA) Range Structure.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089821"></A>6.2 B</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089823"></A>1951 _PXM Clarifications</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089828"></A><A HREF="../ACPI_Software_Programming_Model.htm#_Toc202340544" CLASS="XRef">See System Resource Affinity Table (SRAT).</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1089832"></A><A HREF="../ACPI_Software_Programming_Model.htm#_Toc202340545" CLASS="XRef">See Generic Initiator Affinity Structure.</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1089836"></A><A HREF="../Device_Configuration.htm#81577" CLASS="XRef">See _PXM (Proximity).</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1089840"></A><A HREF="../Device_Configuration.htm#RSVD_SLI" CLASS="XRef">See _SLI (System Locality Information).</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1089844"></A><A HREF="../NUMA_Architecture_Platforms.htm#_Toc202341933" CLASS="XRef">See System Locality.</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1089848"></A><A HREF="../NUMA_Architecture_Platforms.htm#_Toc202341934" CLASS="XRef">See System Resource Affinity Table Definition.</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1089852"></A><A HREF="../NUMA_Architecture_Platforms.htm#_Toc202341935" CLASS="XRef">See System Locality Distance Information.</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1089856"></A><A HREF="../NUMA_Architecture_Platforms.htm#37518" CLASS="XRef">See Online Hot Plug.</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1089860"></A><A HREF="../NUMA_Architecture_Platforms.htm#80818" CLASS="XRef">See Heterogeneous Memory Attributes Information.</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1089864"></A><A HREF="../NUMA_Architecture_Platforms.htm#56800" CLASS="XRef">See Online Hot Plug.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089866"></A>6.2 B</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089868"></A>1960 PWR_BUTTON desription should say &quot;power button&quot;, not &quot;sleep button&quot; </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089873"></A><A HREF="../ACPI_Software_Programming_Model.htm#_Ref369779603" CLASS="XRef">See Fixed ACPI Description Table Fixed Feature Flags.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089875"></A>6.2 B</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089877"></A>1962 Clarifications for the use of _REG methods</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089882"></A><A HREF="../Device_Configuration.htm#_Toc489256074" CLASS="XRef">See _REG (Region).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089884"></A>6.2 B</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089886"></A>1965 Clean up Address Space ID</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089891"></A><A HREF="../ACPI_Software_Programming_Model.htm#79748" CLASS="XRef">See Generic Address Structure (GAS).</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1089895"></A><A HREF="../Device_Configuration.htm#95646" CLASS="XRef">See Generic Register Descriptor Definition.</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1089899"></A><A HREF="../ACPI_Source_Language_Reference.htm#ASL_Register" CLASS="XRef">See Register (Generic Register Resource Descriptor Macro).</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1089903"></A><A HREF="../ACPI_Source_Language_Reference.htm#_Toc202341944" CLASS="XRef">See ASL Parameter Keyword Terms.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089905"></A>6.2B</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089907"></A>1968 Clarifications for ACPI Namepaths</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089912"></A><A HREF="../ACPI_Software_Programming_Model.htm#61173" CLASS="XRef">See ACPI System Description Tables.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089914"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089916"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089918"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089920"></A>6.2 A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089922"></A>1839 Missing space in title of ACPI RAS Feature Table (RASF)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089927"></A><A HREF="../ACPI_Software_Programming_Model.htm#61173" CLASS="XRef">See ACPI System Description Tables.</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1089931"></A><A HREF="../ACPI_Software_Programming_Model.htm#16530" CLASS="XRef">See ACPI RAS Feature Table (RASF).</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1089935"></A><A HREF="../ACPI_Software_Programming_Model.htm#95136" CLASS="XRef">See DESCRIPTION_HEADER Signatures for tables defined by ACPI.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089937"></A>6.2 A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089939"></A>1837 Typos in Extended PCC subspaces (types 3 and 4)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089944"></A><A HREF="../Platform_Comm_Channel.htm#56438" CLASS="XRef">See Extended PCC subspaces (types 3 and 4).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089946"></A>6.2 A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089948"></A>1831 Add a new NFIT Platform Capabilities Structure </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089953"></A><A HREF="../ACPI_Software_Programming_Model.htm#11301" CLASS="XRef">See NFIT Overview.</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1089957"></A><A HREF="../ACPI_Software_Programming_Model.htm#53065" CLASS="XRef">See NVDIMM Firmware Interface Table (NFIT) Overview.</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1089961"></A><A HREF="../ACPI_Software_Programming_Model.htm#_Ref396499543" CLASS="XRef">See NFIT Structure Types.</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1089965"></A><A HREF="../ACPI_Software_Programming_Model.htm#58079" CLASS="XRef">See Platform Capabilities Structure.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089967"></A>6.2 A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089969"></A>1827 PPTT ID Type Structure offsets</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089974"></A><A HREF="../ACPI_Software_Programming_Model.htm#61595" CLASS="XRef">See ID structure - Type 2.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089976"></A>6.2 A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089978"></A>1825 Remove bits 2-4 in the Platform RAS Capabilities Bitmap table</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089983"></A><A HREF="../ACPI_Software_Programming_Model.htm#53676" CLASS="XRef">See Platform RAS Capabilities.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089985"></A>6.2 A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089987"></A>1820 Region Format Interface Code description</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089992"></A><A HREF="../ACPI_Software_Programming_Model.htm#42965" CLASS="XRef">See NVDIMM Control Region Structure.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089994"></A>6.2 A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1089996"></A>1819 Remove support for multiple GICD structures</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090001"></A><A HREF="../ACPI_Software_Programming_Model.htm#_Toc258262222" CLASS="XRef">See Multiple APIC Description Table (MADT).</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1090005"></A><A HREF="../ACPI_Software_Programming_Model.htm#_Toc374252776" CLASS="XRef">See MADT Processor Local APIC / SAPIC Structure Entry Order.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090007"></A>6.2 A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090009"></A>1814 PDTT typos and PPTT reference</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090011"></A>Revision History</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1090015"></A><A HREF="../ACPI_Software_Programming_Model.htm#61173" CLASS="XRef">See ACPI System Description Tables.</A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1090019"></A><A HREF="../ACPI_Software_Programming_Model.htm#16209" CLASS="XRef">See Platform Debug Trigger Table (PDTT).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090021"></A>6.2 A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090023"></A>1812 Minor correction to Trigger Action Table</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090028"></A><A HREF="../ACPI_PLatform_Error_Interfaces.htm#34164" CLASS="XRef">See Trigger Action Table.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090030"></A>6.2 A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090032"></A>1811 General Purpose Event Handling flow</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090037"></A><A HREF="../ACPI_Software_Programming_Model.htm#44234" CLASS="XRef">See General-Purpose Event Handling.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090039"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090041"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090043"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090045"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090047"></A>1795 ACPI Table Signature Reservation</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090052"></A><A HREF="../ACPI_Software_Programming_Model.htm#84652" CLASS="XRef">See DESCRIPTION_HEADER Signatures for tables reserved by ACPI.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1094691"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1094693"></A>1781 Clarify ResourceUsage Descriptor Argument</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1094695"></A><A HREF="../Device_Configuration.htm#77874" CLASS="XRef">See Device Configuration Objects.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090054"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090056"></A>1780 Add DescriptorName to PinFunction and PinConfig Macros</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090061"></A><A HREF="../ACPI_Source_Language_Reference.htm#23454" CLASS="XRef">See Pin Function.</A> and <A HREF="../ACPI_Source_Language_Reference.htm#78365" CLASS="XRef">See Pin Group.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090066"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090068"></A>1770 Update Revision History</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090073"></A><A HREF="Front Matter.htm#57962" CLASS="XRef">See Revision History.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090075"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090077"></A>1769 FADT Format: ACPI Version update to reflect 6.2 versus 6.1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090082"></A><A HREF="../ACPI_Software_Programming_Model.htm#66696" CLASS="XRef">See FADT Format.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090084"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090086"></A>1755 Deprecate PCC Platform Async Notifications</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090094"></A><A HREF="../Platform_Comm_Channel.htm#23089" CLASS="XRef">See Doorbell Protocol.</A>, and <A HREF="../Platform_Comm_Channel.htm#79897" CLASS="XRef">See Platform Notification for Subspace Types 0, 1 and 2.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090096"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090098"></A>1743 PinGroupFunctionConfig resource descriptors update</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090105"></A><A HREF="../Device_Configuration.htm#27571" CLASS="XRef">See Pin Group Descriptor.</A>, <A HREF="../Device_Configuration.htm#63702" CLASS="XRef">See Pin Group Function Descriptor.</A>, <A HREF="../Device_Configuration.htm#89036" CLASS="XRef">See Pin Group Configuration Descriptor.</A>, </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090111"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090113"></A>1738 PCIEXP_WAKE Bits description updates</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090121"></A><A HREF="../ACPI Hardware Specification.htm#12599" CLASS="XRef">See PM1 Status Registers Fixed Hardware Feature Status Bits.</A>, <A HREF="../ACPI Hardware Specification.htm#49045" CLASS="XRef">See PM1 Enable Registers Fixed Hardware Feature Enable Bits.</A>, and <A HREF="../ACPI_Software_Programming_Model.htm#_Ref369779603" CLASS="XRef">See Fixed ACPI Description Table Fixed Feature Flags.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090126"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090128"></A>1731 Software Delegated Exception HW error notitication</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090133"></A><A HREF="../ACPI_PLatform_Error_Interfaces.htm#90281" CLASS="XRef">See Hardware Error Notification Structure.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090135"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090137"></A>1725 NVST Updates - NFIT ARS Error Injection</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090144"></A><A HREF="../ACPIdefined_Devices_and_DeviceSpecificObjects.htm#63158" CLASS="XRef">See Function Index 7 - ARS Error Inject.</A>, <A HREF="../ACPIdefined_Devices_and_DeviceSpecificObjects.htm#59100" CLASS="XRef">See Function Index 8 - ARS Error Inject Clear.</A>,and <A HREF="../ACPIdefined_Devices_and_DeviceSpecificObjects.htm#40521" CLASS="XRef">See Function Index 9 - ARS Error Inject Status Query.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090150"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090152"></A>1724 NVST Updates - Platform RAS Capabilities Updates</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090157"></A><A HREF="../ACPI_Software_Programming_Model.htm#53676" CLASS="XRef">See Platform RAS Capabilities.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090159"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090161"></A>1723 NVST Updates - Translate SPA DSM Interface</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090169"></A><A HREF="../Definition_of_Terms.htm#_Toc489255948" CLASS="XRef">See General ACPI Terminology.</A>, <A HREF="../ACPIdefined_Devices_and_DeviceSpecificObjects.htm#17785" CLASS="XRef">See Function Index 5 - Translate SPA.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090171"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090173"></A>1722 NVST Updates - ARS Updates</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090181"></A><A HREF="../Definition_of_Terms.htm#_Toc489255948" CLASS="XRef">See General ACPI Terminology.</A>, <A HREF="../ACPIdefined_Devices_and_DeviceSpecificObjects.htm#88603" CLASS="XRef">See Address Range Scrubbing (ARS) Overview.</A>, <A HREF="../ACPIdefined_Devices_and_DeviceSpecificObjects.htm#64636" CLASS="XRef">See Function Index 1 - Query ARS Capabilities.</A>, <A HREF="../ACPIdefined_Devices_and_DeviceSpecificObjects.htm#44801" CLASS="XRef">See Function Index 2 - Start ARS.</A>,and <A HREF="../ACPIdefined_Devices_and_DeviceSpecificObjects.htm#85266" CLASS="XRef">See  Function Index 3 - Query ARS Status.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090192"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090194"></A>1721 NVST Updates - Labels</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090202"></A><A HREF="../Definition_of_Terms.htm#_Toc489255948" CLASS="XRef">See General ACPI Terminology.</A>, <A HREF="../ACPI_Software_Programming_Model.htm#59376" CLASS="XRef">See Predefined ACPI Names.</A>,and <A HREF="../Device_Configuration.htm#72079" CLASS="XRef">See NVDIMM Label Methods.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090207"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090209"></A>1717 ASL Grammar Update for Reference Operators</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090214"></A><A HREF="../ACPI_Source_Language_Reference.htm#_Toc489272732" CLASS="XRef">See ASL Language Grammar.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090216"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090218"></A>1714 Reserve the table name &quot;SDEI&quot;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090223"></A><A HREF="../ACPI_Software_Programming_Model.htm#84652" CLASS="XRef">See DESCRIPTION_HEADER Signatures for tables reserved by ACPI.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090225"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090227"></A>1705 Add Heterogeneous Memory Attributes Tables (HMAT)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090235"></A><A HREF="../ACPI_Software_Programming_Model.htm#61173" CLASS="XRef">See ACPI System Description Tables.</A>, <A HREF="../ACPI_Software_Programming_Model.htm#_Toc489256030" CLASS="XRef">See Device Object Notifications.</A>, <A HREF="../ACPI_Software_Programming_Model.htm#_Toc202340664" CLASS="XRef">See Predefined ACPI Names for Objects, Methods, and Resources.</A>, <A HREF="../Device_Configuration.htm#64348" CLASS="XRef">See Device Configuration Objects.</A>, <A HREF="../Device_Configuration.htm#16303" CLASS="XRef">See _HMA(Heterogeneous Memory Attributes).</A>, and <A HREF="../NUMA_Architecture_Platforms.htm#80818" CLASS="XRef">See Heterogeneous Memory Attributes Information.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090249"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090251"></A>1703 Time &amp; Alarm Device _GCP new bits</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090256"></A><A HREF="../ACPIdefined_Devices_and_DeviceSpecificObjects.htm#51896" CLASS="XRef">See _GCP (Get Capability).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090258"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090260"></A>1680 Pin Group, Pin Group Function and Pin Group Configuration Descriptors and Macros</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090265"></A><A HREF="../Device_Configuration.htm#96311" CLASS="XRef">See Large Resource Items.</A> and <A HREF="../Device_Configuration.htm#29001" CLASS="XRef">See Pin Configuration Descriptor.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090270"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090272"></A>1679 Pin Configuration Descriptor and Macro</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090277"></A><A HREF="../Device_Configuration.htm#96311" CLASS="XRef">See Large Resource Items.</A> and <A HREF="../Device_Configuration.htm#29001" CLASS="XRef">See Pin Configuration Descriptor.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090282"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090284"></A>1677 CPPC Registers in System Memory</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090289"></A><A HREF="../Device_Configuration.htm#73116" CLASS="XRef">See Platform-Wide OSPM Capabilities.</A> and <A HREF="../Processor_Configuration_and_Control.htm#91893" CLASS="XRef">See _CPC (Continuous Performance Control).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090294"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090296"></A>1674 GHES_ASSIST Proposal</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090301"></A><A HREF="../ACPI_PLatform_Error_Interfaces.htm#_Toc258262560" CLASS="XRef">See ACPI Error Source.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090303"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090305"></A>1669 FADT HEADLESS flag should be valid for HW_REDUCED_ACPI platforms</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090310"></A><A HREF="../ACPI_Software_Programming_Model.htm#64460" CLASS="XRef">See Fixed ACPI Description Table (FADT).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090312"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090314"></A>1667 Processor Properties Topology Table (PPTT)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090319"></A><A HREF="../ACPI_Software_Programming_Model.htm#67872" CLASS="XRef">See Processor Properties Topology Table (PPTT).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090321"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090323"></A>1659 Master Slave PCC channels</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090327"></A>Chapter 14, <A HREF="../Platform_Comm_Channel.htm#68313" CLASS="XRef">See Platform Communications Channel (PCC).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090330"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090332"></A>1656 SRAT Support for ITS</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090337"></A><A HREF="../ACPI_Software_Programming_Model.htm#_Toc202340544" CLASS="XRef">See System Resource Affinity Table (SRAT).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090339"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090341"></A>1650 CPPC Support for Multiple PCC Channels</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090346"></A><A HREF="../Device_Configuration.htm#21183" CLASS="XRef">See Platform-Wide _OSC Capabilities DWORD 2.</A> and <A HREF="../Processor_Configuration_and_Control.htm#73784" CLASS="XRef">See Using PCC Registers.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090351"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090353"></A>1649 ECR: Minor updates to IA-32 Architecture Deferred Machine Check</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090358"></A><A HREF="../ACPI_PLatform_Error_Interfaces.htm#96254" CLASS="XRef">See IA-32 Architecture Deferred Machine Check.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090360"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090362"></A>1645 Add _STR Support for Thermal Zones</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090370"></A><A HREF="../Device_Configuration.htm#_Toc489256040" CLASS="XRef">See Device Identification Objects.</A>, <A HREF="../Device_Configuration.htm#72094" CLASS="XRef">See _STR (String).</A>, <A HREF="../Thermal_management.htm#_Toc489267309" CLASS="XRef">See Thermal Objects.</A>, <A HREF="../Thermal_management.htm#74540" CLASS="XRef">See _STR (String).</A>, and <A HREF="../Thermal_management.htm#_Toc489267325" CLASS="XRef">See Example: The Basic Thermal Zone.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090381"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090383"></A>1632 Secure Devices Table (SDEV)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090388"></A><A HREF="../ACPI_Software_Programming_Model.htm#84652" CLASS="XRef">See DESCRIPTION_HEADER Signatures for tables reserved by ACPI.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090390"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090392"></A>1611 Add a _PPL object to processor devices</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090397"></A><A HREF="../Processor_Configuration_and_Control.htm#30073" CLASS="XRef">See Collaborative Processor Performance Control.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090399"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090401"></A>1597 ASL For() Conditional Loop Macro</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090409"></A><A HREF="../ACPI_Source_Language_Reference.htm#29080" CLASS="XRef">See For (Conditional Loop).</A>, <A HREF="../ACPI_Source_Language_Reference.htm#_Toc202341942" CLASS="XRef">See ASL Opcode Terms.</A>, <A HREF="../ACPI_Source_Language_Reference.htm#_Toc202341943" CLASS="XRef">See ASL Primary (Terminal) Terms.</A>, and <A HREF="../ACPI_Source_Language_Reference.htm#_Toc489256024" CLASS="XRef">See ASL Macros.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090417"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090419"></A>1588 Clarification on Interrupt Descriptor Usage for &quot;Interrupt Combining&quot;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090426"></A><A HREF="../Device_Configuration.htm#73116" CLASS="XRef">See Platform-Wide OSPM Capabilities.</A>, <A HREF="../Device_Configuration.htm#10216" CLASS="XRef">See Extended Interrupt Descriptor.</A>, <A HREF="../ACPI_Source_Language_Reference.htm#28093" CLASS="XRef">See IndexField (Declare Index/Data Fields).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090432"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090434"></A>1585 Reserve table signature &#8220;WSMT,&#8221; with reference to ACPI links page for more details</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090439"></A><A HREF="../ACPI_Software_Programming_Model.htm#84652" CLASS="XRef">See DESCRIPTION_HEADER Signatures for tables reserved by ACPI.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090441"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090443"></A>1583 Diverse Highest Processor Performance</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090451"></A><A HREF="../ACPI_Software_Programming_Model.htm#82197" CLASS="XRef">See ID Type Structure.</A> and <A HREF="../Device_Configuration.htm#21183" CLASS="XRef">See Platform-Wide _OSC Capabilities DWORD 2.</A> </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090453"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090455"></A>1578 Function Config Descriptor and Macro</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090463"></A><A HREF="../Device_Configuration.htm#89495" CLASS="XRef">See IRQ Descriptor Definition.</A> and <A HREF="../Device_Configuration.htm#63258" CLASS="XRef">See Pin Function Descriptor.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090465"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090467"></A>1576 Platform Debug Trigger Table (PDTT)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090472"></A><A HREF="../ACPI_Software_Programming_Model.htm#16209" CLASS="XRef">See Platform Debug Trigger Table (PDTT).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090474"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090476"></A>1573 Extensions to the ASL Concatenate operator</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090481"></A><A HREF="../ACPI_Source_Language_Reference.htm#_Toc202341943" CLASS="XRef">See ASL Primary (Terminal) Terms.</A> and <A HREF="../ACPI_Source_Language_Reference.htm#ASL_Concatenate" CLASS="XRef">See Concatenate (Concatenate Data).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090486"></A>6.2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090488"></A>1569 Add new introduction (background) section</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090490"></A>Background chapter</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090492"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090494"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090496"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090498"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090500"></A>1796 Clarify that Type 1 can never support Level triggered platform interrupt</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090505"></A><A HREF="../Platform_Comm_Channel.htm#89355" CLASS="XRef">See HW-Reduced Communications Subspace Structure (type 1).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090507"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090509"></A>1785 Lack of clarity on use of System Vector Base on GICD structures</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090514"></A><A HREF="../ACPI_Software_Programming_Model.htm#31257" CLASS="XRef">See GIC Distributor (GICD) Structure.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090516"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090518"></A>1783 Clarification on Interrupt Descriptor Usage for Bit [0] Consumer/Producer</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090523"></A><A HREF="../Device_Configuration.htm#87812" CLASS="XRef">See Extended Interrupt Descriptor Definition.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090525"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090527"></A>1760 Typo - incorrect bit offsets in the PM1 Enable Registers Fixed Hardware Feature Enable Bits table. </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090532"></A><A HREF="../ACPI Hardware Specification.htm#49045" CLASS="XRef">See PM1 Enable Registers Fixed Hardware Feature Enable Bits.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090534"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090536"></A>1758 Minor Errata in ERST tables, Serialization Instruction Entry and Injection Instruction Entry. </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090544"></A><A HREF="../ACPI_PLatform_Error_Interfaces.htm#82542" CLASS="XRef">See Serialization Instruction Entry.</A> and <A HREF="../ACPI_PLatform_Error_Interfaces.htm#48042" CLASS="XRef">See Injection Instruction Entry.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090546"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090548"></A>1756 Errata: Ensure non-secure timers are accesible to non-secure in the Flag Definitions: Common Flags table. </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090553"></A><A HREF="../ACPI_Software_Programming_Model.htm#36950" CLASS="XRef">See Flag Definitions: GT Block Physical Timers and Virtual Timers.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090555"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090557"></A>1740 Errata in section 9.13: wrong reference</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090562"></A><A HREF="../ACPIdefined_Devices_and_DeviceSpecificObjects.htm#30870" CLASS="XRef">See Memory Devices.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090564"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090566"></A>1715 0 is a valid GSIV for the secure EL1 physical timer in GTDT</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090571"></A><A HREF="../ACPI_Software_Programming_Model.htm#74443" CLASS="XRef">See Firmware Basic Boot Performance Data Record Structure.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090573"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090575"></A>1687 Typo in the Reserved field of the GIC ITS Structure table. </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090580"></A><A HREF="../ACPI_Software_Programming_Model.htm#32004" CLASS="XRef">See GIC ITS Structure .</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090582"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090584"></A>1686 Clarification of the FADT HW_REDUCED_ACPI flag description in the FADT Format table. </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090589"></A><A HREF="../ACPI_Software_Programming_Model.htm#66696" CLASS="XRef">See FADT Format.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090591"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090593"></A>1676 Clarifications for the ASL Buffer (Declare Buffer Object)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090598"></A><A HREF="../ACPI_Source_Language_Reference.htm#ASL_Buffer" CLASS="XRef">See Buffer (Declare Buffer Object).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090600"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090602"></A>1671 Typo in Memory Affinity Structure table</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090607"></A><A HREF="../ACPI_Software_Programming_Model.htm#12710" CLASS="XRef">See Memory Affinity Structure.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090609"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090611"></A>1670 Update for _OSI return value</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090616"></A><A HREF="../ACPI_Software_Programming_Model.htm#78908" CLASS="XRef">See _OSI (Operating System Interfaces).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090618"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090620"></A>1664 Clarification of the RSDP Structure table, Revision description. </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090625"></A><A HREF="../ACPI_Software_Programming_Model.htm#32004" CLASS="XRef">See GIC ITS Structure .</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090627"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090629"></A>1662 Clarification of the Generic Communications Channel Command Field table. </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090634"></A><A HREF="../Platform_Comm_Channel.htm#71957" CLASS="XRef">See Generic Communications Channel Command Field.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090636"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090638"></A>1661 typos in the Generic Communications Channel Status Field table and the Platform Notification section. </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090646"></A><A HREF="../Platform_Comm_Channel.htm#_Ref272262297" CLASS="XRef">See Generic Communications Channel Status Field.</A> and <A HREF="../Platform_Comm_Channel.htm#21024" CLASS="XRef">See Platform Notification.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090648"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090650"></A>1660 type in the Generic Communications Channel Shared Memory Region table</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090655"></A><A HREF="../Platform_Comm_Channel.htm#_Ref272262201" CLASS="XRef">See Generic Communications Channel Shared Memory Region.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090657"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090659"></A>1651 LPI Clarifications</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090664"></A><A HREF="../Processor_Configuration_and_Control.htm#66957" CLASS="XRef">See _LPI (Low Power Idle States).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090666"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090668"></A>1644 Mismatch of mantis number 1449 vs. change description</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090673"></A><A HREF="Front Matter.htm#57962" CLASS="XRef">See Revision History.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090675"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090677"></A>1643 Incorrect row order in GET_EXECUTE_OPERATION_TIMINGS table</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090682"></A><A HREF="../ACPI_PLatform_Error_Interfaces.htm#31515" CLASS="XRef">See Error Record Serialization Actions.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090684"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090686"></A>1642 Clarifications and fixes to _PSD and _TSD</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090691"></A><A HREF="../ACPI_Software_Programming_Model.htm#59376" CLASS="XRef">See Predefined ACPI Names.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090693"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090695"></A>1639 _WPC and _WPP are missing in the Predefined ACPI Names table. </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090700"></A><A HREF="../ACPI_Software_Programming_Model.htm#21557" CLASS="XRef">See Fixed ACPI Events.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090702"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090704"></A>1616 Clarify which processor ID to use in the EINJ for ARM</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090709"></A><A HREF="../ACPI_PLatform_Error_Interfaces.htm#10057" CLASS="XRef">See Error Injection Table (EINJ).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090711"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090713"></A>1606 Errata: typos in the Interrupt Resource Descriptor Macro definition</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090718"></A><A HREF="../ACPI_Source_Language_Reference.htm#28093" CLASS="XRef">See IndexField (Declare Index/Data Fields).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090720"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090722"></A>1602 Updates to the PMC Method Result Codes table</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090727"></A><A HREF="../Power_Source_and_Power_Meter_Devices.htm#18171" CLASS="XRef">See PMC Method Result Codes.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090729"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090731"></A>1601 Typos in the _CPC Implementation Example</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090736"></A><A HREF="../Processor_Configuration_and_Control.htm#14651" CLASS="XRef">See _CPC Implementation Example.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090738"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090740"></A>1600 Typos in PCC Subspace Structure Type 1 and Type 2. </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090748"></A><A HREF="../Platform_Comm_Channel.htm#56025" CLASS="XRef">See PCC Subspace Structure type 1 (HW-Reduced Communications Subspace).</A> and <A HREF="../Platform_Comm_Channel.htm#66530" CLASS="XRef">See PCC Subspace Structure type 2 (HW-Reduced Communications Subspace).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090750"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090752"></A>1599 Add clarification to existing text (_OSC Control Field via arg3)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090757"></A><A HREF="../Device_Configuration.htm#72230" CLASS="XRef">See Example Relative Distances Between Proximity Domains.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090759"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090761"></A>1591 ASL grammar clarification for &#8220;executable&#8221; AML opcodes</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090766"></A><A HREF="../ACPI_Software_Programming_Model.htm#_Toc489256021" CLASS="XRef">See Definition Block Encoding.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090768"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090770"></A> 1589 Wireless Power Calibration Device ACPI ID not defined</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090775"></A><A HREF="../Power_Source_and_Power_Meter_Devices.htm#37425" CLASS="XRef">See Wireless Power Controllers.</A> (Table 10-292 removed) and <A HREF="../ACPI_Software_Programming_Model.htm#46820" CLASS="XRef">See ACPI Event Programming Model Components.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090780"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090782"></A>1582 Clarification for Time and Alarm wake description</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090787"></A><A HREF="../ACPIdefined_Devices_and_DeviceSpecificObjects.htm#_Toc258262405" CLASS="XRef">See Overview.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090789"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090791"></A>1581 Processing Sequence for Graceful Shutdown Request - need to update section 6.3.5.1 to reflect change</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090799"></A><A HREF="../ACPI_Software_Programming_Model.htm#55233" CLASS="XRef">See System Bus Notification Values.</A> and <A HREF="../Device_Configuration.htm#89872" CLASS="XRef">See Processing Sequence for Graceful Shutdown Request:.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090801"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090803"></A>1579 typos</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090811"></A><A HREF="../ACPI_Software_Programming_Model.htm#41258" CLASS="XRef">See NVDIMM Firmware Interface Table (NFIT).</A> and <A HREF="../ACPI_Software_Programming_Model.htm#_Ref396499543" CLASS="XRef">See NFIT Structure Types.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090813"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090815"></A>1577 BGRT Image Orientation Offset</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090820"></A><A HREF="../ACPI_Software_Programming_Model.htm#29157" CLASS="XRef">See Boot Graphics Resource Table Fields.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090822"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090824"></A>1572 Update ASL grammar to support multiple Definition Blocks</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090829"></A><A HREF="../ACPI_Source_Language_Reference.htm#_Toc489272735" CLASS="XRef">See ASL Root and Secondary Terms.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090831"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090833"></A>1571 Update AML Filename description for ASL DefinitionBlock operator</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090838"></A><A HREF="../ACPI_Source_Language_Reference.htm#_Toc202341980" CLASS="XRef">See DefinitionBlock (Declare Definition Block).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090840"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090842"></A>1552 GIC Redistributor base address language in GICC leaves room for ambiguity </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090847"></A><A HREF="../ACPI_Software_Programming_Model.htm#20483" CLASS="XRef">See GICC Structure.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090849"></A>6.1 Errata A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090851"></A>1549 Errata: wrong offset in Generic Communications Channel Shared Memory Region table.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090856"></A><A HREF="../Platform_Comm_Channel.htm#_Ref272262201" CLASS="XRef">See Generic Communications Channel Shared Memory Region.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090858"></A>6.1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090860"></A>1527 Qualcomm feedback on ACPI 6.1 draft 2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090862"></A>Throughout</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090864"></A>6.1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090866"></A>1524 Strange hotlink</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090871"></A><A HREF="../ACPI_Software_Programming_Model.htm#35175" CLASS="XRef">See _DLM (DeviceLock Mutex).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090873"></A>6.1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090875"></A>1514 Comments against 6.1 Draft from HPE</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090877"></A>Throughout--draft corrections and typos, but especially <A HREF="../ACPIdefined_Devices_and_DeviceSpecificObjects.htm#88603" CLASS="XRef">See Address Range Scrubbing (ARS) Overview.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090882"></A>6.1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090884"></A>1512 Microsoft feedbacks on ACPI 6.1 draft 2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090892"></A><A HREF="../ACPI_Software_Programming_Model.htm#24805" CLASS="XRef">See NVDIMM Firmware Interface Table (NFIT).</A>, <A HREF="../ACPIdefined_Devices_and_DeviceSpecificObjects.htm#88893" CLASS="XRef">See NVDIMM Root Device _DSMs.</A>, <A HREF="../ACPI_PLatform_Error_Interfaces.htm#_Toc258262560" CLASS="XRef">See ACPI Error Source.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090897"></A>6.1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090899"></A>1503 Editorial comments against 6.1 Draft 1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090901"></A>Throughout--draft corrections &amp; typos</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090903"></A>6.1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090905"></A>1500 ACPI 6.1 - Graceful Shutdown (Device Object Notification)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090910"></A><A HREF="../ACPI_Software_Programming_Model.htm#55233" CLASS="XRef">See System Bus Notification Values.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090912"></A>6.1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090914"></A>1499 _FIT and _MAT ASL nits in 6.0 and 6.1 Draft</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090922"></A><A HREF="../Device_Configuration.htm#_Toc489256054" CLASS="XRef">See _MAT (Multiple APIC Table Entry).</A>, <A HREF="../Device_Configuration.htm#31911" CLASS="XRef">See _FIT (Firmware Interface Table).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090924"></A>6.1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090926"></A>1490 ACPI Version update to reflect 6.1 versus 6.0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090931"></A><A HREF="../ACPI_Software_Programming_Model.htm#66696" CLASS="XRef">See FADT Format.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090933"></A>6.1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090935"></A>1483 NFIT SPD extensions and clarifications</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090942"></A><A HREF="../ACPI_Software_Programming_Model.htm#24805" CLASS="XRef">See NVDIMM Firmware Interface Table (NFIT).</A>x, <A HREF="../Device_Configuration.htm#31911" CLASS="XRef">See _FIT (Firmware Interface Table).</A>, <A HREF="../ACPIdefined_Devices_and_DeviceSpecificObjects.htm#21528" CLASS="XRef">See NVDIMM Devices.</A>x </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090948"></A>6.1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090950"></A>1478 Wireless Power Calibration ACPI Device</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090958"></A><A HREF="../Power_Source_and_Power_Meter_Devices.htm#37425" CLASS="XRef">See Wireless Power Controllers.</A> &amp; <A HREF="../Power_Source_and_Power_Meter_Devices.htm#88541" CLASS="XRef">See Wireless Power Calibration Event  .</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090960"></A>6.1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090962"></A>1427 Addition to Memory Device State Flags in NFIT</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090967"></A><A HREF="../ACPI_Software_Programming_Model.htm#35502" CLASS="XRef">See NVDIMM Region Mapping Structure .</A> </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090969"></A>6.1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090971"></A>1395 _DSM interfaces associated with NVDIMM-N objects</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090976"></A><A HREF="../ACPIdefined_Devices_and_DeviceSpecificObjects.htm#72060" CLASS="XRef">See NVDIMM Root Device.</A>x through <A HREF="../ACPIdefined_Devices_and_DeviceSpecificObjects.htm#88893" CLASS="XRef">See NVDIMM Root Device _DSMs.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090981"></A>6.1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090983"></A>1384 ERST/EINJ max wait time</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090991"></A><A HREF="../ACPI_PLatform_Error_Interfaces.htm#31515" CLASS="XRef">See Error Record Serialization Actions.</A>, <A HREF="../ACPI_PLatform_Error_Interfaces.htm#86632" CLASS="XRef">See Error Injection Actions.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090993"></A>6.1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1090995"></A>1367 Interrupt-signaled Events</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091003"></A><A HREF="../ACPI Hardware Specification.htm#11302" CLASS="XRef">See GPIO-Signaled Events or Interrupt Signaled Events.</A>  <A HREF="../ACPI_Software_Programming_Model.htm#_Toc489256027" CLASS="XRef">See ACPI Event Programming Model.</A>, , <A HREF="../ACPI_Software_Programming_Model.htm#84101" CLASS="XRef">See Managing a Wake Event Using Device _PRW Objects .</A>, <A HREF="../ACPI_Software_Programming_Model.htm#44234" CLASS="XRef">See General-Purpose Event Handling.</A>, <A HREF="../ACPI_Software_Programming_Model.htm#19454" CLASS="XRef">See GPIO-signaled ACPI Events.</A> <A HREF="../ACPI_Software_Programming_Model.htm#75827" CLASS="XRef">See _AEI Object for GPIO-signaled Events.</A>, <A HREF="../Device_Configuration.htm#73116" CLASS="XRef">See Platform-Wide OSPM Capabilities.</A>, <A HREF="../Power_and_Performance_Mgmt.htm#71464" CLASS="XRef">See _PRW (Power Resources for Wake).</A>, <A HREF="../ACPI_PLatform_Error_Interfaces.htm#26005" CLASS="XRef">See Event Notification For Generic Error Sources.</A>, <A HREF="../ACPI_PLatform_Error_Interfaces.htm#23929" CLASS="XRef">See Firmware First Error Handling.</A>  Added <A HREF="../ACPI_Software_Programming_Model.htm#36453" CLASS="XRef">See Interrupt-signaled ACPI events.</A>, through <A HREF="../ACPI_Software_Programming_Model.htm#76513" CLASS="XRef">See GED Wake Events.</A> </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091035"></A>6.1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091037"></A>1356 ARM APEI extensions</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091044"></A><A HREF="../ACPI_PLatform_Error_Interfaces.htm#41948" CLASS="XRef">See Generic Hardware Error Source.</A>, <A HREF="../ACPI_PLatform_Error_Interfaces.htm#25719" CLASS="XRef">See Generic Hardware Error Source version 2 (GHESv2 - Type 10).</A>, <A HREF="../ACPI_PLatform_Error_Interfaces.htm#37420" CLASS="XRef">See Hardware Error Notification.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091050"></A>6.1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091052"></A>1344 Sharing of Connection Resources<BR>
+NOTE: The changes were included in ACPI 6.0, but was missed in the ACPI 6.0 Revision History</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091057"></A><A HREF="../ACPI_Software_Programming_Model.htm#10758" CLASS="XRef">See Declaring GenericSerialBus Operation Regions.</A> through <A HREF="../ACPI_Software_Programming_Model.htm#40392" CLASS="XRef">See Raw Read/Write N Bytes (AttribRawBytes).</A> <A HREF="../ACPI_Source_Language_Reference.htm#29686" CLASS="XRef">See Connection (Declare Field Connection Attributes).</A> </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091065"></A>6.1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091067"></A>1326</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091075"></A><A HREF="../Definition_of_Terms.htm#91173" CLASS="XRef">See Global System State Definitions.</A>, <A HREF="../ACPI_Software_Programming_Model.htm#34632" CLASS="XRef">See Firmware ACPI Control Structure (FACS).</A>, <A HREF="../Power_and_Performance_Mgmt.htm#RSVD_S4" CLASS="XRef">See System &#92;_S4 State.</A>, <A HREF="../Sys_Address_Map_Interfaces.htm#68313" CLASS="XRef">See System Address Map Interfaces.</A>, <A HREF="../Sys_Address_Map_Interfaces.htm#17616" CLASS="XRef">See Address Range Types.</A>, <A HREF="../Waking_and_Sleeping.htm#_Toc489256123" CLASS="XRef">See S4 Sleeping State.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091089"></A>6.0 Errata</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091091"></A>1488 Typo on description of PkgLength encoding (ACPI v6.0, section 5.4)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091096"></A><A HREF="../ACPI_Software_Programming_Model.htm#_Toc489256021" CLASS="XRef">See Definition Block Encoding.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091098"></A>6.0 Errata</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091100"></A>1487 The Length of GIC ITS Structure is wrong</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091105"></A><A HREF="../ACPI_Software_Programming_Model.htm#32004" CLASS="XRef">See GIC ITS Structure .</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091107"></A>6.0 Errata</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091109"></A>1470 Region Format Interface Code clarification</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091114"></A><A HREF="../ACPI_Software_Programming_Model.htm#_Toc400770402" CLASS="XRef">See NVDIMM Control Region Structure Mark.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091116"></A>6.0 Errata</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091118"></A>1462 5.2.21 Errata</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091123"></A><A HREF="../ACPI_Software_Programming_Model.htm#66239" CLASS="XRef">See Memory Power State Table (MPST).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091125"></A>6.0 Errata</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091127"></A>1461 5.2.21.10 Clarification</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091132"></A><A HREF="../ACPI_Software_Programming_Model.htm#90816" CLASS="XRef">See Interaction with Memory Hot Plug.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091134"></A>6.0 Errata</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1091135"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091137"></A>1449 Graceful Shutdown Request (Device Object Notification Values)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091145"></A><A HREF="../Definition_of_Terms.htm#_Toc489255948" CLASS="XRef">See General ACPI Terminology.</A>, <A HREF="../ACPI_Software_Programming_Model.htm#49510" CLASS="XRef">See Multiple APIC Flags.</A>,  <A HREF="../ACPI_Software_Programming_Model.htm#78712" CLASS="XRef">See Non-Maskable Interrupt (NMI) Source Structure.</A>,<A HREF="../ACPI_Software_Programming_Model.htm#62866" CLASS="XRef">See NMI Source Structure.</A>, <A HREF="../ACPI_Software_Programming_Model.htm#51165" CLASS="XRef">See I/O SAPIC Structure.</A>, <A HREF="../ACPI_Software_Programming_Model.htm#81013" CLASS="XRef">See GIC CPU Interface (GICC) Structure.</A> through <A HREF="../ACPI_Software_Programming_Model.htm#45360" CLASS="XRef">See GIC Interrupt Translation Service (ITS) Structure.</A>, <A HREF="../ACPI_Software_Programming_Model.htm#24805" CLASS="XRef">See NVDIMM Firmware Interface Table (NFIT).</A>, <A HREF="../ACPI_Software_Programming_Model.htm#_Toc489256027" CLASS="XRef">See ACPI Event Programming Model.</A>, <A HREF="../Device_Configuration.htm#77874" CLASS="XRef">See Device Configuration Objects.</A>, <A HREF="../Device_Configuration.htm#_Toc489256054" CLASS="XRef">See _MAT (Multiple APIC Table Entry).</A>, <A HREF="../Device_Configuration.htm#86136" CLASS="XRef">See Other Objects and Methods.</A>, <A HREF="../Device_Configuration.htm#31911" CLASS="XRef">See _FIT (Firmware Interface Table).</A> </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091180"></A>6.0 Errata</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091182"></A>1445 Section 19.6.99 &quot;Package&quot; of the specification needs updating</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091187"></A><A HREF="../ACPI_Source_Language_Reference.htm#ASL_Package" CLASS="XRef">See Package (Declare Package Object).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091189"></A>6.0 Errata</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091191"></A>1444 GTDT CntReadBase Physical address should be optional</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091196"></A><A HREF="../ACPI_Software_Programming_Model.htm#44426" CLASS="XRef">See Generic Timer Description Table (GTDT).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091198"></A>6.0 Errata</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091200"></A>1433 Time and Alarm _GCP changes in support of wakes from S4/S5</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091205"></A><A HREF="../ACPIdefined_Devices_and_DeviceSpecificObjects.htm#51896" CLASS="XRef">See _GCP (Get Capability).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091207"></A>6.0 Errata</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091209"></A>1432 Errata - Explicit Data Type Conversions</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091217"></A><A HREF="../ACPI_Source_Language_Reference.htm#_Toc489256024" CLASS="XRef">See ASL Macros.</A>, <A HREF="../ACPI_Source_Language_Reference.htm#13652" CLASS="XRef">See Explicit Data Type Conversions.</A>, <A HREF="../ACPI_Source_Language_Reference.htm#54087" CLASS="XRef">See Implicit Data Type Conversions.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091222"></A>6.0 Errata</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091224"></A>1406 NFIT RAMDisk Update</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091229"></A><A HREF="../ACPI_Software_Programming_Model.htm#46965" CLASS="XRef">See System Physical Address (SPA) Range Structure.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091231"></A>6.0 Errata</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091233"></A>1403 Two distinct definitions of the MADT have the same revision number</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091238"></A><A HREF="../ACPI_Software_Programming_Model.htm#_Ref374118614" CLASS="XRef">See Multiple APIC Description Table (MADT) Format.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091240"></A>6.0 Errata</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091242"></A>1393 In FADT: if X_DSDT field is non-zero, DSDT field should be ignored or deprecated</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091247"></A><A HREF="../ACPI_Software_Programming_Model.htm#66696" CLASS="XRef">See FADT Format.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091249"></A>6.0 Errata</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091251"></A>1392 Incorrect length in the GIC ITS Structure</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091256"></A><A HREF="../ACPI_Software_Programming_Model.htm#32004" CLASS="XRef">See GIC ITS Structure .</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091258"></A>6.0 Errata</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091260"></A>1386 Clarify APEI vs UEFI runtime variable support</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091265"></A><A HREF="../ACPI_PLatform_Error_Interfaces.htm#31515" CLASS="XRef">See Error Record Serialization Actions.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091267"></A>6.0 Errata</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091269"></A>1385 ACPI 6.0 typo and table misnumbering</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091274"></A><A HREF="../ACPI_PLatform_Error_Interfaces.htm#44196" CLASS="XRef">See Writing.</A>, </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091276"></A>6.0 Errata</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091278"></A>1380 Unnecessary restrictions to FW vendors in ordering of GIC structures in MADT</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091283"></A><A HREF="../ACPI_Software_Programming_Model.htm#81013" CLASS="XRef">See GIC CPU Interface (GICC) Structure.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091285"></A>6.0 Errata</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091287"></A>1378 Duplication of table 5-155/156, section mismatch in GIC redistributor</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091292"></A>duplicates of <A HREF="../ACPI_Software_Programming_Model.htm#49902" CLASS="XRef">See Processor Device Notification Values.</A> &amp; <A HREF="../ACPI_Software_Programming_Model.htm#80510" CLASS="XRef">See Error Device Notification Values.</A> removed; <A HREF="../ACPI_Software_Programming_Model.htm#62903" CLASS="XRef">See GIC Redistributor (GICR) Structure.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091300"></A>6.0 Errata</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091302"></A>1374 section mismatch: _CCA method belongs to section 6.2 Device Configuration Objects?</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091310"></A><A HREF="../Device_Configuration.htm#64694" CLASS="XRef">See Device Identification Objects.</A>/<A HREF="../Device_Configuration.htm#77874" CLASS="XRef">See Device Configuration Objects.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091312"></A>6.0 Errata</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091314"></A>1372 Fix inconsistency for _PXM method in section 17</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091322"></A><A HREF="../NUMA_Architecture_Platforms.htm#_Toc202341934" CLASS="XRef">See System Resource Affinity Table Definition.</A>, <A HREF="../NUMA_Architecture_Platforms.htm#13557" CLASS="XRef">See Impact to Existing Localities.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091324"></A>6.0 Errata</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091326"></A>1368 Various errata fixes and clarifications in chapter 18 APEI</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091333"></A><A HREF="../ACPI_PLatform_Error_Interfaces.htm#_Toc258262559" CLASS="XRef">See Boot Error Source.</A>,.<A HREF="../ACPI_PLatform_Error_Interfaces.htm#55007" CLASS="XRef">See Generic Error Data.</A>, <A HREF="../ACPI_PLatform_Error_Interfaces.htm#98912" CLASS="XRef">See Serialization Action Table.</A>, <A HREF="../ACPI_PLatform_Error_Interfaces.htm#_Toc258262567" CLASS="XRef">See Error Injection Table (EINJ).</A>, <A HREF="../ACPI_PLatform_Error_Interfaces.htm#14899" CLASS="XRef">See Injection Instruction Entries.</A> , <A HREF="../ACPI_PLatform_Error_Interfaces.htm#34164" CLASS="XRef">See Trigger Action Table.</A> </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091348"></A>6.0 Errata</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091350"></A>1361 Clarify _PIC Method on ARM</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091355"></A><A HREF="../ACPI_Software_Programming_Model.htm#_Toc489256038" CLASS="XRef">See _PIC Method.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091357"></A>6.0 Errata</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091359"></A>1289 replace use of the term &quot;BIOS&quot; with more accurate descriptions</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091361"></A>Throughout</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091363"></A>6.0 Errata</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091365"></A>1154 Ensure that ACPI and UEFI specs agree on the treatment of &quot;holes&quot; in the memory map</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091370"></A><A HREF="../Sys_Address_Map_Interfaces.htm#_Toc489267400" CLASS="XRef">See UEFI Assumptions and Limitations.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091372"></A>6.0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091374"></A>1370 Changes needed for ACPI 6.0: persistent memory S4 behavior</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091379"></A><A HREF="../Waking_and_Sleeping.htm#_Toc489256132" CLASS="XRef">See Exiting ACPI Mode.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091381"></A>6.0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091383"></A>1359 Vendor Range for E820 Address Types and UEFI memory Types</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091388"></A><A HREF="../Sys_Address_Map_Interfaces.htm#17616" CLASS="XRef">See Address Range Types.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091390"></A>6.0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091392"></A>1354 Disambiguation of _REV</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091397"></A><A HREF="../ACPI_Software_Programming_Model.htm#_Toc489256036" CLASS="XRef">See &#92;_REV (Revision Data Object).</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091399"></A>6.0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091401"></A>1343 Comments against v6.0 Final Draft</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091409"></A><A HREF="../ACPI_PLatform_Error_Interfaces.htm#14899" CLASS="XRef">See Injection Instruction Entries.</A>; <A HREF="../ACPI_PLatform_Error_Interfaces.htm#34164" CLASS="XRef">See Trigger Action Table.</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091411"></A>6.0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091413"></A>1340 comment against the Final Draft: Minor errata in register fields of LPI example</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1091418"></A><A HREF="../Processor_Configuration_and_Control.htm#90925" CLASS="XRef">See </A></P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+</BODY>
+</HTML>

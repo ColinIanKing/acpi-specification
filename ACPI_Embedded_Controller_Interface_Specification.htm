@@ -1,0 +1,3560 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2016/HTML Export Filter">
+<LINK REL="STYLESHEET" HREF="ACPI_Embedded_Controller_Interface_Specification.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE> 12 ACPI Embedded Controller Interface Specification</TITLE></HEAD>
+<BODY>
+<DIV>
+<H1 CLASS="Heading-1">
+<A NAME="pgfId-1350526"></A><A NAME="71995"></A>ACPI Embedded Controller Interface Specification<DIV>
+<IMG SRC="ACPI_Embedded_Controller_Interface_Specification-1.gif" ALT="">
+</DIV>
+</H1>
+<P CLASS="Body">
+<A NAME="pgfId-1350527"></A>ACPI defines a standard hardware and software communications interface between an OS driver and an embedded controller. This allows any OS to provide a standard driver that can directly communicate with an embedded controller in the system, thus allowing other drivers within the system to communicate with and use the resources of system embedded controllers. This in turn enables the OEM to provide platform features that the OS OSPM and applications can take advantage of.<A NAME="marker-1350528"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1347777"></A>ACPI also defines a standard hardware and software communications interface between an OS driver and an Embedded Controller-based SMB-HC (EC-SMB-HC).<A NAME="marker-1347778"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1347779"></A>The ACPI standard supports multiple embedded controllers in a system, each with its own resources. Each embedded controller has a flat byte-addressable I/O space, currently defined as 256 bytes. Features implemented in the embedded controller have an event &#8220;query&#8221; mechanism that allows feature hardware implemented by the embedded controller to gain the attention of an OS driver or ASL/AML code handler. The interface has been specified to work on the most popular embedded controllers on the market today, only requiring changes in the way the embedded controller is &#8220;wired&#8221; to the host interface.<A NAME="marker-1347780"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1347781"></A>Two interfaces are specified: </P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347782"></A>A private interface, exclusively owned by the embedded controller driver.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347783"></A>A shared interface, used by the embedded controller driver and some other driver.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1347784"></A>This interface is separate from the traditional PC keyboard controller. Some OEMs might choose to implement the ACPI Embedded Controller Interface (ECI) within the same embedded controller as the keyboard controller function, but the ECI requires its own unique host resources (interrupt event and access registers).<A NAME="marker-1347785"></A><A NAME="marker-1347786"></A><A NAME="marker-1347787"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1347788"></A>This interface does support sharing the ECI with an inter-environment interface (such as SMI) and relies on the ACPI-defined &#8220;Global Lock&#8221; protocol. Note, however, that HW-reduced ACPI platforms, which do not support the Global Lock, cannot share the EC interface. For information about the Global Lock interface, see <A HREF="ACPI_Software_Programming_Model.htm#18034" CLASS="XRef">See Global Lock.</A>, &#8220;Global Lock.&#8221; Both the shared and private EC interfaces are described in the following sections.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1347789"></A>The ECI has been designed such that a platform can use it in either the legacy or ACPI modes with minimal changes between the two operating environments. This is to encourage standardization for this interface to enable faster development of platforms as well as opening up features within these controllers to higher levels of software. </P>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1347810"></A><A NAME="_Toc489267328"></A><A NAME="_Toc489267702"></A><A NAME="_Toc489272676"></A><A NAME="_Toc202341861"></A><A NAME="_Toc258262479"></A>Embedded Controller Interface Description</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1347811"></A>Embedded controllers are the general class of microcontrollers used to support OEM-specific implementations. The ACPI specification supports embedded controllers in any platform design, as long as the microcontroller conforms to one of the models described in this section. The embedded controller is a unique feature in that it can perform complex low-level functions through a simple interface to the host microprocessor(s). </P>
+<P CLASS="Body">
+<A NAME="pgfId-1347812"></A>Although there is a large variety of microcontrollers in the market today, the most commonly used embedded controllers include a host interface that connects the embedded controller to the host data bus, allowing bi-directional communications. A bi-directional interrupt scheme reduces the host processor latency in communicating with the embedded controller.<A NAME="marker-1347813"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1352178"></A>Currently, the most common host interface architecture incorporated into microcontrollers is modeled after the standard IA-PC architecture keyboard controller. This keyboard controller is accessed at 0x60 and 0x64 in system I/O space. Port 0x60 is termed the data register, and allows bi-directional data transfers to and from the host and embedded controller. Port 0x64 is termed the command/status register; it returns port status information upon a read, and generates a command sequence to the embedded controller upon a write. This same class of controllers also includes a second decode range that shares the same properties as the keyboard interface by having a command/status register and a data register. The following diagram graphically depicts this interface.</P>
+<DIV>
+<H6 CLASS="spacing">
+<A NAME="pgfId-1347821"></A>&nbsp;</H6>
+</DIV>
+<DIV>
+<H4 CLASS="Normal">
+<A NAME="pgfId-1347825"></A><IMG SRC="ACPI_Embedded_Controller_Interface_Specification-2.gif" ALIGN="BASELINE" ALT="">
+&nbsp;</H4>
+<DIV>
+<H6 CLASS="FigureTitle">
+<A NAME="pgfId-1352191"></A>Shared Interface<A NAME="marker-1347826"></A><A NAME="marker-1347827"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1347828"></A>The diagram above depicts the general register model supported by the ACPI Embedded Controller Interface.</P>
+<DIV>
+<H6 CLASS="Pb">
+<A NAME="pgfId-1347834"></A>&nbsp;</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1347835"></A>The first method uses an embedded controller interface shared between OSPM and the system management code, which requires the Global Lock semaphore overhead to arbitrate ownership. The second method is a dedicated embedded controller decode range for sole use by OSPM driver. The following diagram illustrates the embedded controller architecture that includes a dedicated ACPI interface.</P>
+</DIV>
+<DIV>
+<H6 CLASS="spacing">
+<A NAME="pgfId-1347836"></A>&nbsp;</H6>
+<P CLASS="Art">
+<A NAME="pgfId-1347840"></A><IMG SRC="ACPI_Embedded_Controller_Interface_Specification-3.gif" ALIGN="BASELINE" ALT="">
+&nbsp;</P>
+</DIV>
+</DIV>
+<DIV>
+<H6 CLASS="FigureTitle">
+<A NAME="pgfId-1347841"></A>Private Interface</H6>
+<DIV>
+<H6 CLASS="Pb">
+<A NAME="pgfId-1347849"></A><A NAME="marker-1347848"></A>&nbsp;</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1347851"></A>The private interface allows OSPM to communicate with the embedded controller without the additional software overhead associated with using the Global Lock. Several common system configurations can provide the additional embedded controller interfaces:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347852"></A>Non-shared embedded controller. This will be the most common case where there is no need for the system management handler to communicate with the embedded controller when the system transitions to ACPI mode. OSPM processes all normal types of system management events, and the system management handler does not need to take any actions.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347853"></A>Integrated keyboard controller and embedded controller. This provides three host interfaces as described earlier by including the standard keyboard controller in an existing component (chip set, I/O controller) and adding a discrete, standard embedded controller with two interfaces for system management activities.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347854"></A>Standard keyboard controller and embedded controller. This provides three host interfaces by providing a keyboard controller as a distinct component, and two host interfaces are provided in the embedded controller for system management activities.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347855"></A>Two embedded controllers. This provides up to four host interfaces by using two embedded controllers; one controller for system management activities providing up to two host interfaces, and one controller for keyboard controller functions providing up to two host interfaces.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347856"></A>Embedded controller and no keyboard controller. Future platforms might provide keyboard functionality through an entirely different mechanism, which would allow for two host interfaces in an embedded controller for system management activities.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1347859"></A><A NAME="_Ref351717382"></A><A NAME="_Toc357858970"></A>To handle the general embedded controller interface (as opposed to a dedicated interface) model, a method is available to make the embedded controller a shareable resource between multiple tasks running under the operating system&#8217;s control and the system management interrupt handler. This method, as described in this section, requires several changes: <A NAME="marker-1347860"></A><A NAME="marker-1347861"></A></P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347862"></A>Additional external hardware </LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347863"></A>Embedded controller firmware changes </LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347864"></A>System management interrupt handler firmware changes</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347865"></A>Operating software changes</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1347866"></A>Access to the shared embedded controller interface requires additional software to arbitrate between the operating system&#8217;s use of the interface and the system management handler&#8217;s use of the interface. This is done using the Global Lock as described in <A HREF="ACPI_Software_Programming_Model.htm#18034" CLASS="XRef">See Global Lock.</A>, &#8220;Global Lock&quot;, but is not supported on HW-reduced ACPI platforms.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1416520"></A>This interface sharing protocol also requires embedded controller firmware changes, in order to ensure that collisions do not occur at the interface. A collision could occur if a byte is placed in the system output buffer and an interrupt is then generated. There is a small window of time when the incorrect recipient could receive the data. This problem is resolved by ensuring that the firmware in the embedded controller does not place any data in the output buffer until it is requested by OSPM or the system management handler.<A NAME="marker-1347868"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1347869"></A>More detailed algorithms and descriptions are provided in the following sections.</P>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1347891"></A><A NAME="_Toc489267329"></A><A NAME="_Toc489267703"></A><A NAME="_Toc489272677"></A><A NAME="_Toc202341862"></A><A NAME="_Toc258262480"></A>Embedded Controller Register Descriptions<A NAME="marker-1347889"></A><A NAME="marker-1347890"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1347892"></A>The embedded controller contains three registers at two address locations: EC_SC and EC_DATA. The EC_SC, or Embedded Controller Status/Command register, acts as two registers: a status register for reads to this port and a command register for writes to this port. The EC_DATA (Embedded Controller Data register) acts as a port for transferring data between the host CPU and the embedded controller.</P>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1347924"></A><A NAME="marker-1347920"></A>Embedded Controller Status, EC_SC (R)</H5>
+<P CLASS="Body">
+<A NAME="pgfId-1352331"></A>This is a read-only register that indicates the current status of the embedded controller interface.</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1347960"></A>Read only register table</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1347928"></A>Bit7</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1347930"></A>Bit6</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1347932"></A>Bit5</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1347934"></A>Bit4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1347936"></A>Bit3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1347938"></A>Bit2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1347940"></A>Bit1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1347942"></A>Bit0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347944"></A>IGN</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347946"></A>SMI_EVT</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347948"></A>SCI_EVT</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347950"></A>BURST</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347952"></A>CMD</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347954"></A>IGN</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347956"></A>IBF</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347958"></A>OBF</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1352262"></A>Where:</P>
+</DIV>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1356040"></A>Register details </H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1347964"></A>IGN:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1347966"></A>Ignored</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347968"></A>SMI_EVT:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347970"></A>1 - Indicates SMI event is pending (requesting SMI query).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347972"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347974"></A>0 - No SMI events are pending.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347976"></A>SCI_EVT:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347978"></A>1 - Indicates SCI event is pending (requesting SCI query).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347980"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347982"></A>0 - No SCI events are pending.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347984"></A>BURST:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347986"></A>1 - Controller is in burst mode for polled command processing.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347988"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347990"></A>0 - Controller is in normal mode for interrupt-driven command processing.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347992"></A>CMD:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347994"></A>1 - Byte in data register is a command byte (only used by controller).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347996"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347998"></A>0 - Byte in data register is a data byte (only used by controller).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348000"></A>IBF:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348002"></A>1 - Input buffer is full (data ready for embedded controller).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348004"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348006"></A>0 - Input buffer is empty.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348008"></A>OBF:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348010"></A>1 - Output buffer is full (data ready for host).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348012"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348014"></A>0 - Output buffer is empty.</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1352279"></A>The Output Buffer Full (OBF) flag is set when the embedded controller has written a byte of data into the command or data port but the host has not yet read it. After the host reads the status byte and sees the OBF flag set, the host reads the data port to get the byte of data that the embedded controller has written. After the host reads the data byte, the OBF flag is cleared automatically by hardware. This signals the embedded controller that the data has been read by the host and the embedded controller is free to write more data to the host.<A NAME="marker-1348018"></A><A NAME="marker-1348019"></A><A NAME="marker-1348020"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1348021"></A>The Input Buffer Full (IBF) flag is set when the host has written a byte of data to the command or data port, but the embedded controller has not yet read it. After the embedded controller reads the status byte and sees the IBF flag set, the embedded controller reads the data port to get the byte of data that the host has written. After the embedded controller reads the data byte, the IBF flag is automatically cleared by hardware. This is the signal to the host that the data has been read by the embedded controller and that the host is free to write more data to the embedded controller.<A NAME="marker-1348022"></A><A NAME="marker-1348023"></A><A NAME="marker-1348024"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1348025"></A>The SCI event (SCI_EVT) flag is set when the embedded controller has detected an internal event that requires the operating system&#8217;s attention. The embedded controller sets this bit in the status register, and generates an SCI to OSPM. OSPM needs this bit to differentiate command-complete SCIs from notification SCIs. OSPM uses the query command to request the cause of the SCI_EVT and take action. For more information, see <A HREF="ACPI_Embedded_Controller_Interface_Specification.htm#_Toc489267333" CLASS="XRef">See Embedded Controller Command Set.</A>, &#8220;Embedded Controller Command Set.&#8221;) </P>
+<P CLASS="Body">
+<A NAME="pgfId-1348037"></A><A NAME="marker-1348036"></A>The SMI event (SMI_EVT) flag is set when the embedded controller has detected an internal event that requires the system management interrupt handler's attention. The embedded controller sets this bit in the status register before generating an SMI. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1348040"></A>The Burst (BURST) flag indicates that the embedded controller has received the burst enable command from the host, has halted normal processing, and is waiting for a series of commands to be sent from the host. This allows OSPM or system management handler to quickly read and write several bytes of data at a time without the overhead of SCIs between the commands.<A NAME="marker-1348041"></A><A NAME="marker-1348042"></A><A NAME="marker-1348043"></A></P>
+</DIV>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1348063"></A><A NAME="_Toc489267331"></A><A NAME="_Toc489267705"></A><A NAME="_Toc489272679"></A><A NAME="_Toc202341864"></A><A NAME="_Toc258262482"></A>Embedded Controller Command, EC_SC (W)</H5>
+<P CLASS="Body">
+<A NAME="pgfId-1348064"></A>This is a write-only register that allows commands to be issued to the embedded controller. Writes to this port are latched in the input data register and the input buffer full flag is set in the status register. Writes to this location also cause the command bit to be set in the status register. This allows the embedded controller to differentiate the start of a command sequence from a data byte write operation.<A NAME="marker-1348065"></A><A NAME="marker-1348066"></A></P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1348088"></A><A NAME="_Toc489267332"></A><A NAME="_Toc489267706"></A><A NAME="_Toc489272680"></A><A NAME="_Toc202341865"></A><A NAME="_Toc258262483"></A>Embedded Controller Data, EC_DATA (R/W)<A NAME="marker-1348086"></A><A NAME="marker-1348087"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1348089"></A>This is a read/write register that allows additional command bytes to be issued to the embedded controller, and allows OSPM to read data returned by the embedded controller. Writes to this port by the host are latched in the input data register, and the input buffer full flag is set in the status register. Reads from this register return data from the output data register and clear the output buffer full flag in the status register.</P>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1348117"></A><A NAME="_Toc489267333"></A><A NAME="_Toc489267707"></A><A NAME="_Toc489272681"></A><A NAME="_Toc202341866"></A><A NAME="_Toc258262484"></A>Embedded Controller Command Set<A NAME="marker-1348115"></A><A NAME="marker-1348116"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1348118"></A>The embedded controller command set allows OSPM to communicate with the embedded controllers. ACPI defines the commands and their byte encodings for use with the embedded controller that are shown in the following table.</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1348119"></A>Embedded Controller Commands<A NAME="_Toc365910038"></A><A NAME="_Toc369679915"></A><A NAME="_Toc369801532"></A><A NAME="_Toc369936305"></A><A NAME="_Toc370017395"></A><A NAME="_Toc374114841"></A><A NAME="_Toc375244483"></A><A NAME="_Toc375924879"></A><A NAME="_Toc423760104"></A><A NAME="_Toc442516161"></A><A NAME="_Toc465497036"></A><A NAME="_Toc486665564"></A></H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348122"></A>Embedded Controller Command</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348124"></A>Command Byte Encoding</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348126"></A>Read Embedded Controller (RD_EC)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348128"></A>0x80</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348130"></A>Write Embedded Controller (WR_EC)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348132"></A>0x81</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348134"></A>Burst Enable Embedded Controller (BE_EC)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348136"></A>0x82</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348138"></A>Burst Disable Embedded Controller (BD_EC)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348140"></A>0x83</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348142"></A>Query Embedded Controller (QR_EC)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348144"></A>0x84</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1348167"></A><A NAME="_Toc489267334"></A><A NAME="_Toc489267708"></A><A NAME="_Toc489272682"></A><A NAME="_Toc202341867"></A><A NAME="_Toc258262485"></A>Read Embedded Controller, RD_EC (0x80)<A NAME="marker-1348166"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1348168"></A>This command byte allows OSPM to read a byte in the address space of the embedded controller. This command byte is reserved for exclusive use by OSPM, and it indicates to the embedded controller to generate SCIs in response to related transactions (that is, IBF=0 or OBF=1 in the EC Status Register), rather than SMIs. This command consists of a command byte written to the Embedded Controller Command register (EC_SC), followed by an address byte written to the Embedded Controller Data register (EC_DATA). The embedded controller then returns the byte at the addressed location. The data is read at the data port after the OBF flag is set.</P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1348196"></A><A NAME="marker-1348193"></A>Write Embedded Controller, WR_EC (0x81)</H5>
+<P CLASS="Body">
+<A NAME="pgfId-1348197"></A>This command byte allows OSPM to write a byte in the address space of the embedded controller. This command byte is reserved for exclusive use by OSPM, and it indicates to the embedded controller to generate SCIs in response to related transactions (that is, IBF=0 or OBF=1 in the EC Status Register), rather than SMIs. This command allows OSPM to write a byte in the address space of the embedded controller. It consists of a command byte written to the Embedded Controller Command register (EC_SC), followed by an address byte written to the Embedded Controller Data register (EC_DATA), followed by a data byte written to the Embedded Controller Data Register (EC_DATA); this is the data byte written at the addressed location. </P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1348220"></A><A NAME="_Toc489267336"></A><A NAME="_Toc489267710"></A><A NAME="_Toc489272684"></A><A NAME="_Toc202341869"></A><A NAME="_Toc258262487"></A>Burst Enable Embedded Controller, BE_EC (0x82)<A NAME="marker-1348217"></A><A NAME="marker-1348218"></A><A NAME="marker-1348219"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1348221"></A>This command byte allows OSPM to request dedicated attention from the embedded controller and (except for critical events) prevents the embedded controller from doing tasks other than receiving command and data from the host processor (either the system management interrupt handler or OSPM). This command is an optimization that allows the host processor to issue several commands back to back, in order to reduce latency at the embedded controller interface. When the controller is in the burst mode, it should transition to the burst disable state if the host does not issue a command within the following guidelines:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348222"></A>First Access - 400 microseconds</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348223"></A>Subsequent Accesses - 50 microseconds each</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348224"></A>Total Burst Time - 1 millisecond</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1348225"></A>In addition, the embedded controller can disengage the burst mode at any time to process a critical event. If the embedded controller disables burst mode for any reason other than the burst disable command, it should generate an SCI to OSPM to indicate the change.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348226"></A>While in burst mode, the embedded controller follows these guidelines for OSPM driver:</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348227"></A>SCIs are generated as normal, including IBF=0 and OBF=1.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348228"></A>Accesses should be responded to within 50 microseconds.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348229"></A>Burst mode is entered in the following manner: </P>
+<P CLASS="Body">
+<A NAME="pgfId-1348230"></A>OSPM driver writes the Burst Enable Embedded Controller, BE_EC (0x82) command byte and then the Embedded Controller will prepare to enter the Burst mode. This includes processing any routine activities such that it should be able to remain dedicated to OSPM interface for &#126; 1 microsecond. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1348231"></A>The Embedded Controller sets the Burst bit of the Embedded Controller Status Register, puts the Burst Acknowledge byte (0x90) into the SCI output buffer, sets the OBF bit, and generates an SCI to signal OSPM that it is in Burst mode.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348232"></A>Burst mode is exited the following manner: </P>
+<P CLASS="Body">
+<A NAME="pgfId-1348233"></A>OSPM driver writes the Burst Disable Embedded Controller, BD_EC (0x83) command byte and then the Embedded Controller will exit Burst mode by clearing the Burst bit in the Embedded Controller Status register and generating an SCI signal (due to IBF=0). </P>
+<P CLASS="Body">
+<A NAME="pgfId-1348234"></A>The Embedded Controller clears the Burst bit of the Embedded Controller Status Register.</P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1348254"></A><A NAME="_Toc489267337"></A><A NAME="_Toc489267711"></A><A NAME="_Toc489272685"></A><A NAME="_Toc202341870"></A><A NAME="_Toc258262488"></A>Burst Disable Embedded Controller, BD_EC (0x83)<A NAME="marker-1348253"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1348255"></A>This command byte releases the embedded controller from a previous burst enable command and allows it to resume normal processing. This command is sent by OSPM or system management interrupt handler after it has completed its entire queued command sequence to the embedded controller.</P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1348282"></A><A NAME="marker-1348279"></A>Query Embedded Controller, QR_EC (0x84)</H5>
+<P CLASS="Body">
+<A NAME="pgfId-1348283"></A>OSPM driver sends this command when the SCI_EVT flag in the EC_SC register is set. When the embedded controller has detected a system event that must be communicated to OSPM, it first sets the SCI_EVT flag in the EC_SC register, generates an SCI, and then waits for OSPM to send the query (QR_EC) command. OSPM detects the embedded controller SCI, sees the SCI_EVT flag set, and sends the query command to the embedded controller. Upon receipt of the QR_EC command byte, the embedded controller places a notification byte with a value between 0-255, indicating the cause of the notification. The notification byte indicates which interrupt handler operation should be executed by OSPM to process the embedded controller SCI. The query value of zero is reserved for a spurious query result and indicates &#8220;no outstanding event.&#8221; </P>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1348304"></A><A NAME="_Toc489267339"></A><A NAME="_Toc489267713"></A><A NAME="_Toc489272687"></A><A NAME="_Toc202341872"></A><A NAME="_Toc258262490"></A>SMBus Host Controller Notification Header (Optional), OS_SMB_EVT<A NAME="marker-1348302"></A><A NAME="marker-1348303"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1348305"></A>This query command notification header is the special return code that indicates events with an SMBus controller implemented within an embedded controller. These events include:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348306"></A>Command completion</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348307"></A>Command error</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348308"></A>Alarm reception</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1348309"></A>The actual notification value is declared in the EC-SMB-HC device object in the ACPI Namespace. </P>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1348332"></A><A NAME="_Toc489267340"></A><A NAME="_Toc489267714"></A><A NAME="_Toc489272688"></A><A NAME="_Toc202341873"></A><A NAME="_Toc258262491"></A>Embedded Controller Firmware<A NAME="marker-1348330"></A><A NAME="marker-1348331"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1348333"></A>The embedded controller firmware must obey the following rules in order to be ACPI-compatible:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348334"></A>SMI Processing. Although it is not explicitly stated in the command specification section, a shared embedded controller interface has a separate command set for communicating with each environment it plans to support. In other words, the embedded controller knows which environment is generating the command request, as well as which environment is to be notified upon event detection, and can then generate the correct interrupts and notification values. This implies that a system management handler uses commands that parallel the functionality of all the commands for ACPI including query, read, write, and any other implemented specific commands. <A NAME="marker-1348335"></A></LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348338"></A>SCI/SMI Task Queuing. If the system design is sharing the interface between both a system management interrupt handler and OSPM, the embedded controller should always be prepared to queue a notification if it receives a command. The embedded controller only sets the appropriate event flag in the status (EC_SC) register if the controller has detected an event that should be communicated to the OS or system management handler. The embedded controller must be able to field commands from either environment without loss of the notification event. At some later time, the OS or system management handler issues a query command to the embedded controller to request the cause of the notification event.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348339"></A>Notification Management. The use of the embedded controller means using the query (QR_EC) command to notify OSPM of system events requiring action. If the embedded controller is shared with the operating system, the SMI handler uses the SMI_EVT flag and an SMI query command (not defined in this document) to receive the event notifications. The embedded controller doesn&#8217;t place event notifications into the output buffer of a shared interface unless it receives a query command from OSPM or the system management interrupt handler. </LI>
+</UL>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1348366"></A><A NAME="marker-1348363"></A>Interrupt Model</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1348367"></A>The EC Interrupt Model uses pulsed interrupts to speed the clearing process. The Interrupt is firmware generated using an EC general-purpose output and has the waveform shown in <A HREF="ACPI_Embedded_Controller_Interface_Specification.htm#82077" CLASS="XRef">See Interrupt Model.</A>. The embedded controller SCI is always wired directly to a GPE input or a GPIO pin, and OSPM driver treats this as an edge event (the EC SCI cannot be shared). </P>
+<DIV>
+<H6 CLASS="spacing">
+<A NAME="pgfId-1348368"></A>&nbsp;</H6>
+<P CLASS="Art-Caption">
+<A NAME="pgfId-1348372"></A><IMG SRC="ACPI_Embedded_Controller_Interface_Specification-4.gif" ALIGN="BASELINE" ALT="">
+&nbsp;</P>
+</DIV>
+<DIV>
+<H6 CLASS="FigureTitle">
+<A NAME="pgfId-1352549"></A><A NAME="82077"></A>Interrupt Model</H6>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1348387"></A><A NAME="_Toc489267342"></A><A NAME="_Toc489267716"></A><A NAME="_Toc489272690"></A><A NAME="_Toc202341875"></A><A NAME="_Toc258262493"></A>Event Interrupt Model</H5>
+<P CLASS="Body">
+<A NAME="pgfId-1348388"></A>The embedded controller must generate SCIs for the events listed in the following table.</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1348390"></A>Events for Which Embedded Controller Must Generate SCIs<A NAME="marker-1348389"></A></H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348393"></A>Event</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348395"></A>Description</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348397"></A>IBF=0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348399"></A>Signals that the embedded controller has read the last command or data from the input buffer and the host is free to send more data.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348401"></A>OBF=1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348403"></A>Signals that the embedded controller has written a byte of data into the output buffer and the host is free to read the returned data.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348405"></A>SCI_EVT=1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348407"></A>Signals that the embedded controller has detected an event that requires OS attention. OSPM should issue a query (QR_EC) command to find the cause of the event.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1348430"></A><A NAME="_Toc489267343"></A><A NAME="_Toc489267717"></A><A NAME="_Toc489272691"></A><A NAME="_Toc202341876"></A><A NAME="_Toc258262494"></A>Command Interrupt Model<A NAME="marker-1348429"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1348431"></A>The embedded controller must generate SCIs for commands as follows:</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1348433"></A>Read Command (3 Bytes)</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348436"></A>Byte #1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348438"></A>(Command byte Header)	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348440"></A>Interrupt on IBF=0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348442"></A>Byte #2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348444"></A>(Address byte to read)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348446"></A>No Interrupt</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348448"></A>Byte #3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348450"></A>(Data read to host)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348452"></A>Interrupt on OBF=1</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1352585"></A>Write Command (3 Bytes)</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1352588"></A>Byte #1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1352590"></A>(Command byte Header)	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1352592"></A>Interrupt on IBF=0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1352594"></A>Byte #2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1352596"></A>(Address byte to write)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1352598"></A>Interrupt on IBF=0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1352600"></A>Byte #3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1352602"></A>(Data to read )</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1352604"></A>Interrupt on IBF=0</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1352606"></A>Query Command (2 Bytes</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348488"></A>Byte #1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348490"></A>(Command byte Header)	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348492"></A>No Interrupt</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348494"></A>Byte #2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348496"></A>(Query value to host)	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348498"></A>Interrupt on OBF=1</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1348502"></A>Burst Enable Command (2 Bytes)</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348505"></A>Byte #1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348507"></A>(Command byte Header)	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348509"></A>No Interrupt</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348511"></A>Byte #2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348513"></A>(Burst acknowledge byte)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348515"></A>Interrupt on OBF=1</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1348519"></A>Burst Disable Command (1 Byte)</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348522"></A>Byte #1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348524"></A>(Command byte Header)	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348526"></A>Interrupt on IBF=0</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1348544"></A><A NAME="_Toc489267344"></A><A NAME="_Toc489267718"></A><A NAME="_Toc489272692"></A><A NAME="_Toc202341877"></A><A NAME="_Toc258262495"></A>Embedded Controller Interfacing Algorithms<A NAME="marker-1348543"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1348545"></A>To initiate communications with the embedded controller, OSPM or system management handler acquires ownership of the interface. This ownership is acquired through the use of the Global Lock (described in <A HREF="ACPI_Software_Programming_Model.htm#18034" CLASS="XRef">See Global Lock.</A>, &#8220;Global Lock&#8221;), or is owned by default by OSPM as a non-shared resource (and the Global Lock is not required for accessibility).</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348546"></A>After ownership is acquired, the protocol always consists of the passing of a command byte. The command byte will indicate the type of action to be taken. Following the command byte, zero or more data bytes can be exchanged in either direction. The data bytes are defined according to the command byte that is transferred.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348547"></A>The embedded controller also has two status bits that indicate whether the registers have been read. This is used to ensure that the host or embedded controller has received data from the embedded controller or host. When the host writes data to the command or data register of the embedded controller, the input buffer flag (IBF) in the status register is set within 1 microsecond. When the embedded controller reads this data from the input buffer, the input buffer flag is reset. When the embedded controller writes data into the output buffer, the output buffer flag (OBF) in the status register is set. When the host processor reads this data from the output buffer, the output buffer flag is reset. <A NAME="marker-1348548"></A><A NAME="marker-1348549"></A><A NAME="marker-1348550"></A><A NAME="marker-1348551"></A><A NAME="marker-1348552"></A><A NAME="marker-1348553"></A></P>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1348573"></A><A NAME="_Toc489267345"></A><A NAME="_Toc489267719"></A><A NAME="_Toc489272693"></A><A NAME="_Toc202341878"></A><A NAME="_Toc258262496"></A>Embedded Controller Description Information</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1348574"></A>Certain aspects of the embedded controller&#8217;s operation have OEM-definable values associated with them. The following is a list of values that are defined in the software layers of the ACPI specification:<A NAME="marker-1348575"></A></P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348576"></A>Status flag indicating whether the interface requires the use of the Global Lock.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348577"></A>Bit position of embedded controller interrupt in general-purpose status register.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348578"></A>Decode address for command/status register.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348579"></A>Decode address for data register.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348580"></A>Base address and query value of any EC-SMBus controller.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1348581"></A>For implementation details of the above listed information, see <A HREF="ACPI_Embedded_Controller_Interface_Specification.htm#_Toc489267373" CLASS="XRef">See Defining an Embedded Controller Device in ACPI Namespace.</A>, &#8220;Defining an Embedded Controller Device in ACPI Namespace,&#8221; and <A HREF="ACPI_Embedded_Controller_Interface_Specification.htm#_Toc489267375" CLASS="XRef">See Defining an EC SMBus Host Controller in ACPI Namespace.</A>, &#8220;Defining an EC SMBus Host Controller in ACPI Namespace.&#8221;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348582"></A>An embedded controller will require the inclusion of the GLK method in its ACPI namespace if potentially contentious accesses to device resources are performed by non-OS code. See <A HREF="Device_Configuration.htm#_Toc489256077" CLASS="XRef">See _GLK (Global Lock).</A>, &#8220;_GLK (Global Lock)&#8221; for details about the _GLK method.</P>
+<DIV>
+<H6 CLASS="Pb">
+<A NAME="pgfId-1348591"></A>&nbsp;</H6>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1348597"></A><A NAME="37345"></A> SMBus Host Controller Interface via Embedded Controller</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1348598"></A>This section specifies a standard interface that an ACPI-compatible OS can use to communicate with embedded controller-based SMBus host controllers (EC-SMB-HC). This interface allows the host processor (under control of OSPM) to manage devices on the SMBus. Typical devices residing on the SMBus include Smart Batteries, Smart Battery Chargers, contrast/backlight control, and temperature sensors.<A NAME="marker-1348599"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1348600"></A>The EC-SMB-HC interface consists of a block of registers that reside in embedded controller space. These registers are used by software to initiate SMBus transactions and receive SMBus notifications. By using a well-defined register set, OS software can be written to operate with any vendor&#8217;s embedded controller hardware.<A NAME="marker-1348601"></A><A NAME="marker-1348602"></A><A NAME="marker-1348603"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1348604"></A>Certain SMBus segments have special requirements that the host controller filters certain SMBus commands (for example, to prevent an errant application or virus from potentially damaging the battery subsystem). This is most easily accomplished by implementing the host interface controller through an embedded controller--as embedded controller can easily filter out potentially problematic commands.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348605"></A>Notice that an EC-SMB-HC interface will require the inclusion of the GLK method in its ACPI namespace if potentially contentious accesses to device resources are performed by non-OS code. See <A HREF="Device_Configuration.htm#_Toc489256077" CLASS="XRef">See _GLK (Global Lock).</A>, &#8220;_GLK (Global Lock)&#8221; for details on using the _GLK method.</P>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1348627"></A><A NAME="_Toc489267347"></A><A NAME="_Toc489267721"></A><A NAME="_Toc489272695"></A><A NAME="_Toc202341880"></A><A NAME="_Toc258262498"></A>Register Description</H5>
+<P CLASS="Body">
+<A NAME="pgfId-1348628"></A>The EC-SMBus host interface is a flat array of registers that are arranged sequentially in the embedded controller address space.<A NAME="marker-1348629"></A></P>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1348649"></A>S<A NAME="_Toc489267348"></A>tatus Register, SMB_STS<A NAME="marker-1348646"></A><A NAME="marker-1348647"></A><A NAME="marker-1348648"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348650"></A>This register indicates general status on the SMBus. This includes SMB-HC command completion status, alarm received status, and error detection status (the error codes are defined later in this section). This register is cleared to zeroes (except for the ALRM bit) whenever a new command is issued using a write to the protocol (SMB_PRTCL) register. This register is always written with the error code before clearing the protocol register. The SMB-HC query event (that is, an SMB-HC interrupt) is raised after the clearing of the protocol register.</P>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1352712"></A>OSPM must ensure the ALRM bit is cleared after it has been serviced by writing &#8216;00&#8217; to the SMB_STS register.</LI>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1352715"></A>Bit7</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1352717"></A>Bit6</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1352719"></A>Bit5</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1352721"></A>Bit4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1352723"></A>Bit3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1352725"></A>Bit2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1352727"></A>Bit1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1352729"></A>Bit0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1352731"></A>DONE</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1352733"></A>ALRM</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1352735"></A>RES</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1352737"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1352739"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1352741"></A>STATUS </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1352743"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1352745"></A>&nbsp;</P>
+</TD>
+</TR>
+</TABLE>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1352775"></A><A NAME="_Toc302834014"></A><A NAME="_Toc302834441"></A><A NAME="_Toc304688264"></A><A NAME="_Toc304688658"></A><A NAME="_Toc304808111"></A><A NAME="_Toc304860145"></A><A NAME="_Toc305318582"></A><A NAME="_Toc314626334"></A><A NAME="_Toc315233729"></A><A NAME="_Toc315233999"></A><A NAME="_Toc317036610"></A>Where:</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1352760"></A>DONE:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1352762"></A>Indicates the last command has completed and no error.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1352764"></A>ALRM:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1352766"></A>Indicates an SMBus alarm message has been received.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1352768"></A>RES:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1352770"></A><EM CLASS="Italic">
+Reserved</EM>
+</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1352772"></A>STATUS:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1352774"></A>Indicates SMBus communication status for one of the reasons listed in the following table.</P>
+</TD>
+</TR>
+</TABLE>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1348726"></A>SMBus Status Codes</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1411288"></A>Status Code</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1411290"></A>Name</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1411292"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348735"></A>00h</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348737"></A>SMBus OK</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348739"></A>Indicates the transaction has been successfully completed.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348741"></A>07h</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348743"></A>SMBus Unknown Failure</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348745"></A>Indicates failure because of an unknown SMBus error.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348747"></A>10h</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348749"></A>SMBus Device Address Not Acknowledged</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348751"></A>Indicates the transaction failed because the slave device address was not acknowledged.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348753"></A>11h</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348755"></A>SMBus Device Error Detected</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348757"></A>Indicates the transaction failed because the slave device signaled an error condition.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348759"></A>12h</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348761"></A>SMBus Device Command Access Denied</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348763"></A>Indicates the transaction failed because the SMBus host does not allow the specific command for the device being addressed. For example, the SMBus host might not allow a caller to adjust the Smart Battery Charger&#8217;s output.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348765"></A>13h</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348767"></A>SMBus Unknown Error</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348769"></A>Indicates the transaction failed because the SMBus host encountered an unknown error.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348771"></A>17h</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348773"></A>SMBus Device Access Denied</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348775"></A>Indicates the transaction failed because the SMBus host does not allow access to the device addressed. For example, the SMBus host might not allow a caller to directly communicate with an SMBus device that controls the system&#8217;s power planes.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348777"></A>18h</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348779"></A>SMBus Timeout</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348781"></A>Indicates the transaction failed because the SMBus host detected a timeout on the bus.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348783"></A>19h</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348785"></A>SMBus Host Unsupported Protocol</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348787"></A>Indicates the transaction failed because the SMBus host does not support the requested protocol.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348789"></A>1Ah</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348791"></A>SMBus Busy</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348793"></A>Indicates that the transaction failed because the SMBus host reports that the SMBus is presently busy with some other transaction. For example, the Smart Battery might be sending charging information to the Smart Battery Charger.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348795"></A>1Fh</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348797"></A>SMBus PEC (CRC-8) Error</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348799"></A>Indicates that a Packet Error Checking (PEC) error occurred during the last transaction.</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1348806"></A><A NAME="_Toc369679931"></A><A NAME="_Toc369801548"></A><A NAME="_Toc369936321"></A><A NAME="_Toc370017411"></A>All other error codes are reserved.</P>
+</DIV>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1348822"></A>P<A NAME="_Toc489267349"></A>rotocol Register, SMB_PRTCL<A NAME="marker-1348820"></A><A NAME="marker-1348821"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348824"></A>This register determines the type of SMBus transaction generated on the SMBus. In addition to indicating the protocol type to the SMB-HC, a write to this register initiates the transaction on the SMBus. Notice that bit 7 of the protocol value is used to indicate whether packet error checking should be employed. A value of 1 (one) in this bit indicates that PEC format should be used for the specified protocol, and a value of 0 (zero) indicates the standard (non-PEC) format should be used.<A NAME="marker-1348825"></A></P>
+<DIV>
+<H6 CLASS="spacing">
+<A NAME="pgfId-1348860"></A>&nbsp;</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348829"></A>Bit7</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348831"></A>Bit6</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348833"></A>Bit5</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348835"></A>Bit4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348837"></A>Bit3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348839"></A>Bit2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348841"></A>Bit1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348843"></A>Bit0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348845"></A>PEC</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="7">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348847"></A>PROTOCOL</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1348868"></A>Where:</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416468"></A>PROTOCOL:</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416470"></A>0x00 - Controller Not In Use</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348875"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348877"></A>0x01 - Reserved</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348879"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348881"></A>0x02 - Write Quick Command</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348883"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348885"></A>0x03 - Read Quick Command</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348887"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348889"></A>0x04 - Send Byte</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348891"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348893"></A>0x05 - Receive Byte</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348895"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348897"></A>0x06 - Write Byte</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348899"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348901"></A>0x07 - Read Byte</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348903"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348905"></A>0x08 - Write Word</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348907"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348909"></A>0x09 - Read Word</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348911"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348913"></A>0x0A - Write Block</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348915"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348917"></A>0x0B - Read Block</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348919"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348921"></A>0x0C - Process Call</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348923"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348926"></A>0x0D - <A NAME="_Toc478201880"></A><A NAME="_Toc479063458"></A><A NAME="_Toc479064781"></A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348931"></A>Block Write-Block Read Process Call</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1348934"></A>For example, the protocol value of 0x09 would be used to communicate to a device that supported the standard read word protocol. If this device also supported packet error checking for this protocol, a value of 0x89 (read word with PEC) could optionally be used. See the SMBus specification for more information on packet error checking. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1348935"></A>When OSPM initiates a new command such as write to the SMB_PRTCL register, the SMBus controller first updates the SMB_STS register and then clears the SMB_PRTCL register. After the SMB_PRTCL register is cleared, the host controller query value is raised.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348936"></A>All other protocol values are reserved.</P>
+</DIV>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1348953"></A>A<A NAME="_Toc489267350"></A>ddress Register, SMB_ADDR<A NAME="marker-1348951"></A><A NAME="marker-1348952"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1356104"></A>This register contains the 7-bit address to be generated on the SMBus. This is the first byte to be sent on the SMBus for all of the different protocols.</P>
+<DIV>
+<H6 CLASS="spacing">
+<A NAME="pgfId-1356185"></A>&nbsp;</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1356154"></A>Bit7</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1356156"></A>Bit6</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1356158"></A>Bit5</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1356160"></A>Bit4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1356162"></A>Bit3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1356164"></A>Bit2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1356166"></A>Bit1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1356168"></A>Bit0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="7">
+<P CLASS="TableBody">
+<A NAME="pgfId-1356170"></A>ADDRESS (A6:A0)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1356184"></A>RES</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1356195"></A>Where:</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1356188"></A>RES:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1356190"></A><EM CLASS="Italic">
+Reserved</EM>
+</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1356192"></A>ADDRESS:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1356194"></A>7-bit SMBus address. This address is not zero aligned (in other words, it is only a 7-bit address (A6:A0) that is aligned from bit 1-7).</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1349025"></A><A NAME="marker-1349024"></A>Command Register, SMB_CMD</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349026"></A>This register contains the command byte that will be sent to the target device on the SMBus and is used for the following protocols: send byte, write byte, write word, read byte, read word, process call, block read and block write. It is not used for the quick commands or the receive byte protocol, and as such, its value is a &#8220;don&#8217;t care&#8221; for those commands.</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349030"></A>Bit7</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349032"></A>Bit6</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349034"></A>Bit5</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349036"></A>Bit4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349038"></A>Bit3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349040"></A>Bit2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349042"></A>Bit1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349044"></A>Bit0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="8">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349046"></A>COMMAND</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1349063"></A>Where:</P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1349087"></A>D<A NAME="_Toc489267352"></A>ata Register Array, SMB_DATA[i], i=0-31<A NAME="marker-1349085"></A><A NAME="marker-1349086"></A></H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349066"></A>COMMAND:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349068"></A>Command byte to be sent to SMBus device.</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1349088"></A>This bank of registers contains the remaining bytes to be sent or received in any of the different protocols that can be run on the SMBus. The SMB_DATA[i] registers are defined on a per-protocol basis and, as such, provide efficient use of register space.</P>
+<DIV>
+<H6 CLASS="spacing">
+<A NAME="pgfId-1349123"></A>&nbsp;</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349092"></A>Bit7</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349094"></A>Bit6</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349096"></A>Bit5</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349098"></A>Bit4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349100"></A>Bit3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349102"></A>Bit2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349104"></A>Bit1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349106"></A>Bit0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="8">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349108"></A>DATA</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1349125"></A>Where:</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349128"></A>DATA:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349130"></A>One byte of data to be sent or received (depending upon protocol).</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1349144"></A>B<A NAME="_Toc489267353"></A>lock Count Register, SMB_BCNT<A NAME="marker-1349142"></A><A NAME="marker-1349143"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349145"></A>This register contains the number of bytes of data present in the SMB_DATA[i] registers preceding any write block and following any read block transaction. The data size is defined on a per protocol basis.</P>
+<DIV>
+<H6 CLASS="spacing">
+<A NAME="pgfId-1411329"></A>&nbsp;</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1411298"></A>Bit7</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1411300"></A>Bit6</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1411302"></A>Bit5</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1411304"></A>Bit4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1411306"></A>Bit3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1411308"></A>Bit2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1411310"></A>Bit1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1411312"></A>Bit0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="3">
+<P CLASS="TableBody">
+<A NAME="pgfId-1411314"></A>RES 	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="5">
+<P CLASS="TableBody">
+<A NAME="pgfId-1411320"></A>BCNT</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1411333"></A>A<A NAME="_Toc489267354"></A>larm Address Register, SMB_ALRM_ADDR<A NAME="marker-1411331"></A><A NAME="marker-1411332"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349193"></A>This register contains the address of an alarm message received by the host controller, at slave address 0x8, from the SMBus master that initiated the alarm. The address indicates the slave address of the device on the SMBus that initiated the alarm message. The status of the alarm message is contained in the SMB_ALRM_DATAx registers. Once an alarm message has been received, the SMB-HC will not receive additional alarm messages until the ALRM status bit is cleared.</P>
+<DIV>
+<H6 CLASS="spacing">
+<A NAME="pgfId-1349228"></A>&nbsp;</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349197"></A>Bit7</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349199"></A>Bit6</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349201"></A>Bit5</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349203"></A>Bit4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349205"></A>Bit3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349207"></A>Bit2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349209"></A>Bit1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349211"></A>Bit0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="7">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349213"></A>ADDRESS (A6:A0)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349227"></A>RES</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1349230"></A>Where:</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1411339"></A>RES:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1411341"></A><EM CLASS="Italic">
+Reserved</EM>
+</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1411343"></A>ADDRESS:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1411345"></A>Slave address (A6:A0) of the SMBus device that initiated the SMBus alarm message.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1349262"></A>Alarm Data Registers, SMB_ALRM_DATA[0], SMB_ALRM_DATA[1]</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1352923"></A><A NAME="marker-1352922"></A>These registers contain the two data bytes of an alarm message received by the host controller, at slave address 0x8, from the SMBus master that initiated the alarm. These data bytes indicate the specific reason for the alarm message, such that OSPM can take actions. Once an alarm message has been received, the SMB-HC will not receive additional alarm messages until the ALRM status bit is cleared.</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1352926"></A>Bit7</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1352928"></A>Bit6</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1352930"></A>Bit5</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1352932"></A>Bit4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1352934"></A>Bit3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1352936"></A>Bit2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1352938"></A>Bit1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1352940"></A>Bit0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="8">
+<P CLASS="TableBody">
+<A NAME="pgfId-1352942"></A>DATA (D7:D0)</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1352958"></A>Where:</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349305"></A>DATA:	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349307"></A>Data byte received in alarm message.</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1349316"></A><A NAME="_Toc365910063"></A><A NAME="_Toc369679937"></A><A NAME="_Toc369801554"></A><A NAME="_Toc369936327"></A><A NAME="_Toc370017417"></A><A NAME="_Toc374114866"></A>The alarm address and alarm data registers are not read by OSPM until the alarm status bit is set. OSPM driver then reads the 3 bytes, and clears the alarm status bit to indicate that the alarm registers are now available for the next event.</P>
+</DIV>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1349333"></A><A NAME="_Toc489267356"></A><A NAME="_Toc489267722"></A><A NAME="_Toc489272696"></A><A NAME="_Toc202341881"></A><A NAME="_Toc258262499"></A>Protocol Description<A NAME="marker-1349330"></A><A NAME="marker-1349331"></A><A NAME="marker-1349332"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1416885"></A>This section describes how to initiate the different protocols on the SMBus through the interface described in <A HREF="ACPI_Embedded_Controller_Interface_Specification.htm#_Toc489267347" CLASS="XRef">See Register Description.</A>, &#8220;Register Descriptions.&#8221; The registers should all be written with the appropriate values before writing the protocol value that starts the SMBus transaction. All transactions can be completed in one pass. </P>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1416890"></A>W<A NAME="_Toc489267357"></A>rite Quick </H6>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1349349"></A>Data Sent:</H3>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349352"></A>SMB_ADDR:	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349354"></A>Address of SMBus device.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349356"></A>SMB_PRTCL:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349358"></A>Write 0x02 to initiate the write quick protocol.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1349361"></A>Data Returned:</H3>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349364"></A>SMB_STS:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349366"></A>Status code for transaction.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349368"></A>SMB_PRTCL:	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349370"></A>0x00 to indicate command completion.</P>
+</TD>
+</TR>
+</TABLE>
+<OL>
+<LI CLASS="ACPIHeading-4">
+<A NAME="pgfId-1416912"></A>R<A NAME="_Toc489267358"></A>ead Quick </LI>
+</OL>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1416922"></A>Data Sent:</H3>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416915"></A>SMB_ADDR:	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416917"></A>Address of SMBus device.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416919"></A>SMB_PRTCL:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416921"></A>Write 0x03 to initiate the read quick protocol.</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1416926"></A>&nbsp;</P>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1416936"></A>Data Returned:</H3>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416929"></A>SMB_STS:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416931"></A>Status code for transaction.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416933"></A>SMB_PRTCL:	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416935"></A>0x00 to indicate command completion.</P>
+</TD>
+</TR>
+</TABLE>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1416938"></A> <A NAME="_Toc489267359"></A>Send Byte</H6>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1416847"></A>Data Sent:</H3>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416836"></A>SMB_ADDR:	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416838"></A>Address of SMBus device.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416840"></A>SMB_CMD:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416842"></A>Command byte to be sent.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416844"></A>SMB_PRTCL:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416846"></A>Write 0x04 to initiate the send byte protocol, or 0x84 to initiate the send byte protocol with PEC.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1416857"></A>Data Returned:</H3>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416850"></A>SMB_STS:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416852"></A>Status code for transaction.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416854"></A>SMB_PRTCL:	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416856"></A>0x00 to indicate command completion.</P>
+</TD>
+</TR>
+</TABLE>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1353070"></A><A NAME="_Toc365910066"></A><A NAME="_Toc369679940"></A><A NAME="_Toc369801557"></A><A NAME="_Toc369936330"></A><A NAME="_Toc370017420"></A><A NAME="_Toc374114869"></A><A NAME="_Toc375244509"></A><A NAME="_Toc375924905"></A><A NAME="_Toc423760130"></A><A NAME="_Toc465497062"></A> R<A NAME="_Toc489267360"></A>eceive Byte</H6>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1349465"></A>Data Sent:</H3>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349468"></A>SMB_ADDR:	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349470"></A>Address of SMBus device.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349472"></A>SMB_PRTCL:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349474"></A>Write 0x05 to initiate the receive byte protocol, or 0x85 to initiate the receive byte protocol with PEC.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1349477"></A>Data Returned:</H3>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349480"></A>SMB_DATA[0]:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349482"></A>Data byte received.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349484"></A>SMB_STS:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349486"></A>Status code for transaction.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349488"></A>SMB_PRTCL:	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349490"></A>0x00 to indicate command completion.</P>
+</TD>
+</TR>
+</TABLE>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1349506"></A>W<A NAME="_Toc489267361"></A>rite Byte</H6>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1349507"></A>Data Sent:</H3>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349510"></A>SMB_ADDR:	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349512"></A>Address of SMBus device.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349514"></A>SMB_CMD:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349516"></A>Command byte to be sent.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349518"></A>SMB_DATA[0]:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349520"></A>Data byte to be sent.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349522"></A>SMB_PRTCL:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349524"></A>Write 0x06 to initiate the write byte protocol, or 0x86 to initiate the write byte protocol with PEC.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1349527"></A>Data Returned:</H3>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349530"></A>SMB_STS:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349532"></A>Status code for transaction.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349534"></A>SMB_PRTCL:	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349536"></A>0x00 to indicate command completion.</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1416951"></A>&nbsp;</P>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1349556"></A> <A NAME="_Toc489267362"></A>Read Byte</H6>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1349557"></A>Data Sent:</H3>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349560"></A>SMB_ADDR:	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349562"></A>Address of SMBus device.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349564"></A>SMB_CMD:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349566"></A>Command byte to be sent.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349568"></A>SMB_PRTCL:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349570"></A>Write 0x07 to initiate the read byte protocol, or 0x87 to initiate the read byte protocol with PEC.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1349573"></A>Data Returned:</H3>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349576"></A>SMB_DATA[0]:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349578"></A>Data byte received.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349580"></A>SMB_STS:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349582"></A>Status code for transaction.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349584"></A>SMB_PRTCL:	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349586"></A>0x00 to indicate command completion.</P>
+</TD>
+</TR>
+</TABLE>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1416964"></A>W<A NAME="_Toc489267363"></A>rite Word</H6>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1416986"></A>Data Sent:</H3>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416967"></A>SMB_ADDR:	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416969"></A>Address of SMBus device.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416971"></A>SMB_CMD:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416973"></A>Command byte to be sent.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416975"></A>SMB_DATA[0]:	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416977"></A>Low data byte to be sent.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416979"></A>SMB_DATA[1]:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416981"></A>High data byte to be sent.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416983"></A>SMB_PRTCL:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416985"></A>Write 0x08 to initiate the write word protocol, or 0x88 to initiate the write word protocol with PEC.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1416996"></A>Data Returned:</H3>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416989"></A>SMB_STS:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416991"></A>Status code for transaction.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416993"></A>SMB_PRTCL:	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1416995"></A>0x00 to indicate command completion.</P>
+</TD>
+</TR>
+</TABLE>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1353294"></A>Read Word</H6>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1349652"></A>Data Sent:</H3>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349655"></A>SMB_ADDR:	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349657"></A>Address of SMBus device.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349659"></A>SMB_CMD:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349661"></A>Command byte to be sent.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349663"></A>SMB_PRTCL:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349665"></A>Write 0x09 to initiate the read word protocol, or 0x89 to initiate the read word protocol with PEC.</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1417008"></A>&nbsp;</P>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1349668"></A>Data Returned:</H3>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349671"></A>SMB_DATA[0]:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349673"></A>Low data byte received.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349675"></A>SMB_DATA[1]:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349677"></A>High data byte received.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349679"></A>SMB_STS:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349681"></A>Status code for transaction.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349683"></A>SMB_PRTCL:	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349685"></A>0x00 to indicate command completion.</P>
+</TD>
+</TR>
+</TABLE>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1353160"></A>Write Block</H6>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1353161"></A>Data Sent:</H3>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349709"></A>SMB_ADDR:	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349711"></A>Address of SMBus device.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349713"></A>SMB_CMD:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349715"></A>Command byte to be sent.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349717"></A>SMB_DATA[0-31]:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349719"></A>Data bytes to write (1-32).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349721"></A>SMB_BCNT:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349723"></A>Number of data bytes (1-32) to be sent.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349725"></A>SMB_PRTCL:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349727"></A>Write 0x0A to initiate the write block protocol, or 0x8A to initiate the write block protocol with PEC.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1349730"></A>Data Returned:</H3>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349733"></A>SMB_PRTCL:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349735"></A>0x00 to indicate command completion.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349737"></A>SMB_STS:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349739"></A>Status code for transaction.</P>
+</TD>
+</TR>
+</TABLE>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1349755"></A>R<A NAME="_Toc489267366"></A>ead Block</H6>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1349756"></A>Data Sent:</H3>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349759"></A>SMB_ADDR:	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349761"></A>Address of SMBus device.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349763"></A>SMB_CMD:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349765"></A>Command byte to be sent.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349767"></A>SMB_PRTCL:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349769"></A>Write 0x0B to initiate the read block protocol, or 0x8B to initiate the read block protocol with PEC.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1349772"></A>Data Returned:</H3>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349775"></A>SMB_BCNT:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349777"></A>Number of data bytes (1-32) received.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349779"></A>SMB_DATA[0-31]:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349781"></A>Data bytes received (1-32).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349783"></A>SMB_STS:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349785"></A>Status code for transaction.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349787"></A>SMB_PRTCL:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349789"></A>0x00 to indicate command completion.</P>
+</TD>
+</TR>
+</TABLE>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1349791"></A><A NAME="_Toc365910073"></A><A NAME="_Toc369679947"></A><A NAME="_Toc369801564"></A><A NAME="_Toc369936337"></A><A NAME="_Toc370017427"></A><A NAME="_Toc374114876"></A><A NAME="_Toc375244516"></A><A NAME="_Toc375924912"></A><A NAME="_Toc423760137"></A><A NAME="_Toc465497069"></A>P<A NAME="_Toc489267367"></A>rocess Call</H6>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1349806"></A>Data Sent:</H3>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349809"></A>SMB_ADDR:	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349811"></A>Address of SMBus device.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349813"></A>SMB_CMD:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349815"></A>Command byte to be sent.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349817"></A>SMB_DATA[0]:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349819"></A>Low data byte to be sent.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349821"></A>SMB_DATA[1]:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349823"></A>High data byte to be sent.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349825"></A>SMB_PRTCL:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349827"></A>Write 0x0C to initiate the process call protocol, or 0x8C to initiate the process call protocol with PEC.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1349830"></A>Data Returned:</H3>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349833"></A>SMB_DATA[0]:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349835"></A>Low data byte received.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349837"></A>SMB_DATA[1]:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349839"></A>High data byte received.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349841"></A>SMB_STS:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349843"></A>Status code for transaction.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349845"></A>SMB_PRTCL:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349847"></A>0x00 to indicate command completion.</P>
+</TD>
+</TR>
+</TABLE>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1349864"></A>B<A NAME="_Toc489267368"></A>lock Write-Block Read Process Call</H6>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1349865"></A>Data Sent:</H3>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349868"></A>SMB_ADDR:	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349870"></A>Address of SMBus device.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349872"></A>SMB_CMD:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349874"></A>Command byte to be sent.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349876"></A>SMB_DATA[0-31]:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349878"></A>Data bytes to write (1-31).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349880"></A>SMB_BCNT:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349882"></A>Number of data bytes (1-31) to be sent.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349884"></A>SMB_PRTCL:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349886"></A>Write 0x0D to initiate the write block-read block process call protocol, or 0x8D to initiate the write block-read block process call protocol with PEC.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1349889"></A>Data Returned:</H3>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349892"></A>SMB_BCNT:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349894"></A>Number of data bytes (1-31) received.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349896"></A>SMB_DATA[0-31]:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349898"></A>Data bytes received (1-31).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349900"></A>SMB_STS:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349902"></A>Status code for transaction.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349904"></A>SMB_PRTCL:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349906"></A>0x00 to indicate command completion.</P>
+</TD>
+</TR>
+</TABLE>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1349909"></A>The following restrictions apply: The aggregate data length of the write and read blocks must not exceed 32 bytes and each block (write and read) must contain at least 1 byte of data.</LI>
+</UL>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1349920"></A><A NAME="_Toc489267369"></A><A NAME="_Toc489267723"></A><A NAME="_Toc489272697"></A><A NAME="_Toc202341882"></A><A NAME="_Toc258262500"></A>SMBus Register Set<A NAME="marker-1349918"></A><A NAME="marker-1349919"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349921"></A>The register set for the SMB-HC has the following format. All registers are 8 bit.</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1349922"></A>SMB EC Interface</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1411353"></A>Location</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1411355"></A>Register Name</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1411357"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349931"></A>BASE+0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349933"></A>SMB_PRTCL</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349935"></A>Protocol register</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349937"></A>BASE+1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349939"></A>SMB_STS</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349941"></A>Status register</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349943"></A>BASE+2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349945"></A>SMB_ADDR</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349947"></A>Address register</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349949"></A>BASE+3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349951"></A>SMB_CMD</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349953"></A>Command register</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349955"></A>BASE+4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349957"></A>SMB_DATA[0]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349959"></A>Data register zero</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349961"></A>BASE+5</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349963"></A>SMB_DATA[1]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349965"></A>Data register one</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349967"></A>BASE+6</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349969"></A>SMB_DATA[2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349971"></A>Data register two</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349973"></A>BASE+7</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349975"></A>SMB_DATA[3]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349977"></A>Data register three</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349979"></A>BASE+8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349981"></A>SMB_DATA[4]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349983"></A>Data register four</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349985"></A>BASE+9</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349987"></A>SMB_DATA[5]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349989"></A>Data register five</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349991"></A>BASE+10</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349993"></A>SMB_DATA[6]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349995"></A>Data register six</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349997"></A>BASE+11</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349999"></A>SMB_DATA[7]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350001"></A>Data register seven</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350003"></A>BASE+12</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350005"></A>SMB_DATA[8]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350007"></A>Data register eight</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350009"></A>BASE+13</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350011"></A>SMB_DATA[9]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350013"></A>Data register nine</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350015"></A>BASE+14</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350017"></A>SMB_DATA[10]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350019"></A>Data register ten</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350021"></A>BASE+15</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350023"></A>SMB_DATA[11]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350025"></A>Data register eleven</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350027"></A>BASE+16</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350029"></A>SMB_DATA[12]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350031"></A>Data register twelve</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350033"></A>BASE+17</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350035"></A>SMB_DATA[13]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350037"></A>Data register thirteen</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350039"></A>BASE+18 </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350041"></A>SMB_DATA[14]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350043"></A>Data register fourteen</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350045"></A>BASE+19</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350047"></A>SMB_DATA[15]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350049"></A>Data register fifteen</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350051"></A>BASE+20</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350053"></A>SMB_DATA[16]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350055"></A>Data register sixteen</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350057"></A>BASE+21</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350059"></A>SMB_DATA[17] </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350061"></A>Data register seventeen</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350063"></A>BASE+22</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350065"></A>SMB_DATA[18]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350067"></A>Data register eighteen</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350069"></A>BASE+23</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350071"></A>SMB_DATA[19]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350073"></A>Data register nineteen</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350075"></A>BASE+24</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350077"></A>SMB_DATA[20]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350079"></A>Data register twenty</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350081"></A>BASE+25</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350083"></A>SMB_DATA[21]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350085"></A>Data register twenty-one</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350087"></A>BASE+26</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350089"></A>SMB_DATA[22]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350091"></A>Data register twenty-two</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350093"></A>BASE+27</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350095"></A>SMB_DATA[23]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350097"></A>Data register twenty-three</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350099"></A>BASE+28</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350101"></A>SMB_DATA[24]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350103"></A>Data register twenty-four</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350105"></A>BASE+29</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350107"></A>SMB_DATA[25]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350109"></A>Data register twenty-five</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350111"></A>BASE+30</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350113"></A>SMB_DATA[26]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350115"></A>Data register twenty-six</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350117"></A>BASE+31</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350119"></A>SMB_DATA[27]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350121"></A>Data register twenty-seven</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350123"></A>BASE+32</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350125"></A>SMB_DATA[28]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350127"></A>Data register twenty-eight</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350129"></A>BASE+33</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350131"></A>SMB_DATA[29]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350133"></A>Data register twenty-nine</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350135"></A>BASE+34</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350137"></A>SMB_DATA[30]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350139"></A>Data register thirty</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350141"></A>BASE+35</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350143"></A>SMB_DATA[31]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350145"></A>Data register thirty-one</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350147"></A>BASE+36</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350149"></A>SMB_BCNT</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350151"></A>Block Count Register</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350153"></A>BASE+37</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350155"></A>SMB_ALRM_ADDR</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350157"></A>Alarm address</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350159"></A>BASE+38</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350161"></A>SMB_ALRM_DATA[0]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350163"></A>Alarm data register zero</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350165"></A>BASE+39</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350167"></A>SMB_ALRM_DATA[1]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350169"></A>Alarm data register one</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1350202"></A><A NAME="marker-1350201"></A>SMBus Devices</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1350203"></A>The embedded controller interface provides the system with a standard method to access devices on the SMBus. It does not define the data and/or access protocol(s) used by any particular SMBus device. Further, the embedded controller can (and probably will) serve as a gatekeeper to prevent accidental or malicious access to devices on the SMBus.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350204"></A>Some SMBus devices are defined by their address and a specification that describes the data and the protocol used to access that data. For example, the Smart Battery System devices are defined by a series of specifications including:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350205"></A>Smart Battery Data specification</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350206"></A>Smart Battery Charger specification</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350207"></A>Smart Battery Selector specification</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350208"></A>Smart Battery System Manager specification</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1417063"></A>The embedded controller can also be used to emulate (in part or totally) any SMBus device. </P>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1417069"></A><A NAME="_Toc489267371"></A><A NAME="_Toc489267725"></A><A NAME="_Toc489272699"></A><A NAME="_Toc202341884"></A><A NAME="_Toc258262502"></A>SMBus Device Access Restrictions</H5>
+<P CLASS="Body">
+<A NAME="pgfId-1417070"></A>In some cases, the embedded controller interface will not allow access to a particular SMBus device. Some SMBus devices can and do communicate directly between themselves. Unexpected accesses can interfere with their normal operation and cause unpredictable results.</P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1350257"></A><A NAME="_Toc489267372"></A><A NAME="_Toc489267726"></A><A NAME="_Toc489272700"></A><A NAME="_Toc202341885"></A><A NAME="_Toc258262503"></A>SMBus Device Command Access Restriction<A NAME="marker-1350255"></A><A NAME="marker-1350256"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1350258"></A>There are cases where part of an SMBus device&#8217;s commands are public while others are private. Extraneous attempts to access these commands might cause interference with the SMBus device&#8217;s normal operation.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350259"></A>The Smart Battery and the Smart Battery Charger are good examples of devices that should not have their entire command set exposed. The Smart Battery commands the Smart Battery Charger to supply a specific charging voltage and charging current. Attempts by anyone to alter these values can cause damage to the battery or the mobile system. To protect the system&#8217;s integrity, the embedded controller interface can restrict access to these commands by returning one of the following error codes: Device Command Access Denied (0x12) or Device Access Denied (0x17).</P>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1350287"></A><A NAME="_Toc489267373"></A><A NAME="_Toc489267727"></A><A NAME="_Toc489272701"></A><A NAME="RSVD_GPE2"></A><A NAME="_Toc202341886"></A><A NAME="_Toc258262504"></A>Defining an Embedded Controller Device in ACPI Namespace<A NAME="marker-1350283"></A><A NAME="marker-1350284"></A><A NAME="marker-1350285"></A><A NAME="marker-1350286"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1350288"></A>An embedded controller device is created using the named device object. The embedded controller&#8217;s device object requires the following elements:</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1350289"></A>Embedded Controller Device Object Control Methods</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1417020"></A>Object</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1417022"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350296"></A>_CRS</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350298"></A>Named object that returns the Embedded Controller&#8217;s current resource settings. Embedded Controllers are considered static resources; hence only return their defined resources. The embedded controller resides only in system I/O or memory space. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1416645"></A>The first address region returned is the data port, and the second address region returned is the status/command port for the embedded controller. If the EC is used on a HW-Reduced ACPI platform, a third resource is required, which is the GPIO Interrupt Connection resource for the EC's SCI Interrupt.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1416619"></A>&nbsp;</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1416626"></A>CRS is a standard device configuration control method defined in <A HREF="Device_Configuration.htm#78460" CLASS="XRef">See _CRS (Current Resource Settings).</A>, &#8220;_CRS (Current Resource Settings).&#8221;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350300"></A>_HID</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350302"></A>Named object that provides the Embedded Controller&#8217;s Plug and Play identifier. This value is set to PNP0C09. _HID is a standard device configuration control method defined in <A HREF="Device_Configuration.htm#_Toc489256044" CLASS="XRef">See _HID (Hardware ID).</A>, &#8220;_HID (Hardware ID).&#8221;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350304"></A>_GPE</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350306"></A>Named Object that evaluates to either an integer or a package. If _GPE evaluates to an integer, the value is the bit assignment of the SCI interrupt within the GPEx_STS register of a GPE block described in the FADT that the embedded controller will trigger. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1350307"></A>If _GPE evaluates to a package, then that package contains two elements. The first is an object reference to the GPE Block device that contains the GPE register that will be triggered by the embedded controller. The second element is numeric (integer) that specifies the bit assignment of the SCI interrupt within the GPEx_STS register of the GPE Block device referenced by the first element in the package. This control method is specific to the embedded controller.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1416652"></A>&nbsp;</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1416671"></A>This method is not required on Hardware-reduced ACPI platforms. </P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1350329"></A><A NAME="_Toc489267374"></A><A NAME="_Toc489267728"></A><A NAME="_Toc489272702"></A><A NAME="_Toc202341887"></A><A NAME="_Toc258262505"></A>Example: EC Definition ASL Code <A NAME="marker-1350327"></A><A NAME="marker-1350328"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1350330"></A>Example ASL code that defines an embedded controller device is shown below:</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350332"></A>Device(EC0) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350333"></A>                                        // PnP ID</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350334"></A>    Name(_HID, EISAID(&#8220;PNP0C09&#8221;))</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350335"></A>                                        // Returns the &#8220;Current Resources&#8221; of EC</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350336"></A>    Name(_CRS, </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350337"></A>        ResourceTemplate(){             // port 0x62 and 0x66</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350338"></A>            IO(Decode16, 0x62, 0x62, 0, 1),</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350339"></A>            IO(Decode16, 0x66, 0x66, 0, 1)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1416686"></A>        /*  For HW-Reduced ACPI Platforms, include a GPIO Interrupt Connection resource, </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1416702"></A>            e.g. GPIO controller #2, pin 43.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1416747"></A>            GpioInt(Edge, ActiveHigh, ExclusiveAndWake,PullUp 0, &#8220;&#92;&#92;_SB.GPI2&#8221;){43}</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1416748"></A>        */</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1416749"></A>            }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350341"></A>        )</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350342"></A>    </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1416757"></A>                                        // Define that the EC SCI is bit 0 of the GP_STS register</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1416758"></A>    Name(_GPE, 0)                       // Not required for HW-Reduced ACPI platforms</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1416759"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350346"></A>    OperationRegion(ECOR, EmbeddedControl, 0, 0xFF)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350347"></A>    Field(ECOR, ByteAcc, Lock, Preserve) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350348"></A>                                        // Field definitions go here</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350349"></A>        }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350350"></A>    }</P>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1350363"></A><A NAME="_Toc465497076"></A><A NAME="_Toc486665585"></A><A NAME="_Toc489267375"></A><A NAME="_Toc489267729"></A><A NAME="_Toc489272703"></A><A NAME="RSVD_EC"></A><A NAME="_Toc202341888"></A><A NAME="_Toc258262506"></A>Defining an EC SMBus Host Controller in ACPI Namespace<A NAME="marker-1350361"></A><A NAME="marker-1350362"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1350364"></A>An EC-SMB-HC device is defined using the named device object. The EC-SMB- HC&#8217;s device object requires the following elements:</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1350365"></A>EC SMBus HC Device Objects</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1350368"></A>Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1350370"></A>Description</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350372"></A>_HID</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350374"></A>Named object that provides the EC-SMB- HC&#8217;s Plug and Play identifier. This value is be set to ACPI0001. _HID is a standard device configuration control method defined in <A HREF="Device_Configuration.htm#_Toc489256044" CLASS="XRef">See _HID (Hardware ID).</A>, &#8220;_HID (Hardware ID).&#8221;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350376"></A>_EC</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350378"></A>Named object that evaluates to a WORD that defines the SMBus attributes needed by the SMBus driver. _EC is the Embedded Controller Offset Query Control Method. The most significant byte is the address offset in embedded controller space of the SMBus controller; the least significant byte is the query value for all SMBus events.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1350402"></A><A NAME="marker-1350401"></A>Example: EC SMBus Host Controller ASL-Code</H5>
+<P CLASS="Body">
+<A NAME="pgfId-1350403"></A>Example ASL code that defines an SMB-HC from within an embedded controller device is shown below:</P>
+<P CLASS="code-Ex-CODE-PRE-CITE">
+<A NAME="pgfId-1350404"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350405"></A>Device(EC0) </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350406"></A>{</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350407"></A>    Name(_HID, EISAID(&quot;PNP0C09&quot;))</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350408"></A>    Name(_CRS, ResourceTemplate()</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350409"></A>    { </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350410"></A>        IO(Decode16, 0x62, 0x62, 0, 1),  // Status port</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350411"></A>        IO(Decode16, 0x66, 0x66, 0, 1)   // command port</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350412"></A>    })</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350413"></A>    Name(_GPE, 0)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350414"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350415"></A>    Device (SMB0)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350416"></A>    {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350417"></A>        Name(_HID, &quot;ACPI0001&quot;)            // EC-SMB-HC</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350418"></A>        Name(_UID, 0)                     // Unique device identifier</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350419"></A>        Name(_EC, 0x2030)                 // EC offset 0x20, query bit 0x30</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350420"></A>            :</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350421"></A>    }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350423"></A>    Device (SMB1) </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350424"></A>    {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350425"></A>        Name(_HID, &quot;ACPI0001&quot;)            // EC-SMB-HC</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350426"></A>        Name(_UID, 1)                     // Unique device identifier</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350427"></A>        Name(_EC, 0x8031)                 // EC offset 0x80, query bit 0x31</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350428"></A>            :</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350429"></A>    }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1346798"></A>} // end of EC0.</P>
+</DIV>
+</DIV>
+</DIV>
+</BODY>
+</HTML>

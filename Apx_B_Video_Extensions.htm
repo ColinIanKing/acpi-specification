@@ -1,0 +1,1548 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2016/HTML Export Filter">
+<LINK REL="STYLESHEET" HREF="Apx_B_Video_Extensions.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE> Appendix B: Video Extensions</TITLE></HEAD>
+<BODY>
+<DIV>
+<H1 CLASS="zHeading-1-Appendix">
+<A NAME="pgfId-1347747"></A>Video Extensions<DIV>
+<IMG SRC="Apx_B_Video_Extensions-1.gif" ALT="">
+</DIV>
+</H1>
+<DIV>
+<H6 CLASS="zHeading-2-Appendix">
+<A NAME="pgfId-1349603"></A> <A NAME="_Toc489267627"></A><A NAME="_Toc489267832"></A>ACPI Extensions for Display Adapters: Introduction</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349604"></A>This section of the document describes a number of specialized ACPI methods to support motherboard graphics devices.<A NAME="marker-1349605"></A><A NAME="marker-1349606"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1349607"></A>In many cases, system manufacturers need to add special support to handle multiple output devices such as panels and TV-out capabilities, as well as special power management features. This is particularly true for notebook manufacturers. The methods described here have been designed to enable interaction between the platform firmware, video driver, and OS to smoothly support these features.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1349608"></A>Systems containing a built-in display adapter are required to implement the ACPI Extensions for Display Adapters.<A NAME="marker-1349609"></A></P>
+</DIV>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1349613"></A>Video Extension Object Requirements<A NAME="marker-1349610"></A><A NAME="marker-1349611"></A><A NAME="marker-1349612"></A></H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349616"></A>Method</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349619"></A><A NAME="_Toc486665692"></A>Description</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349621"></A>Requirement</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349623"></A>_DOS</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349625"></A>Enable/Disable output switching</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349627"></A>Required if system supports display switching or LCD brightness levels</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349629"></A>_DOD</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349631"></A>Enumerate all devices attached to display adapter</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349633"></A>Required if integrated controller supports output switching</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349635"></A>_ROM</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349637"></A>Get ROM Data</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349639"></A>Required if ROM image is stored in proprietary format </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349641"></A>_GPD</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349643"></A>Get POST Device</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349645"></A>Required if _VPO is implemented</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349647"></A>_SPD</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349649"></A>Set POST Device</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349651"></A>Required if _VPO is implemented</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349653"></A>_VPO</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349655"></A>Video POST Options</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349657"></A>Required if system supports changing post VGA device</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349659"></A>_ADR</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349661"></A>Return the unique ID for this device</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349663"></A>Required</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349665"></A>_BCL</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349667"></A>Query list of brightness control levels supported</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349669"></A>Required if embedded LCD supports brightness control</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349671"></A>_BCM</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349673"></A>Set the brightness level</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349675"></A>Required if _BCL is implemented</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349677"></A>_DDC</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349679"></A>Return the EDID for this device</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349681"></A>Required if embedded LCD does not support return of EDID via standard interface</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349683"></A>_DCS</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349685"></A>Return status of output device</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349687"></A>Required if the system supports display switching (via hotkey)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349689"></A>_DGS</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349691"></A>Query graphics state</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349693"></A>Required if the system supports display switching (via hotkey</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349695"></A>_DSS</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349697"></A>Device state set</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349699"></A>Required if the system supports display switching (via hotkey).</P>
+</TD>
+</TR>
+</TABLE>
+<DIV>
+<H6 CLASS="Pb">
+<A NAME="pgfId-1349716"></A>&nbsp;</H6>
+<DIV>
+<H6 CLASS="zHeading-2-Appendix">
+<A NAME="pgfId-1349718"></A><A NAME="marker-1349717"></A>Definitions</H6>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1349719"></A>Built-in display adapter. This is a graphics chip that is built into the motherboard and cannot be replaced. ACPI information is valid for such built-in devices.<A NAME="marker-1349720"></A></LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1349722"></A>&nbsp;</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1349723"></A>Add-in display adapter. This is a graphics chip or board that can be added to or removed from the computer. Because the platform firmware cannot have specific knowledge of add-in boards, ACPI information is not available for add-in devices.<A NAME="marker-1349724"></A></LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1349726"></A>&nbsp;</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1349727"></A>Boot-up display adapter. This is the display adapter programmed by the platform boot firmware during machine power-on self-test (POST). It is the device upon which the machine will show the initial operating system boot screen, as well as any platform boot firmware messages.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1349731"></A>The system can change the boot-up display adapter, and it can switch between the built-in adapter and the add-in adapter. </LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1349732"></A>Display device. This is a synonym for the term display adapter discussed above.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1349733"></A>Output device. This is a device, which is a recipient of the output of a display device. For example, a CRT or a TV is an output device.<A NAME="marker-1349734"></A></LI>
+</UL>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-2-Appendix">
+<A NAME="pgfId-1349747"></A><A NAME="_Toc489267629"></A><A NAME="_Toc489267834"></A>ACPI Namespace<A NAME="marker-1349745"></A><A NAME="marker-1349746"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349748"></A>This is an example of the display-related namespace on an ACPI system:</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349750"></A>GPE                      // ACPI General-purpose HW event</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349751"></A>    _L0x                 // Notify(VGA, 0x80) to tell OSPM of the event, when user presses </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349752"></A>// the hot key to switch the output status of the monitor.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349753"></A>// Notify(VGA, 0x81) to tell the event to OSPM, when there are any</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349754"></A>// changes on the sub-devices for the VGA controller </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349755"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349756"></A>SB</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349757"></A>|- PCI</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349758"></A>    |- VGA                // Define the VGA controller in the namespace</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349759"></A>        |- _PS0 / PR0</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349760"></A>        |- _PS1 / PR1</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349761"></A>        |- _PS3</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349762"></A>        |- _DOS            // Method to control display output switching</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349763"></A>        |- _DOD            // Method to retrieve information about child output devices</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349764"></A>        |- _ROM            // Method to retrieve the ROM image for this device</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349765"></A>        |- _GPD            // Method for determining which VGA device will post</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349766"></A>        |- _SPD            // Method for controlling which VGA device will post</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349767"></A>        |- _VPO            // Method for determining the post options</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349768"></A>        |- CRT             // Child device CRT</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349769"></A>            |- _ADR        // Hardware ID for this device</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349770"></A>            |- _DDC        // Get EDID information from the monitor device</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349771"></A>            |- _DCS        // Get current hardware status</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349772"></A>            |- _DGS        // Query desired hardware active &#92; inactive state</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349773"></A>            |- _DSS        // Set hardware active &#92; inactive state</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349774"></A>            |- _PS0   &#92;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349775"></A>            |- _PS1        - Power methods</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349776"></A>            |- _PS2        - for the output device</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349777"></A>            |- _PS3   /</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349778"></A>        |- LCD             // Child device LCD</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349779"></A>            |- _ADR        // Hardware ID for this device</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349780"></A>            |- _DDC        // Get EDID information from the monitor device</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349781"></A>            |- _DCS        // Get current hardware status</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349782"></A>            |- _DGS        // Query desired hardware active &#92; inactive state</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349783"></A>            |- _DSS        // Set hardware active &#92; inactive state</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349784"></A>            |- _BCL        // Brightness control levels</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349785"></A>            |- _BCM        // Brightness control method</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349786"></A>            |- _BQC        // Brightness Query Current Level</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349787"></A>            |- _PS0   &#92;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349788"></A>            |- _PS1        - Power methods</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349789"></A>            |- _PS2        - for the output device</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349790"></A>            |- _PS3   /</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349791"></A>        |- TV              // Child Device TV</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349792"></A>            |- _ADR        // Hardware ID for this device</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349793"></A>            |- _DDC        // Get EDID information from the monitor device</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349794"></A>            |- _DCS        // Get current hardware status</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349795"></A>            |- _DGS        // Query desired hardware active &#92; inactive state</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349796"></A>            |- _DSS        // Set hardware active &#92; inactive state</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1389780"></A>&nbsp;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1349797"></A>The LCD device represents the built-in output device. Mobile PCs will always have a built-in LCD display, but desktop systems that have a built-in graphics adapter generally don&#8217;t have a built-in output device.</P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-2-Appendix">
+<A NAME="pgfId-1349806"></A><A NAME="_Toc424364325"></A><A NAME="_Toc475523836"></A><A NAME="_Toc486665695"></A><A NAME="_Toc489272809"></A><A NAME="_Toc202342167"></A><A NAME="_Toc258262797"></A><A NAME="_Toc489267630"></A><A NAME="_Toc489267835"></A>Display-specific Methods</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349807"></A>The methods described in this section are all associated with specific display devices. This device-specific association is represented in the namespace example in the previous section by the positioning of these methods in a device tree.</P>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1349818"></A><A NAME="_Toc489267631"></A><A NAME="_Toc489267836"></A><A NAME="RSVD_DOS"></A>_DOS (Enable/Disable Output Switching)<A NAME="marker-1349815"></A><A NAME="marker-1349816"></A><A NAME="marker-1349817"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349819"></A>Many ACPI machines currently reprogram the active display output automatically when the user presses the display toggle switch on the keyboard. This is done because most video device drivers are currently not capable of being notified synchronously of such state changes. However, this behavior violates the ACPI specification, because the system modifies some graphics device registers.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1349820"></A>The existence of the _DOS method indicates that the platform runtime firmware is capable of automatically switching the active display output or controlling the brightness of the LCD. If it exists at all, the _DOS method must be present for all display output devices. This method is required if the system supports display switching or LCD brightness control.</P>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1349821"></A>Arguments: (1)</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1349822"></A>Arg0 - An Integer containing the encoded switching controls (see below)</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1349823"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1349824"></A>None</P>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1349825"></A>Additional Argument Information:</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1349826"></A>Bits [1:0]</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1349827"></A>0 -	The platform runtime firmware should not automatically switch (toggle) the active display output, but instead just save the desired state change for the display output devices in variables associated with each display output, and generate the display switch event. OSPM can query these state changes by calling the _DGS method.</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1349828"></A>1 -	The platform runtime firmware should automatically switch (toggle) the active display output, with no interaction required on the OS part. The display switch event should not be generated in this case.</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1349829"></A>2 -	The _DGS values should be locked. It&#8217;s highly recommended that the platform runtime firmware do nothing when hotkey pressed. No switch, no notification.</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1349830"></A>3 -	The platform runtime firmware should not automatically switch (toggle) the active display output, but instead generate the display switch event notify codes 0x82, 0x83, or 0x84. OSPM will determine what display output state should be set, and change the display output state without further involvement from the platform runtime firmware.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1349831"></A>Bit [2]</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1349832"></A>0 -	The platform runtime firmware should automatically control the brightness level of the LCD when the power changes from AC to DC.</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1349833"></A>1 -	The platform runtime firmware should not automatically control the brightness level of the LCD when the power changes from AC to DC. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1349840"></A>The _DOS method controls this automatic switching behavior. This method should do so by saving the parameter passed to this method in a global variable somewhere in the platform runtime firmware data segment. The platform runtime firmware then checks the value of this variable when doing display switching. This method is also used to control the generation of the display switching Notify(VGA, 0x80/0x81).</P>
+<P CLASS="Body">
+<A NAME="pgfId-1349841"></A>The platform runtime firmware, when doing switching of the active display, must verify the state of the variable set by the _DOS method. The default value of this variable must be 1.</P>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1349853"></A> <A NAME="RSVD_DOD"></A>_DOD (Enumerate All Devices Attached to the Display Adapter)<A NAME="marker-1349850"></A><A NAME="marker-1349851"></A><A NAME="marker-1349852"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349855"></A><A NAME="_Toc424364330"></A>This method is used to enumerate devices attached to the display adapter. This method is required if integrated controller supports output switching.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1349856"></A>On many laptops today, a number of devices can be connected to the graphics adapter in the machine. These devices are on the motherboard and generally are not directly enumerable by the video driver; for this reason, all motherboard VGA attached devices are listed in the ACPI namespace.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1349860"></A>These devices fall into two categories:<A NAME="marker-1349857"></A><A NAME="marker-1349858"></A><A NAME="marker-1349859"></A></P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1349861"></A>Video output devices. For example, a machine with a single display device on the motherboard can have three possible output devices attached to it, such as a TV, a CRT, or a panel.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1349862"></A>Non-video output devices. For example, TV Tuner, DVD decoder, Video Capture. They just attach to VGA and their power management closely relates to VGA.<A NAME="marker-1349863"></A></LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1349866"></A>Both ACPI and the video driver have the ability to program and configure output devices. This means that both ACPI and the video driver must enumerate the devices using the same IDs. To solve this problem, the _DOD method returns a list of devices attached to the graphics adapter, along with device-specific configuration information. This information will allow the cooperation between ACPI components and the video driver.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1349867"></A>Every child device enumerated in the ACPI namespace under the graphics adapter must be specified in this list of devices. Each display device must have its own ID, which is unique with respect to any other attachable devices enumerated.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1349868"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1349869"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1349870"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1349871"></A>A Package containing a variable-length list of Integers, each of which contains the 32-bit device attribute of a child device (See <A HREF="Apx_B_Video_Extensions.htm#35709" CLASS="XRef">See Video Output Device Attributes.</A>)</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1349872"></A>Example:</H3>
+<DIV>
+<H5 CLASS="code-Ex-CODE-PRE-CITE">
+<A NAME="pgfId-1349873"></A>&nbsp;</H5>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349874"></A>Method (_DOD, 0) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349875"></A>    Return (</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349876"></A>        Package()</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349877"></A>        {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349878"></A>             0x00000110, // Primary LCD panel, not detectable by firmware</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349879"></A>             0x80000100, // CRT type display, not detectable by firmware</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349880"></A>             0x80000220, // TV type display, not detectable by the firmware</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349881"></A>             0x80000411, // Secondary LCD panel, not detectable by firmware</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1349882"></A>        }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1386288"></A>    )</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1386289"></A>}</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1386369"></A><A NAME="35709"></A>Video Output Device Attributes</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1386293"></A>Bits </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1386295"></A>Definition</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="5" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1386299"></A>15:0 </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1386301"></A>Device ID. The device ID must match the ID&#8217;s specified by Video Chip Vendors. They must also be unique under VGA namespace.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1386307"></A>Bit [3:0]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1386309"></A>Display Index </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1386310"></A>A zero-based instance of the Display, when multiple displays of the same type are attached, regardless of where it is associated. Starting from the first adapter and its first display of the type on the first integrated internal device and then incrementing per device-function according to its relative port number.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1386314"></A>Bit [7:4]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1386316"></A>Display Port Attachment</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1386317"></A>This field differentiates displays of the same type attached at different points of one adapter. The zero-based number scheme is specific to each Video Chip Vendors&#8217; implementation. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1386321"></A>Bit [11:8]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1386323"></A>Display Type</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1386324"></A>Describes the specific type of Display Technology in use.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1386325"></A>0 - Other</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1386326"></A>1 - VGA* CRT or VESA* Compatible Analog Monitor</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1386327"></A>2 - TV/HDTV or other Analog-Video Monitor</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1386328"></A>3 - External Digital Monitor (See Note 1.)</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1386329"></A>4 - Internal/Integrated Digital Flat Panel (See Note 2.) </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1386330"></A>5&#126;15 - Reserved for future use</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1386334"></A>Bit [15:12]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1386336"></A>Chipset Vendor Specific.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1386338"></A>16 </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1386340"></A>Platform boot firmware can detect the device.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1386344"></A>17</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1386346"></A>Non-VGA output device whose power is related to the VGA device. This can be used when specifying devices like TV Tuner, DVD decoder, Video Capture ... etc.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1386350"></A>20:18 </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1386352"></A>For VGA multiple-head devices, this specifies head or pipe ID e.g. for Dual-Pipe*, Dual-Display*, Duo-View*, TwinView*, Triple-View* ... etc, beginning with 0 for head 0 or single-head device and increasing for each additional head.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1386356"></A>30:21 </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1386358"></A>Reserved (must be 0)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1386362"></A>31</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1386364"></A>Device ID Scheme</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1386365"></A>1 - Uses the bit-field definitions above (bits 15:0)</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1386366"></A>0 - Other scheme, contact the Video Chip Vendor</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1352363"></A>As mentioned in the above table, a &#8220;Pipe&#8221; or &#8220;Head&#8221; refers to a unique display content stream e.g. at a particular color-depth, resolution, and refresh-rate. The &#8220;Port&#8221; refers to the display output device attachment and may include a DAC, encoder or other mechanism required to support a given display end-point. The &#8220;Display Type&#8221; describes the generalized class of display output technology, and the means of integration. The &#8220;Display Index&#8221; is then an index that assists in creating a unique identifier display end-points in scenarios where other attributes are the same.</P>
+<P CLASS="caption-Caption-Char1-Caption-Char-Char-fighead2-Char-Char-fighead21-Char-Char-fighead22-Char-Char-fighead211-Char-Char-table-caption-Char-Char-Table-Caption-Char-Char-Table-caption-Char-Char-fig-and-tbl-Char-Char-fighead23-Char-Char-fighead2-fighead21">
+<A NAME="pgfId-1349973"></A><A NAME="_Toc50449851"></A><IMG SRC="Apx_B_Video_Extensions-2.gif" ALIGN="BASELINE" ALT="">
+&nbsp;</P>
+</DIV>
+<DIV>
+<H6 CLASS="FigureTitle">
+<A NAME="pgfId-1349979"></A>Example Display Architecture<A NAME="marker-1349974"></A><A NAME="marker-1349975"></A><A NAME="marker-1349976"></A><A NAME="marker-1349977"></A><A NAME="marker-1349978"></A></H6>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1349981"></A>Example Device Ids</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="Body">
+<A NAME="pgfId-1395236"></A>Bits</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="Body">
+<A NAME="pgfId-1395238"></A>Definition</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349988"></A>0x000xyyyy</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349990"></A>Bit [31] = 0. Other proprietary scheme - 0x110 Device ID is an exception. (See Note 3)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349992"></A>0x00000110</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349994"></A>Integrated LCD Panel #1 using a common, backwards compatible ID</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349996"></A>0x80000100</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349998"></A>Integrated VGA CRT or VESA compatible Monitor #1 on Port0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350000"></A>0x80000240</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350002"></A>Integrated TV #1 on Port4</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350004"></A>0x80000410</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350006"></A>Integrated Internal LCD Panel #1 on Port1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350008"></A>0x80000421</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350010"></A>LVDS Panel #2 Dual-Link using Port2 &amp; 3. (See Note 4)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350012"></A>0x80000131</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350014"></A>VGA CRT or VESA compatible Monitor #2 on Port3</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350016"></A>0x80000121</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350018"></A>Dual-Link VGA CRT or VESA compatible Monitor #2 using Port2 &amp; 3. (See Note 4.)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350020"></A>0x80000320</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350022"></A>DVI Monitor #1 on Port2 (shares Port2 with a Dual-Function DVI/TV Encoder). (See Note 5)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350024"></A>0x80000331</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350026"></A>DVI Monitor #2 on Port3</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350028"></A>0x80000330</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350030"></A>Dual-Link DVI Monitor #1 using Port2 &amp; 3</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350032"></A>0x80000231</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350034"></A>TV #2 on Port2 (shares Port2 with a Dual-Function DVI/TV Encoder). (See Note 5)</P>
+</TD>
+</TR>
+</TABLE>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1350039"></A>An &#8220;External Digital Monitor&#8221; is an external display device attachable via a user-accessible connector standard (e.g. DFP* or DVI* Compatible Monitors).</LI>
+<LI CLASS="Note">
+<A NAME="pgfId-1350040"></A>An &#8220;Internal Flat Panel&#8221; is a non-detachable fixed pixel display device, including a backlight, and is internally associated, without user-accessible connectors, to the Video Chip (e.g. TFT LCD via TMDS*, LVDS* interface).</LI>
+<LI CLASS="Note">
+<A NAME="pgfId-1350041"></A>When Bit [31] is 0, no assumptions can be made on which ID will be used for any particular display type. Contact the Video Chip vendor for details of the ID scheme employed.</LI>
+<LI CLASS="Note">
+<A NAME="pgfId-1350042"></A>In certain cases multiple Displays Ports may be combined to increase bandwidth for a particular Display in higher-resolution modes. In this situation, the Display Type and Port Number should remain the same in order to retain a consistent ID for the same device, regardless of the selected display mode.</LI>
+<LI CLASS="Note">
+<A NAME="pgfId-1350043"></A>In certain cases, more than one type of display (and connector) may be supportable on a single Port (e.g. DVI + TV + CRT on a single Display Encoder device), while only one display is selectable at any time. In this case the Port Number field of the ID may be the same as other Display ID&#8217;s however the other fields (e.g. Display Type) provide uniqueness.</LI>
+</UL>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1350057"></A> <A NAME="_Toc489267633"></A><A NAME="_Toc489267838"></A><A NAME="RSVD_ROM"></A>_ROM (Get ROM Data)<A NAME="marker-1350054"></A><A NAME="marker-1350055"></A><A NAME="marker-1350056"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1350058"></A>This method is used to get a copy of the display devices&#8217; ROM data. This method is required when the ROM image is stored in a proprietary format such as stored in the platform firmware ROM. This method is not necessary if the ROM image can be read through a standard PCI interface (using ROM BAR). If _ROM is present, it is preferred over the image read through the standard PCI interface, in order to allow platform runtime firmware to provide re-configured ROM data via the method.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350059"></A>The video driver can use the data returned by this method to program the device. The format of the data returned by this function is a large linear buffer limited to 4 KB. The content of the buffer is defined by the graphics independent hardware vendor (IHV) that builds this device. The format of this ROM data will traditionally be compatible with the ROM format of the normal PCI video card, which will allow the video driver to program its device, independently of motherboard versus add-in card issues.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350060"></A>The data returned by the _ROM method is implementation-specific data that the video driver needs to program the device. This method is defined to provide this data as motherboard devices typically don&#8217;t have a dedicated option ROM. This method will allow a video driver to get the key implementation specific data it needs so that it can fully control and program the device without platform runtime firmware support.</P>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1350061"></A>Arguments: (2)</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1350062"></A>Arg0 - An Integer containing the offset of the display device ROM data</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350063"></A>Arg1 - An Integer containing the size of the buffer to fill in (up to 4K).</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1350064"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1350065"></A>A Buffer containing the requested ROM data</P>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1350078"></A> <A NAME="_Toc489267634"></A><A NAME="_Toc489267839"></A><A NAME="RSVD_GPD"></A>_GPD (Get POST Device)<A NAME="marker-1350074"></A><A NAME="marker-1350075"></A><A NAME="marker-1350076"></A><A NAME="marker-1350077"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1350079"></A>This method is required if the _VPO method is implemented.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350080"></A>This method is used as a mechanism for the OS to query a CMOS value that determines which VGA device will be posted at boot. A zero return value indicates the motherboard VGA will be posted on the next boot, a 1 indicates a PCI VGA device will be posted, and a 2 indicates an AGP VGA device will be posted.</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1350081"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1350082"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1350083"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1350084"></A>An Integer containing encoded post information (32 bits valid)</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1350085"></A>Bits [1:0]</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1350086"></A>00 - Post the motherboard VGA device</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1350087"></A>01 - Post an add-in PCI VGA device</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1350088"></A>10 - Post an add-in AGP VGA device</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1350089"></A>11 - Post an add-in PCI-Express VGA device</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1350091"></A>Bits [31:2] - Reserved (must be 0)</P>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1350102"></A> <A NAME="_Toc489267635"></A><A NAME="_Toc489267840"></A><A NAME="RSVD_SPD"></A>_SPD (Set POST Device)<A NAME="marker-1350099"></A><A NAME="marker-1350100"></A><A NAME="marker-1350101"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1350103"></A>This method is required if the _VPO method is implemented.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350104"></A>This method is used as a mechanism for the OS to update a CMOS value that determines which video device will be posted at boot. A zero argument will cause the &#8220;motherboard&#8221; to be posted on the next boot, a 1 will cause an add-in PCI device to be posted, and a 2 will cause an add-in AGP device to be posted.</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1352449"></A>Arguments: (1)</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1350106"></A>Arg0 - An Integer containing encode post information (32 bits valid)</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1350107"></A>Bits [1:0]</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1350108"></A>00 - Post the motherboard VGA device</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1350109"></A>01 - Post an add-in PCI VGA device</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1350110"></A>10 - Post an add-in AGP VGA device</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1350111"></A>11 - Post an add-in PCI-Express VGA device</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1350113"></A>Bits [31:2] - Reserved (must be 0)</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1350114"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1350115"></A>An Integer containing the status of the operation</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1350116"></A>0 -	Operation was successful</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1352477"></A>Non-zero -	Operation failed</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1352479"></A>Example</H3>
+<DIV>
+<H5 CLASS="Code">
+<A NAME="pgfId-1352480"></A>&nbsp;</H5>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350121"></A>Method (_SPD, 1)	{ // Make the motherboard device the device to post }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1389792"></A>&nbsp;</P>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1350131"></A><A NAME="_Toc489267636"></A><A NAME="_Toc489267841"></A><A NAME="RSVD_VPO"></A>_VPO (Video POST Options)<A NAME="marker-1350129"></A><A NAME="marker-1350130"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1350132"></A>This method is required for systems with video devices built onto the motherboard and support changing post-VGA device.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350133"></A>This method is used as a mechanism for the OS to determine what options are implemented. This method will be used in conjunction with _GPD and _SPD</P>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1352507"></A>Arguments:</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1350135"></A>None</P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1350136"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1350137"></A>An Integer containing the options that are implemented and available</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1350138"></A>Bit [0] - Posting the motherboard VGA device is an option. (Bit [0] should always be set)</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1350139"></A>Bit [1] - Posting a PCI VGA device is an option.</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1350140"></A>Bit [2] - Posting an AGP VGA device is an option. </P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1350141"></A>Bit [3] - Posting a PCI-Express VGA device is an option.</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1350143"></A>Bits [31:4] - Reserved (must be zero)</P>
+<DIV>
+<H6 CLASS="zHeading-2-Appendix">
+<A NAME="pgfId-1350151"></A>Notifications for Display Devices</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1350152"></A>Display devices may need to know about external, asynchronous events. In order to accommodate that, the following notifications are defined.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350153"></A>The event number is standardized because the event will be handled by the OS directly under certain circumstances (see _DOS method in this specification).</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350154"></A>These notifications are valid for Display Devices</P>
+</DIV>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1354404"></A>Notifications for Display Devices. </H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1386403"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1386405"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350162"></A>0x80</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350164"></A>Cycle Output Device. Used to notify OSPM whenever the state of one of the output devices attached to the VGA controller has been switched or toggled. This event will, for example, be generated when the user presses a hotkey to switch the active display output from the LCD panel to the CRT.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350166"></A>0x81</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350168"></A>Output Device Status Change. Used to notify OSPM whenever the state of any output devices attached to the VGA controller has been changed. This event will, for example, be generated when the user plugs-in or remove a CRT from the VGA port. In this case, OSPM will re-enumerate all devices attached to VGA</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350170"></A>0x82</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350172"></A>Cycle Display Output Hotkey Pressed. Used to notify OSPM whenever the user has pressed the Cycle display hotkey. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350174"></A>0x83</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350176"></A>Next Display Output Hotkey Pressed. Used to notify OSPM whenever the user has pressed the Next display hotkey.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350178"></A>0x84</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350180"></A>Previous Display Output Hotkey Pressed. Used to notify OSPM whenever the user has pressed the Previous display hotkey.</P>
+</TD>
+</TR>
+</TABLE>
+<DIV>
+<H6 CLASS="zHeading-2-Appendix">
+<A NAME="pgfId-1354379"></A>Output Device-specific Methods</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1390448"></A>The methods in this section are methods associated with the display output device.</P>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1390453"></A><A NAME="_Toc489267638"></A><A NAME="_Toc489267843"></A><A NAME="RSVD_ADR2"></A>_ADR (Return the Unique ID for this Device)<A NAME="marker-1390452"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1390454"></A>This method returns a unique ID representing the display output device. All output devices must have a unique hardware ID. This method is required for all The IDs returned by this method will appear in the list of hardware IDs returned by the _DOD method.</P>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1350201"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1350202"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1350203"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1350204"></A>An Integer containing the device ID (32 bits)</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1350205"></A>Example:</H3>
+<DIV>
+<H5 CLASS="Code">
+<A NAME="pgfId-1350206"></A>&nbsp;</H5>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350207"></A>    Method (_ADR, 0) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350208"></A>            return(0x0100)  // device ID for this CRT</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350209"></A>    }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1389803"></A>&nbsp;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350211"></A>This method is required for all output display devices.</P>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1350222"></A><A NAME="_Toc489267639"></A><A NAME="_Toc489267844"></A><A NAME="RSVD_BCL"></A>_BCL (Query List of Brightness Control Levels Supported)<A NAME="marker-1350220"></A><A NAME="marker-1350221"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1350223"></A>This method allows the OS to query a list of brightness level supported by built-in display output devices. (This method in not allowed for externally connected displays.) This method is required if an integrated LCD is present and supports brightness levels.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350224"></A>Each brightness level is represented by a number between 0 and 100, and can be thought of as a percentage. For example, 50 can be 50% power consumption or 50% brightness, as defined by the OEM.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350225"></A>The OEM may define the number 0 as &quot;Zero brightness&quot; that can mean to turn off the lighting (e.g. LCD panel backlight) in the device. This may be useful in the case of an output device that can still be viewed using only ambient light, for example, a transflective LCD. If Notify(Output Device, 0x85) for &#8220;Zero brightness&#8221; is issued, OSPM may be able to turn off the lighting by calling _BCM(0).</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1350232"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1350233"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1350234"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1350235"></A>A variable-length Package containing a list of Integers representing the the supported brightness levels. Each integer has 8 bits of significant data.</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1350236"></A>Example:</H3>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350238"></A>    Method (_BCL, 0) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350239"></A>                           // List of supported brightness levels</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350240"></A>            Return (Package(7){</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350241"></A>                80,        // level when machine has full power</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350242"></A>                50,        // level when machine is on batteries</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350243"></A>                           // other supported levels:</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350244"></A>                20, 40, 60, 80, 100}</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350245"></A>    }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1389810"></A>&nbsp;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350246"></A>The first number in the package is the level of the panel when full power is connected to the machine. The second number in the package is the level of the panel when the machine is on batteries. All other numbers are treated as a list of levels OSPM will cycle through when the user toggles (via a keystroke) the brightness level of the display.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1390459"></A>These levels will be set using the _BCM method described in the following section.</P>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1390472"></A><A NAME="_Toc424364339"></A><A NAME="_Toc475523843"></A><A NAME="_Toc486665705"></A><A NAME="_Toc489272819"></A><A NAME="_Toc202342178"></A><A NAME="_Toc258262808"></A><A NAME="_Toc489267640"></A><A NAME="_Toc489267845"></A><A NAME="RSVD_BCM"></A>_BCM (Set the Brightness Level)<A NAME="marker-1390469"></A><A NAME="marker-1390470"></A><A NAME="marker-1390471"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1390473"></A>This method allows OSPM to set the brightness level of a built-in display output device. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1350262"></A>The OS will only set levels that were reported via the _BCL method. This method is required if _BCL is implemented.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1350263"></A>Arguments: (1)</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1350264"></A>Arg0 - An Integer containing the new brightness level</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1350265"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1350266"></A>None</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1389822"></A>Example:</H3>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1389823"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1389829"></A>    Method (_BCM, 1) { // Set the requested level }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1389836"></A>&nbsp;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1389824"></A>The method will be called in response to a power source change or at the specific request of the end user, for example, when the user presses a function key that represents brightness control.</P>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1390528"></A><A NAME="RSVD_BQC"></A>_BQC (Brightness Query Current level)</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1390536"></A>This  optional method returns the current brightness level of a built-in display output device. If present, it must be set by the platform for initial brightness.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1390530"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1350281"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1350282"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1350283"></A>An Integer containing the current brightness level (must be one of the values returned from the _BCL method)</P>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1350291"></A><A NAME="61650"></A>_DDC (Return the EDID for this Device)<A NAME="marker-1350289"></A><A NAME="marker-1350290"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1350292"></A>This method returns an EDID (Extended Display Identification Data) structure that represents the display output device. This method is required for integrated LCDs that do not have another standard mechanism for returning EDID data.</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1350293"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1350294"></A>Arg0 - An Integer containing a code for the return data length:</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1350295"></A>1 -	Return 128 bytes of data</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1350296"></A>2 -	Return 256 bytes of data</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1350297"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1350298"></A>Either a Buffer containing the requested data (of the length specified in Arg0), or an Integer (value 0) if Arg0 was invalid</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1350300"></A>Example:</H3>
+<DIV>
+<H5 CLASS="code-Ex-CODE-PRE-CITE">
+<A NAME="pgfId-1350301"></A>&nbsp;</H5>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350302"></A>Method (_DDC, 2) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350303"></A>    If (LEqual (Arg0, 1)) { Return (Buffer(128){ ,,,, }) }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350304"></A>    If (LEqual (Arg0, 2)) { Return (Buffer(256){ ,,,, }) }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1389848"></A>    Return (0)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1389849"></A>}</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1389855"></A>&nbsp;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1389850"></A>The buffer will later be interpreted as an EDID data block. The format of this data is defined by the VESA EDID specification.</P>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1350319"></A><A NAME="_Toc424364341"></A><A NAME="_Toc475523845"></A><A NAME="_Toc486665707"></A><A NAME="_Toc489272821"></A><A NAME="_Toc202342181"></A><A NAME="_Toc258262811"></A><A NAME="_Toc489267642"></A><A NAME="_Toc489267847"></A><A NAME="RSVD_DCS"></A>_DCS (Return the Status of Output Device)<A NAME="marker-1350317"></A><A NAME="marker-1350318"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1350320"></A>This method is required if hotkey display switching is supported.</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1350321"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1350322"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1350323"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1350324"></A>An Integer containing the device status (32 bits) (See <A HREF="Apx_B_Video_Extensions.htm#88944" CLASS="XRef">See Device Status.</A>)</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1350325"></A><A NAME="88944"></A>Device Status</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1389865"></A>Bits</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1389867"></A>Definition</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350332"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350334"></A>Output connector exists in the system now</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350336"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350338"></A>Output is activated</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350340"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350342"></A>Output is ready to switch</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350344"></A>3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350346"></A>Output is not defective (it is functioning properly)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350348"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350350"></A>Device is attached (this is optional)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350352"></A>31:5</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350354"></A>Reserved (must be zero)</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1350357"></A>Example:</H3>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350358"></A>If the output signal is activated by _DSS, _DCS returns 0x1F or 0x0F.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350359"></A>If the output signal is inactivated by _DSS, _DCS returns 0x1D or 0x0D.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350360"></A>If the device is not attached or cannot be detected, _DCS returns 0x0xxxx and should return 0x1xxxx if it is attached.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350361"></A>If the output signal cannot be activated, _ DCS returns 0x1B or 0x0B.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350362"></A>If the output connector does not exist (when undocked), _DCS returns 0x00.</LI>
+</UL>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1350373"></A><A NAME="23415"></A>_DGS (Query Graphics State)<A NAME="marker-1350371"></A><A NAME="marker-1350372"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1350374"></A>This method is used to query the state (active or inactive) of the output device. This method is required if hotkey display switching is supported.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1350375"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1350376"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1350377"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1350378"></A>An Integer containing the device state (32 bits) (See <A HREF="Apx_B_Video_Extensions.htm#84152" CLASS="XRef">See Device State for _DGS.</A>)</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1350379"></A><A NAME="84152"></A>Device State for _DGS</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1350382"></A>Bits</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1350384"></A>Definition</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350386"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350388"></A>0 - Next desired state is inactive</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1350389"></A>1 - Next desired state is active</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350391"></A>31:1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350393"></A>Reserved (must be zero)</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1350396"></A>The desired state represents what the user wants to activate or deactivate, based on the special function keys the user pressed. OSPM will query the desired state when it receives the display toggle event (described earlier).</P>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1350408"></A><A NAME="30209"></A>_DSS (Device Set State)<A NAME="marker-1350406"></A><A NAME="marker-1350407"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1350409"></A>OSPM will call this method when it determines the outputs can be activated or deactivated. OSPM will manage this to avoid flickering as much as possible. This method is required if hotkey display switching is supported.</P>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1350410"></A>Arguments: (1)</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1350411"></A>Arg0 - An Integer containing the new device state (32 bits) (See <A HREF="Apx_B_Video_Extensions.htm#10070" CLASS="XRef">See Device State for _DSS.</A>)</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1350412"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1350413"></A>None</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1350414"></A><A NAME="10070"></A>Device State for _DSS</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1390261"></A>Bits</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1390263"></A>Definition</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350421"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350423"></A>0 - Set output device to inactive state</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1350424"></A>1 - Set output device to active state</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350426"></A>30</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350428"></A>0 - Do whatever Bit [31] requires</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1350429"></A>1 - Don&#8217;t do actual switching, but need to change _DGS to next state</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350431"></A>31</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350433"></A>0 - Don&#8217;t do actual switching, just cache the change</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1350434"></A>1 - If Bit [30] = 0, commit actual switching, including any _DSS with MSB=0 called before</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1350435"></A>      If Bit [30] = 1, don&#8217;t do actual switching, change _DGS to next state </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350437"></A>29:1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350439"></A>Reserved (must be zero)</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1350442"></A>Example Usage:</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1350443"></A>OS may call in such an order to turn off CRT, and turn on LCD</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350445"></A>CRT._DSS(0);</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350446"></A>LCD._DSS(80000001L);</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350447"></A>or</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350448"></A>LCD._DSS(1);</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350449"></A>CRT._DSS(80000000L);</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350456"></A>OS may call in such an order to force platform runtime firmware to make _DGS jump to next state without actual CRT, LCD switching </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350458"></A>CRT._DSS(40000000L);</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350459"></A>LCD._DSS(C0000001L);</P>
+<DIV>
+<H6 CLASS="zHeading-2-Appendix">
+<A NAME="pgfId-1350466"></A>Notifications Specific to Output Devices</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1350467"></A>Output devices may need to know about external, asynchronous events. In order, each of these events corresponds to accommodate that, pressing a key or button on the following machine. Using these notifications is not appropriate if no physical device exists that is associated with them. OSPM may ignore any of these notifications if, for example the current user does not have permission to change the state of the output device. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1350468"></A>These notifications are only valid for Output Devices.</P>
+</DIV>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1350469"></A>Notification Values for Output Devices</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1386427"></A><A NAME="OLE_LINK43"></A><A NAME="OLE_LINK44"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1386429"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350479"></A>0x85</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350481"></A>Cycle Brightness. Used to notify OSPM that the output device brightness should be increased by one level. Used to notify OSPM that the user pressed a button or key that is associated with cycling brightness. A useful response by OSPM would be to increase output device brightness by one or more levels. (Levels are defined in _BCL.) If the brightness level is currently at the maximum value, it should be set to the minimum level. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350483"></A>0x86</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350485"></A>Increase Brightness. Used to notify OSPM that the output device brightness should be increased by one or more levels as defined by the _BCL object. Used to notify OSPM that the user pressed a button or key that is associated with increasing brightness. If the brightness level is currently at the maximum value, OSPM may should ignore the notification.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350487"></A>0x87</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350489"></A>Decrease Brightness. Used to notify OSPM that the output device brightness should be decreased by one or more levels as defined by the _BCL object. Used to notify OSPM that the user pressed a button or key that is associated with decreasing device brightness. If the brightness level is currently at the minimum value, OSPM may should ignore the notification.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350491"></A>0x88</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350493"></A>Zero Brightness. Used to notify OSPM that the output device brightness should be zeroed, effectively turning off any lighting that is associated with the device. Used to notify OSPM that the user pressed a button or key associated with zeroing device brightness. This is not to be confused with putting the device in a D3 state. While the brightness may be decreased to zero, the device may still be displaying, using only ambient light.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350495"></A>0x89</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350497"></A>Display Device Off. Used to notify OSPM that the device should be put in an off state, one that is not active or visible to the user, usually D3, but possibly D1 or D2. Used to notify OSPM that the user pressed a low power button or key associated with putting the device in an off state. There is no need for a corresponding &#8220;device on&#8221; notification, for two reasons. First, OSPM may choose to toggle device state when this event is pressed multiple times. Second, OSPM may (and probably will) choose to turn the monitor on whenever the user types on the keyboard, moves the mouse, or otherwise indicates that he or she is attempting to interact with the machine.</P>
+</TD>
+</TR>
+</TABLE>
+<DIV>
+<H6 CLASS="zHeading-2-Appendix">
+<A NAME="pgfId-1350507"></A>Notes on State Changes<A NAME="marker-1350504"></A><A NAME="marker-1350505"></A><A NAME="marker-1350506"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1350508"></A>It is possible to have any number of simultaneous active output devices. It is possible to have 0, 1, 2 ... and so on active output devices. For example, it is possible for both the LCD device and the CRT device to be active simultaneously. It is also possible for all display outputs devices to be inactive (this could happen in a system where multiple graphics cards are present).</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350509"></A>The state of the output device is separate from the power state of the device. The &#8220;active&#8221; state represents whether the image being generated by the graphics adapter would be sent to this particular output device. A device can be powered off or in a low-power mode but still be the active output device. A device can also be in an off state but still be powered on.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350510"></A>Example of the display-switching mechanism:</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350511"></A>The laptop has three output devices on the VGA adapter. At this moment in time, the panel and the TV are both active, while the CRT is inactive. The automatic display-switching capability has been disabled by OSPM by calling _DOS(0), represented by global variable display_switching = 0.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350512"></A>The platform runtime firmware, in order to track the state of these devices, will have three global variable to track the state of these devices. There are currently initialized to:<A NAME="marker-1350513"></A></P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350515"></A>    crt_active - 0</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350516"></A>    panel_active - 1</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350517"></A>    tv_active - 1</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350518"></A>The user now presses the display toggle switch, which would switch the TV output to the CRT.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1352883"></A>The platform runtime firmware first updates three temporary variables representing the desired state of output devices:</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1352885"></A>    want_crt_active - 1</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350522"></A>    want_panel_active - 1</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1350523"></A>    want_tv_active - 0</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350524"></A>Then the platform runtime firmware checks the display_switching variable. Because this variable is set to zero, the platform runtime firmware does not do any device reprogramming, but instead generates a Notify(VGA, 0x80/0x81) event for the display. This event will be sent to OSPM.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350525"></A>OSPM will call the _DGS method for each enumerated output device to determine which devices should now be active. OSPM will determine whether this is possible, and will reconfigure the internal data structure of the OS to represent this state change. The graphics modes will be recomputed and reset.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350526"></A>Finally, OSPM will call the _DSS method for each output device it has reconfigured.</P>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1350527"></A>OSPM may not have called the _DSS routines with the same values and the _DGS routines returned, because the user may be overriding the default behavior of the hardware-switching driver or operating system-provided UI. The data returned by the _DGS method (the want_XXX values) are only a hint to the OS as to what should happen with the output devices.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1346798"></A>If the display-switching variable is set to 1, then the platform runtime firmware would not send the event, but instead would automatically reprogram the devices to switch outputs. Any legacy display notification mechanism could also be performed at this time. </P>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</BODY>
+</HTML>

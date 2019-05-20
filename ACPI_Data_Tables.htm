@@ -1,0 +1,976 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2016/HTML Export Filter">
+<LINK REL="STYLESHEET" HREF="ACPI_Data_Tables.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE> 21 ACPI Data Tables and Table Definition Language </TITLE></HEAD>
+<BODY>
+<DIV>
+<H1 CLASS="Heading-1">
+<A NAME="pgfId-1448711"></A><A NAME="35965"></A>ACPI Data Tables and Table Definition Language <DIV>
+<IMG SRC="ACPI_Data_Tables-1.gif" ALT="">
+</DIV>
+</H1>
+<P CLASS="Body">
+<A NAME="pgfId-1448720"></A>There are two fundamental types of ACPI tables:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1448721"></A>Tables that contain AML code produced from the ACPI Source Language (ASL). These include the DSDT, any SSDTs, and sometimes OEM-specific tables (OEMx).</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1448722"></A>Tables that contain simple data and no AML byte code. These types of tables are known as ACPI Data Tables. They include tables such as the FADT, MADT, ECDT, SRAT, etc. - essentially any table other than a DSDT or SSDT.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1448723"></A>The first type of table is generated using an ASL compiler and this language is specified in section 18.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1448724"></A>The second type of table, the ACPI Data Table, is addressed by this section.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448725"></A>This section describes a simple language (the Table Definition Language or TDL) that can be used to generate any ACPI data table. It simplifies the table generation for platform firmware vendors and can automatically generate fields such as table lengths, subtable lengths, checksums, flag fields, etc.</P>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1448726"></A>Types of ACPI Data Tables</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1448727"></A>In the context of a compiler for the Table Definition Language (TDL), there are two types of ACPI Data Tables:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1448728"></A>ACPI tables that are &quot;known&quot; to the compiler. These would typically include all of the basic ACPI tables defined in the ACPI specification such as the FADT, MADT, ECDT, etc. Since these tables are fully specified (usually via the ACPI specification, but from other sources as well), the TDL compiler knows all details of these tables -- including all required data types, optional or required sub-tables, etc.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1448729"></A>ACPI tables that are unknown to the compiler. These may include tables that are not defined in the ACPI specification such as MCFG, DBGP, etc., or simply new ACPI tables that have not yet been implemented in the compiler.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1448730"></A>One of the goals of the ACPI Table Definition Language is to support both cases above. Most ACPI tables will be known to the compiler (and will be the easiest to specify in TDL), but the language is general enough to allow the definition of new ACPI tables that are unknown or unimplemented in the compiler.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448731"></A>An additional goal of TDL is to support the output of a disassembler that formats an existing table into TDL. This enables disassembler/change/compile operations.</P>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1448733"></A>ACPI Table Definition Language Specification</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1448734"></A>The following section defines the ACPI Table Definition Language (TDL). The grammar notation follows the same rules as the ASL source language (See <A HREF="ACPI_Source_Language_Reference.htm#_Toc489272733" CLASS="XRef">See ASL Grammar Notation.</A>, ASL Grammar Notation.) Full definition of the various data types follows the grammar specification.</P>
+<DIV>
+<H4 CLASS="Heading-3">
+<A NAME="pgfId-1448736"></A>Overview of the Table Definition Language (TDL)</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1449306"></A>Most ACPI tables share the following structure (all except FACS):</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1449307"></A>A common, 36 byte header containing the table signature, length, checksum, revision, and other data.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1449308"></A>A table body which contains the specific table data.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1449309"></A>The Table Definition Language allows the definition of an ACPI table via a collection of fields. Each line of TDL source code is a field, and corresponds to a single data item in the definition of the table.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448741"></A>For example, the C definition of the common ACPI table header is as follows:</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448742"></A>typedef struct acpi_table_header</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448743"></A>{</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448744"></A>    char                    Signature[4];</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448745"></A>    UINT32                  Length;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448746"></A>    UINT8                   Revision;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448747"></A>    UINT8                   Checksum;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448748"></A>    char                    OemId[6];</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448749"></A>    char                    OemTableId[8];</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448750"></A>    UINT32                  OemRevision;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448751"></A>    char                    AslCompilerId[4];</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448752"></A>    UINT32                  AslCompilerRevision;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448753"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448754"></A>} ACPI_TABLE_HEADER;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449340"></A>&nbsp;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448757"></A>In the Table Definition Language, an ACPI table header can be described as follows:</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448758"></A>            : &quot;ECDT&quot;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448759"></A>            : 00000000</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448760"></A>            : 01</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448761"></A>            : 00</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448762"></A>            : &quot;OEM   &quot;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448763"></A>            : &quot;MACHINE1&quot;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448764"></A>            : 00000001</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448765"></A>            : &quot;&quot;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448766"></A>            : 00000000</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449347"></A>&nbsp;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448769"></A>Additionally and optionally, it can also be described with accompanying field names:</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448770"></A>                    Signature : &quot;ECDT&quot;    [Embedded Controller Boot Resources Table]</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448771"></A>                 Table Length : 00000000</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448772"></A>                     Revision : 01</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448773"></A>                     Checksum : 00</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448774"></A>                       Oem ID : &quot;OEM &quot;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448775"></A>                 Oem Table ID : &quot;MACHINE1&quot;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448776"></A>                 Oem Revision : 00000001</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448777"></A>              Asl Compiler ID : &quot;&quot;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448778"></A>        Asl Compiler Revision : 00000000</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448779"></A>&nbsp;</P>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1448781"></A>In the ACPI table header, the TableLength, Checksum, AslCompilerId, and the AslCompilerRevision fields are all output fields that are filled in automatically by the compiler during table generation. Also, the field names are output by a disassembler that formats existing tables into TDL code.</LI>
+</UL>
+</DIV>
+<DIV>
+<H4 CLASS="Heading-3">
+<A NAME="pgfId-1449477"></A>TDL Grammar Specification</H4>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449480"></A>//</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449474"></A>// Root Term</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448789"></A>//</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448790"></A>DataTable :=</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448791"></A>FieldList</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448792"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448793"></A>//</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448794"></A>// Field Terms</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448795"></A>//</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448796"></A>FieldList :=</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448797"></A>      Field |</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448798"></A>      &lt;Field FieldList&gt;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448799"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448800"></A>Field :=</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448801"></A>      &lt;FieldDefinition OptionalFieldComment&gt; |</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448802"></A>      CommentField</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448803"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448804"></A>FieldDefinition :=</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448805"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448806"></A>      // Fields for predefined (known) ACPI tables</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448807"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448808"></A>      &lt;OptionalFieldName ':' FieldValue&gt; |</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448809"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448810"></A>      // Generic data types (used for custom or undefined ACPI tables)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448811"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448812"></A>      &lt;'UINT8'   ':' IntegerExpression&gt; |   // 8-bit unsigned integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448813"></A>      &lt;'UINT16'  ':' IntegerExpression&gt; |   // 16-bit unsigned integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448814"></A>      &lt;'UINT24'  ':' IntegerExpression&gt; |   // 24-bit unsigned integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448815"></A>      &lt;'UINT32'  ':' IntegerExpression&gt; |   // 32-bit unsigned integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448816"></A>      &lt;'UINT40'  ':' IntegerExpression&gt; |   // 40-bit unsigned integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448817"></A>      &lt;'UINT48'  ':' IntegerExpression&gt; |   // 48-bit unsigned integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448818"></A>      &lt;'UINT56'  ':' IntegerExpression&gt; |   // 56-bit unsigned integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448819"></A>      &lt;'UINT64'  ':' IntegerExpression&gt; |   // 64-bit unsigned integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448820"></A>      &lt;'String'  ':' String&gt;            |   // Quoted ASCII string</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448821"></A>      &lt;'Unicode' ':' String&gt;            |   // Quoted ASCII string -&gt; Unicode string</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448822"></A>      &lt;'Buffer'  ':' ByteConstList&gt;     |   // Raw buffer of 8-bit unsigned integers</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448823"></A>      &lt;'GUID'    ':' Guid&gt;              |   // In GUID format</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448824"></A>      &lt;'Label'   ':' Label&gt;                 // ASCII label - unquoted string</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448825"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448826"></A>OptionalFieldName :=</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448827"></A>      Nothing |</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448828"></A>      AsciiCharList                         // Optional field name/description</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448829"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448830"></A>FieldValue :=</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448831"></A>      IntegerExpression | String | Buffer | Flags | Label</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448832"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448833"></A>OptionalFieldComment :=</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448834"></A>      Nothing |</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448835"></A>      &lt;'[' AsciiCharList ']'&gt;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448836"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448837"></A>CommentField :=</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448838"></A>      &lt;'//' AsciiCharList NewLine&gt; |</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448839"></A>      &lt;'/*' AsciiCharList '*/'&gt;    |</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448840"></A>      &lt;'[' AsciiCharList ']'&gt;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448841"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448842"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448843"></A>//</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448844"></A>// Data Expressions</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448845"></A>//</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448846"></A>IntegerExpression :=</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448847"></A>      Integer |</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448848"></A>      &lt;IntegerExpression IntegerOperator IntegerExpression&gt; |</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448849"></A>      &lt;'(' IntegerExpression ')'&gt;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448850"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448851"></A>//</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448852"></A>// Operators below are shown in precedence order. The precedence rules</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448853"></A>// are the same as the C language. Parentheses have precedence over</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448854"></A>// all operators.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448855"></A>//</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448856"></A>IntegerOperator :=</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448857"></A>      '!'  | '&#126;' | '*'  | '/'  | '%'  | '+'  | '-' | '&lt;&lt;' | '&gt;&gt;' | </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448858"></A>      '&lt;'  | '&gt;' | '&lt;=' | '&gt;=' | '==' | '!=' | '&amp;' | '^'  | '|'  | </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448859"></A>      '&amp;&amp;' |'||' |</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448860"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448861"></A>//</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448862"></A>// Data Types</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448863"></A>//</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448864"></A>String :=</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448865"></A>      &lt;'&quot;' AsciiCharList '&quot;'&gt;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448866"></A>Buffer :=</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448867"></A>      ByteConstList</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448868"></A>Guid :=</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448869"></A>      &lt;DWordConst '-' WordConst '-' WordConst '-' WordConst '-' Const48&gt;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448870"></A>Label :=</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448871"></A>      AsciiCharList</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448872"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448873"></A>//</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448874"></A>// Data Terms</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448875"></A>//</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448876"></A>Integer :=</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448877"></A>      ByteConst | WordConst | Const24 | DWordConst | Const40 | Const48 | Const56 | </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449888"></A>      QWordConst | LabelReference</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448878"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448879"></A>LabelReference :=</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448880"></A>      &lt;'$' Label&gt;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448881"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448882"></A>Flags :=</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448883"></A>      OneBit | TwoBits</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448884"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448885"></A>ByteConstList :=</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448886"></A>      ByteConst |</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448887"></A>      &lt;Byte Const ' ' ByteConstList&gt;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448888"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448889"></A>AsciiCharList :=</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448890"></A>      Nothing |</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448891"></A>      PrintableAsciiChar |</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448892"></A>      &lt;PrintableAsciiChar AsciiCharList&gt;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448893"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448894"></A>//</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448895"></A>// Terminals</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448896"></A>//</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448897"></A>ByteConst :=</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448898"></A>      0x00-0xFF</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448899"></A>WordConst :=</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448900"></A>      0x0000 - 0xFFFF</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448901"></A>Const24 :=</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448902"></A>      0x000000 - 0xFFFFFF</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448903"></A>DWordConst :=</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448904"></A>      0x00000000 - 0xFFFFFFFF</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448905"></A>Const40 :=</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448906"></A>      0x0000000000 - 0xFFFFFFFFFF</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448907"></A>Const48 :=</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448908"></A>      0x000000000000 - 0xFFFFFFFFFFFF</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448909"></A>Const56 :=</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448910"></A>      0x00000000000000 - 0xFFFFFFFFFFFFFF</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448911"></A>QWordConst :-</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448912"></A>      0x0000000000000000 - 0xFFFFFFFFFFFFFFFF</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448913"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448914"></A>OneBit :=</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448915"></A>      0 - 1</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448916"></A>TwoBits :=</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448917"></A>      0 - 3</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448918"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448919"></A>PrintableAsciiChar :=</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448920"></A>      0x20 - 0x7E</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448921"></A>NewLine :=</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448922"></A>      '&#92;n'</P>
+</DIV>
+<DIV>
+<H4 CLASS="Heading-3">
+<A NAME="pgfId-1448925"></A>Data Types</H4>
+<DIV>
+<H5 CLASS="Heading-4">
+<A NAME="pgfId-1448927"></A>Integers</H5>
+<P CLASS="Body">
+<A NAME="pgfId-1448928"></A>All integers in ACPI are unsigned. Four major types of unsigned integers are supported by the compiler: Bytes, Words, DWords and QWords. In addition, for special cases, there are some odd sized integers such as 24-bit and 56-bit. The actual required width of an integer is defined by the ACPI table. If an integer is specified that is numerically larger than the width of the target field within the input source, an error is issued by the compiler. Integers are expected by the data table compiler to be entered in hexadecimal with no &quot;hex&quot; prefix.</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1448929"></A>Examples:</H3>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448931"></A>[001]                           Revision : 04			// Byte (8-bit)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448932"></A>[002]                         C2 Latency : 0000			// Word (16-bit)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448933"></A>[004]                       DSDT Address : 00000001		// DWord (32-bit)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448934"></A>[008]                            Address : 0000000000000001	// QWord (64-bit)</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448935"></A>Length of non-power-of-two examples:</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448937"></A>[003]                           Reserved : 000000		// 24 bits</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448938"></A>[007]                       Capabilities : 00000000000000 	// 56 bits</P>
+<DIV>
+<H5 CLASS="Heading-4">
+<A NAME="pgfId-1448940"></A>Integer Expressions</H5>
+<P CLASS="Body">
+<A NAME="pgfId-1448941"></A>Expressions are supported in all fields that require an integer value.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448942"></A>Supported operators (Standard C meanings, in precedence order):</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448944"></A>()	Parentheses</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448945"></A>!	Logical NOT</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448946"></A>&#126;	Bitwise ones compliment (NOT)</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448947"></A>*	Multiply</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448948"></A>/	Divide</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448949"></A>%	Modulo</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448950"></A>+	Add</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448951"></A>-	Subtract</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448952"></A>&lt;&lt;	Shift left</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448953"></A>&gt;&gt;	Shift right</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448954"></A>&lt;	Less than</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448955"></A>&gt;	Greater than</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448956"></A>&lt;=	Less than or equal</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448957"></A>&gt;=	Greater than or equal</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448958"></A>==	Equal</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448959"></A>!=	Not Equal</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448960"></A>&amp;	Bitwise AND</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448961"></A>^	bitwise Exclusive OR</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448962"></A>|	Bitwise OR</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448963"></A>&amp;&amp;	Logical AND</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448964"></A>||	Logical OR</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448965"></A>&nbsp;</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1448966"></A>Examples:</H3>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448968"></A>[001]                           Revision : 04 * (4 + 7)	// Byte (8-bit)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448969"></A>[002]                         C2 Latency : 0032 + 8		// Word (16-bit)</P>
+<DIV>
+<H5 CLASS="Heading-4">
+<A NAME="pgfId-1448971"></A>Flags</H5>
+<P CLASS="Body">
+<A NAME="pgfId-1448973"></A>Many ACPI tables contain flag fields. For these fields, only the individual flag bits need to be specified to the compiler. The individual bits are aggregated into a single integer of the proper size by the compiler.</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1448974"></A>Examples:</H3>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448976"></A>[002]              Flags (decoded below) : 0005</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448977"></A>                                Polarity : 1</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448978"></A>                            Trigger Mode : 1</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448979"></A>In this example, only the Polarity and Trigger Mode fields need to be specified to the compiler (as either zero or one). The compiler then creates the final 16-bit Flags field for the ACPI table.</P>
+<DIV>
+<H5 CLASS="Heading-4">
+<A NAME="pgfId-1448982"></A>Strings</H5>
+<P CLASS="Body">
+<A NAME="pgfId-1448984"></A>Strings must always be surrounded by quotes. The actual string that is generated by the compiler may or may not be null-terminated, depending on the table definition in the ACPI specification. For example, the OEM ID and OEM Table ID in the common ACPI table header (shown above) are fixed at six and eight characters, respectively. They are not necessarily null terminated. Most other strings, however, are of variable-length and are automatically null terminated by the compiler. If a string is specified that is too long for a fixed-length string field, an error is issued. String lengths are specified in the definition for each relevant ACPI table.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1448985"></A>Escape sequences within a quoted string are not allowed. The backslash character '&#92;' refers to the root of the ACPI namespace.</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1448986"></A>Examples:</H3>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448988"></A>[008]                       Oem Table ID : &quot;TEMPLATE&quot; 	// Fixed length</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448989"></A>[006]               Processor UID String : &quot;&#92;CPU0		&quot;// Variable length</P>
+<DIV>
+<H5 CLASS="Heading-4">
+<A NAME="pgfId-1448992"></A>Buffers</H5>
+<P CLASS="Body">
+<A NAME="pgfId-1448994"></A>A buffer is typically used whenever the required binary data is larger than a QWord, or the data does not fit exactly into one of the standard integer widths. Examples include UUIDs and byte data defined by the SLIT table.</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1448995"></A>Examples:</H3>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448997"></A>// SLIT entry</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448998"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1448999"></A>[032]               Locality   0 : 0A 10 16 17 18 19 1A 1B 1C 1D 1E 1F 20 21 22 23 &#92;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449000"></A>                                   24 25 26 27 28 29 2A 2B 2C 2D 2E 2F 30 31 32 33</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449001"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449002"></A>// DMAR entry</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449003"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449004"></A>[002]                   PCI Path : 1F 07</P>
+<P CLASS="Body">
+<A NAME="pgfId-1449005"></A>&nbsp;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1449006"></A>Each hexadecimal byte should be entered separately, separated by a space. The continuation character  (backslash) may be used to continue the buffer data to more than one line.</P>
+<DIV>
+<H4 CLASS="Heading-3">
+<A NAME="pgfId-1449008"></A>Fields Set Automatically by the Compiler</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1449010"></A>There are several types of ACPI table fields that are set automatically by the compiler. This simplifies the process of ACPI table development by relieving the programmer from these tasks.</P>
+<P CLASS="ArgDefinition">
+<A NAME="pgfId-1449011"></A>Checksums: 	All ACPI table checksums are computed and inserted automatically. This includes the main checksum that appears in the standard ACPI table header, as well as any additional checksum fields such as the extended checksum that appears in the ACPI 2.0 RSDP.</P>
+<P CLASS="ArgDefinition">
+<A NAME="pgfId-1449012"></A>Table and Subtable Lengths: All ACPI table lengths are computed and inserted automatically. This includes the master table length that appears in the common ACPI table header, and the length of any internal subtables as applicable.</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1449013"></A>Examples:</H3>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449015"></A>[004]                       Table Length : 000000F4</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449016"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449017"></A>[001]                      Subtable Type : 08 &lt;Platform Interrupt Sources&gt;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449018"></A>[001]                             Length : 10</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449019"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449020"></A>[001]                      Subtable Type : 01 &lt;Memory Affinity&gt;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449021"></A>[001]                             Length : 28</P>
+<P CLASS="ArgDefinition">
+<A NAME="pgfId-1449023"></A>Flags: 	As described in the previous section, individual flags are aggregated automatically by the compiler and inserted into the ACPI table as the correctly sized and valued integer.</P>
+<P CLASS="ArgDefinition">
+<A NAME="pgfId-1449024"></A>Compiler IDs: 	The data table compiler automatically inserts the ID and current revision for iASL into the common ACPI table header for each table during compilation.</P>
+<DIV>
+<H4 CLASS="Heading-3">
+<A NAME="pgfId-1449026"></A>Special Fields</H4>
+<P CLASS="ArgDefinition">
+<A NAME="pgfId-1449028"></A>Reserved Fields: 	All fields that are declared as Reserved by the table definition within the ACPI (or other) specification should be set to zero.</P>
+<P CLASS="ArgDefinition">
+<A NAME="pgfId-1449029"></A>Table Revision: 	This field in the common ACPI table header is often very important and defines the structure of the remaining table. The developer should take care to ensure that this value is correct and current. This field is not set automatically by the compiler. It is instead used to indicate which version of the table is being compiled.</P>
+<P CLASS="ArgDefinition">
+<A NAME="pgfId-1449030"></A>Table Signature: 	There are several table signatures within ACPI that are either different from the table name, or have unusual length:</P>
+<P CLASS="Body">
+<A NAME="pgfId-1449032"></A>FADT - signature is &quot;FACP&quot;.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1449033"></A>MADT - signature is &quot;APIC&quot;.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1450767"></A>RSDP - signature is &quot;RSD PTR &quot; (with trailing space)</P>
+</DIV>
+<DIV>
+<H4 CLASS="Heading-3">
+<A NAME="pgfId-1450768"></A>TDL Generic Data Types</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1450769"></A>These data types are used to construct ACPI tables that are not predefined (known) by the TDL compiler.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1449039"></A>UINT8	Generates an 8-bit unsigned integer</P>
+<P CLASS="Body">
+<A NAME="pgfId-1449040"></A>UINT16	Generates a 16-bit unsigned integer</P>
+<P CLASS="Body">
+<A NAME="pgfId-1449041"></A>UINT24	Generates a 24-bit unsigned integer</P>
+<P CLASS="Body">
+<A NAME="pgfId-1449042"></A>UINT32	Generates a 32-bit unsigned integer</P>
+<P CLASS="Body">
+<A NAME="pgfId-1449043"></A>UINT40	Generates a 40-bit unsigned integer</P>
+<P CLASS="Body">
+<A NAME="pgfId-1449044"></A>UINT48	Generates a 48-bit unsigned integer</P>
+<P CLASS="Body">
+<A NAME="pgfId-1449045"></A>UINT56	Generates a 56-bit unsigned integer</P>
+<P CLASS="Body">
+<A NAME="pgfId-1449046"></A>UINT64	Generates a 64-bit unsigned integer</P>
+<P CLASS="Body">
+<A NAME="pgfId-1449047"></A>String	Generates a null-terminated ASCII string (ASCIIZ)</P>
+<P CLASS="Body">
+<A NAME="pgfId-1449048"></A>Unicode	Generates a null terminated Unicode (UTF-16) string</P>
+<P CLASS="Body">
+<A NAME="pgfId-1449049"></A>Buffer	Generates a buffer of 8-bit unsigned integers</P>
+<P CLASS="Body">
+<A NAME="pgfId-1449050"></A>GUID	Generates an encoded GUID in a 16-byte buffer</P>
+<P CLASS="Body">
+<A NAME="pgfId-1449051"></A>Label	Generates a Label at the current location (offset) within the table. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1450317"></A>	This label can be referenced within integer expressions by prepending <BR>
+	the label with a '$' sign.</P>
+</DIV>
+<DIV>
+<H4 CLASS="Heading-3">
+<A NAME="pgfId-1449053"></A>Defining a Known ACPI Table in TDL</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1449055"></A>It is expected that most ACPI tables that will be created via the TDL compiler are ACPI tables that are known to the compiler. This means that the compiler contains the required structure and definition of the table, as per the ACPI specification or other specification for that table.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1449056"></A>For these known ACPI tables, specifying the data for the table involves simply defining the value for each field in the table. The compiler automatically types the data, performs range and any value checks, and generates the appropriate output.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1449057"></A>The starting point for any of the known ACPI tables is the document that specifies the format of the table (usually the ACPI specification), or a table template file generated by an ASL compiler, or even the output of an AML disassembler. Writing the TDL code involves implementing one line of code for each data item specified in the table definition itself.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1449058"></A>For example, the table header for an ACPI table can be defined as simply a sequence of strings and integers. The TDL compiler will format these data items into a 36-byte ACPI header.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449059"></A>            : &quot;ECDT&quot;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449060"></A>            : 00000000</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449061"></A>            : 01</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449062"></A>            : 00</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449063"></A>            : &quot;OEM   &quot;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449064"></A>            : &quot;MACHINE1&quot;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449065"></A>            : 00000001</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449066"></A>            : &quot;&quot;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449067"></A>            : 00000000</P>
+</DIV>
+<DIV>
+<H4 CLASS="Heading-3">
+<A NAME="pgfId-1449069"></A>Defining an Unknown or New ACPI table in TDL</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1449071"></A>For ACPI tables that are new or whose formats are otherwise unknown to the compiler, &quot;generic&quot; data types are introduced to allow the definition of these tables using explicit data types.</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1449072"></A>Examples of Generic Data Types:</H3>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449074"></A>        Label : StartRecord</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449075"></A>        UINT8 : 11</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449076"></A>       UINT16 : $EndRecord - $StartRecord    // Record length</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449077"></A>       UINT24 : 112233</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449078"></A>       UINT32 : 11223344</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449079"></A>       UINT56 : 11223344556677</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449080"></A>       UINT64 : 1122334455667788</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449081"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449082"></A>       String : &quot;This is a string&quot;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449083"></A>   DevicePath : &quot;&#92;PciRoot(0)&#92;Pci(0x1f,1)&#92;Usb(0,0)&quot;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449084"></A>      Unicode : &quot;This string will be encoded to Unicode&quot;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449085"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449086"></A>       Buffer : AA 01 32 4C 77</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449087"></A>         GUID : 11223344-5566-7788-99aa-bbccddeeff00</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449088"></A>        Label : EndRecord</P>
+<DIV>
+<H4 CLASS="Heading-3">
+<A NAME="pgfId-1449091"></A>Table Definition Language Examples</H4>
+<DIV>
+<H5 CLASS="Heading-4">
+<A NAME="pgfId-1449092"></A>ECDT Disassembler Output</H5>
+<P CLASS="Body">
+<A NAME="pgfId-1449094"></A>The output of the iASL disassembler may be used as direct input to the TDL compiler:</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449095"></A>[000h 0000   4]                    Signature : &quot;ECDT&quot; [Embedded Controller Data Table]</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449096"></A>[004h 0004   4]                 Table Length : 0000004E</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449097"></A>[008h 0008   1]                     Revision : 01</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449098"></A>[009h 0009   1]                     Checksum : F4</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449099"></A>[00Ah 0010   6]                       Oem ID : &quot;INTEL &quot;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449100"></A>[010h 0016   8]                 Oem Table ID : &quot;TEMPLATE&quot;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449101"></A>[018h 0024   4]                 Oem Revision : 00000001</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449102"></A>[01Ch 0028   4]              Asl Compiler ID : &quot;INTL&quot;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449103"></A>[020h 0032   4]        Asl Compiler Revision : 20110316</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449104"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449105"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449106"></A>[024h 0036  12]      Command/Status Register : [Generic Address Structure]</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449107"></A>[024h 0036   1]                     Space ID : 01 [SystemIO]</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449108"></A>[025h 0037   1]                    Bit Width : 08</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449109"></A>[026h 0038   1]                   Bit Offset : 00</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449110"></A>[027h 0039   1]         Encoded Access Width : 00 [Undefined/Legacy]</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449111"></A>[028h 0040   8]                      Address : 0000000000000066</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449112"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449113"></A>[030h 0048  12]                Data Register : [Generic Address Structure]</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449114"></A>[030h 0048   1]                     Space ID : 01 [SystemIO]</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449115"></A>[031h 0049   1]                    Bit Width : 08</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449116"></A>[032h 0050   1]                   Bit Offset : 00</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449117"></A>[033h 0051   1]         Encoded Access Width : 00 [Undefined/Legacy]</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449118"></A>[034h 0052   8]                      Address : 0000000000000062</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449119"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449120"></A>[03Ch 0060   4]                          UID : 00000000</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449121"></A>[040h 0064   1]                   GPE Number : 09</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449122"></A>[041h 0065  13]                     Namepath : &quot;&#92;_SB.PCI0.EC&quot;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449123"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449124"></A>Raw Table Data: Length 78 (0x4E)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449125"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449126"></A>  0000: 45 43 44 54 4E 00 00 00 01 F4 49 4E 54 45 4C 20  ECDTN.....INTEL </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449127"></A>  0010: 54 45 4D 50 4C 41 54 45 01 00 00 00 49 4E 54 4C  TEMPLATE....INTL</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449128"></A>  0020: 16 03 11 20 01 08 00 00 66 00 00 00 00 00 00 00  ... ....f.......</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1450780"></A>  0030: 01 08 00 00 62 00 00 00 00 00 00 00 00 00 00 00  ....b...........</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1450781"></A>  0040: 09 5C 5F 53 42 2E 50 43 49 30 2E 45 43 00        .&#92;_SB.PCI0.EC.</P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-4">
+<A NAME="pgfId-1450782"></A>ECDT Definition with Field Comments</H5>
+<P CLASS="Body">
+<A NAME="pgfId-1449134"></A>Similar to the disassembler output but simpler:</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449135"></A>                    Signature : &quot;ECDT&quot;    [Embedded Controller Data Table]</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449136"></A>                 Table Length : 0000004E</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449137"></A>                     Revision : 01</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449138"></A>                     Checksum : F4</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449139"></A>                       Oem ID : &quot;INTEL &quot;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449140"></A>                 Oem Table ID : &quot;TEMPLATE&quot;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449141"></A>                 Oem Revision : 00000001</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449142"></A>              Asl Compiler ID : &quot;INTL&quot;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449143"></A>        Asl Compiler Revision : 20110316</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449144"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449145"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449146"></A>      Command/Status Register : [Generic Address Structure]</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449147"></A>                     Space ID : 01 [SystemIO]</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449148"></A>                    Bit Width : 08</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449149"></A>                   Bit Offset : 00</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449150"></A>         Encoded Access Width : 00 [Undefined/Legacy]</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449151"></A>                      Address : 0000000000000066</P>
+<P CLASS="Body">
+<A NAME="pgfId-1449152"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449153"></A>                Data Register : [Generic Address Structure]</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449154"></A>                     Space ID : 01 [SystemIO]</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449155"></A>                    Bit Width : 08</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449156"></A>                   Bit Offset : 00</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449157"></A>         Encoded Access Width : 00 [Undefined/Legacy]</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449158"></A>                      Address : 0000000000000062</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449159"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449160"></A>                          UID : 00000000</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449161"></A>                   GPE Number : 09</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449162"></A>                     Namepath : &quot;&#92;_SB.PCI0.EC&quot;</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="Heading-3">
+<A NAME="pgfId-1449164"></A>Minimal ECDT Definition</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1449166"></A>An example of a minimal ECDT definition with no Field Names:</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449167"></A>            : &quot;ECDT&quot;    [Embedded Controller Boot Resources Table]</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449168"></A>            : 0000004E</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449169"></A>            : 01</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449170"></A>            : F4</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449171"></A>            : &quot;INTEL &quot;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449172"></A>            : &quot;TEMPLATE&quot;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449173"></A>            : 00000001</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449174"></A>            : &quot;INTL&quot;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449175"></A>            : 20110316</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449176"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449177"></A>            : [Generic Address Structure]</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449178"></A>            : 01 [SystemIO]</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449179"></A>            : 08</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449180"></A>            : 00</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449181"></A>            : 00 [Undefined/Legacy]</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449182"></A>            : 0000000000000066</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449183"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449184"></A>            : [Generic Address Structure]</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449185"></A>            : 01 [SystemIO]</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449186"></A>            : 08</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449187"></A>            : 00</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449188"></A>            : 00 [Undefined/Legacy]</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449189"></A>            : 0000000000000062</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449190"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449191"></A>            : 00000000</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449192"></A>            : 09</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449193"></A>            : &quot;&#92;_SB.PCI0.EC&quot;</P>
+<DIV>
+<H5 CLASS="Heading-4">
+<A NAME="pgfId-1449196"></A>Generic ACPI Table Definition</H5>
+<P CLASS="Body">
+<A NAME="pgfId-1449198"></A>Tables that are not known to the TDL compiler can be defined by using the generic data types. All ACPI tables are assumed to have the common ACPI header, however:</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449199"></A>Signature               : &quot;OEMZ&quot;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449200"></A>Table Length            : 00000052</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449201"></A>Revision                : 01</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449202"></A>Checksum                : 6C</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449203"></A>Oem ID                  : &quot;TEST&quot;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449204"></A>Oem Table ID            : &quot;CUSTOM  &quot;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449205"></A>Oem Revision            : 00000001</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449206"></A>Asl Compiler ID         : &quot;INTL</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449207"></A>Asl Compiler Revision   : 00000001</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449209"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449210"></A>                UINT8   : 01</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449211"></A>                UINT8   : 08</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449212"></A>                UINT8   : 00</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449213"></A>                UINT8   : 00</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449214"></A>                UINT64  : 0000000000000066</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449215"></A>                UINT32  : 00000000</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449216"></A>                UINT8   : 12</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1449217"></A>                String  : &quot;Hello World!&quot;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1346798"></A>&nbsp;</P>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</BODY>
+</HTML>

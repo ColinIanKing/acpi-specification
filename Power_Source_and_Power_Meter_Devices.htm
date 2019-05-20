@@ -1,0 +1,3132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2016/HTML Export Filter">
+<LINK REL="STYLESHEET" HREF="Power_Source_and_Power_Meter_Devices.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE> 10 Power Source and Power Meter Devices</TITLE></HEAD>
+<BODY>
+<DIV>
+<H1 CLASS="Heading-1">
+<A NAME="pgfId-1354804"></A><A NAME="51315"></A>Power Source and Power Meter Devices<DIV>
+<IMG SRC="Power_Source_and_Power_Meter_Devices-1.gif" ALT="">
+</DIV>
+</H1>
+<P CLASS="Body">
+<A NAME="pgfId-1375700"></A>This section specifies the battery, AC adapter, and power source device objects OSPM uses to manage power resources, as well as the power meter device objects OSPM uses to measure power consumption.<A NAME="marker-1375701"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1375702"></A>A battery device is required to either have a Smart Battery subsystem or a Control Method Battery interface as described in this section. OSPM is required to be able to connect and manage a battery on either of these interfaces. This section describes these interfaces.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1375703"></A>In the case of a compatible ACPI Smart Battery Table, the Definition Block needs to include a Bus/Device package for the SMB-HC. This will install an OS-specific driver for the SMBus, which in turn will locate the components of the Smart Battery subsystem. In addition to the battery or batteries, the Smart Battery subsystem includes a charger and a manager device to handle subsystems with multiple batteries.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1375704"></A>The Smart Battery System Manager is one implementation of a manager device that is capable of arbitrating among the available power sources (AC power and batteries) for a system. It provides a superset of the Smart Battery Selector functionality, such as safely responding to power events (AC versus battery power), inserting and removing batteries and notifying the OS of all such changes. Additionally, the Smart Battery System Manager is capable of handling configurations including simultaneous charging and discharging of multiple batteries. Unlike the Smart Battery Selector that shares responsibility for configuring the battery system with OSPM, the Smart Battery System Manager alone controls the safe configuration of the battery system and simply issues status changes to OSPM when the configuration changes. Smart Battery System Manager is the recommended solution for handling multiple-battery systems.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1375705"></A>A Power Meter device is the logical representation of a platform sensor that measures the power consumption of one or more devices in the system. A basic platform implementation implements interfaces that query the current power consumption and get the currently configured power consumption hardware limit, while more advance power meter device implementations provide interfaces that support OSPM configurable power consumption trip points that trigger SCI events, or enable configuration of the underlying hardware to enforce a hard limit on the maximum amount of power that can be consumed. </P>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1375719"></A><A NAME="_Toc489267273"></A><A NAME="_Toc489267662"></A><A NAME="_Toc489272636"></A><A NAME="_Toc202341734"></A><A NAME="_Toc258262414"></A>Smart Battery Subsystems<A NAME="marker-1375718"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1375720"></A>The Smart Battery subsystem is defined by the: </P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375721"></A>System Management Bus Specification (SMBS)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375722"></A>Smart Battery Data Specification (SBDS)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375723"></A>Smart Battery Charger Specification (SBCS)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375724"></A>Smart Battery System Manager Specification (SBSM)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375725"></A>Smart Battery Selector Specification (SBSS)</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1375726"></A>An ACPI-compatible Smart Battery subsystem consists of:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375727"></A>An SMB-HC (CPU to SMB-HC) interface</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375728"></A>At least one Smart Battery</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375729"></A>A Smart Battery Charger</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375730"></A>Either a Smart Battery System Manager or a Smart Battery Selector if more than one Smart Battery is supported</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1375731"></A>In such a subsystem, a standard way of communicating with a Smart Battery and Smart Battery Charger is through the SMBus physical protocols. The Smart Battery System Manager or Smart Battery Selector provides event notification (battery insertion/removal, and so on) and charger SMBus routing capability for any Smart Battery subsystem. A typical Smart Battery subsystem is illustrated below:</P>
+<DIV>
+<H6 CLASS="Pb">
+<A NAME="pgfId-1382311"></A><IMG SRC="Power_Source_and_Power_Meter_Devices-2.gif" ALIGN="BASELINE" ALT="">
+&nbsp;</H6>
+</DIV>
+<DIV>
+<H6 CLASS="FigureTitle">
+<A NAME="pgfId-1382312"></A>Typical Smart Battery Subsystem (SBS)</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1375743"></A>SMBus defines a fixed 7-bit slave address per device. This means that all batteries in the system have the same address (defined to be 0xB). The slave addresses associated with Smart Battery subsystem components are shown in the following table.<A NAME="marker-1375744"></A><A NAME="marker-1375745"></A><A NAME="marker-1375746"></A></P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1375747"></A>Example SMBus Device Slave Addresses</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1375750"></A>SMBus Device Description</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1375752"></A>SMBus Slave Address (A0-A6)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375754"></A>SMBus Host Slave Interface</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375756"></A>0x8</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375758"></A>Smart Battery Charger/Charger Selector or Charger System Manager</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375760"></A>0x9</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375762"></A>Smart Battery System Manager or Smart Battery Selector</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375764"></A>0xA</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375766"></A>Smart Battery</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375768"></A>0xB</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1375771"></A>Each SMBus device has up to 256 registers that are addressed through the SMBus protocol&#8217;s Command value. SMBus devices are addressed by providing the slave address with the desired register&#8217;s Command value. Each SMBus register can have non-linear registers; that is, command register 1 can have a 32-byte string, while command register 2 can have a byte, and command register 3 can have a word.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1375772"></A>The SMBus host slave interface provides a standard mechanism for the host CPU to generate SMBus protocol commands that are required to communicate with SMBus devices (in other words, the Smart Battery components). ACPI defines such an SMB-HC that resides in embedded controller address space; however, an OS can support any SMB-HC that has a native SMB-HC device driver. <A NAME="marker-1375773"></A></P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375784"></A><A NAME="marker-1375780"></A>Event notification for battery insertion and removal</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375785"></A>Event notification for AC power connected or disconnected</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375786"></A>Status of which Smart Battery is communicating with the SMB-HC</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375787"></A>Status of which Smart Battery(s) are powering the system</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375788"></A>Status of which Smart Battery(s) are connected to the charger</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375789"></A>Status of which Smart Batteries are present in the system</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375790"></A>Event notification when the Smart Battery System Manager switches from one power source to another</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375791"></A>Hardware-switching to an alternate Smart Battery when the Smart Battery supplying power runs low</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375792"></A>Hardware switching between battery-powered and AC-powered powered operation</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1442995"></A>&nbsp;</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1375793"></A>The Smart Battery System Manager function can reside in a standalone SMBus slave device (Smart Battery System Manager that responds to the 0xA slave address), may be present within a smart charger device (Smart Battery Charger that responds to the 0x9 slave address), or may be combined within the embedded controller (that responds to the 0xA slave address). If both a Smart Battery Charger and a standalone Smart Battery System Manager are present in the same Smart Battery subsystem, then the driver assumes that the standalone Smart Battery System Manager is wired to the batteries. <A NAME="marker-1375794"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1375795"></A>The Smart Battery charger is an SMBus device that provides a standard programming model to control the charging of Smart Batteries present in a Smart Battery subsystem. For single battery systems, the Smart Battery Charger is also responsible for notifying the system of the battery and AC status. <A NAME="marker-1375796"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1375797"></A>The Smart Battery provides intelligent chemistry-independent power to the system. The Smart Battery is capable of informing the Smart Battery charger of its charging requirements (which provides chemistry independence) and providing battery status and alarm features needed for platform battery management.</P>
+</DIV>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1375810"></A><A NAME="_Toc489267274"></A><A NAME="_Toc489267663"></A><A NAME="_Toc489272637"></A><A NAME="_Toc202341735"></A><A NAME="_Toc258262415"></A>ACPI Smart Battery Status Change Notification Requirements</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1375811"></A>The Smart Battery System Manager, the Smart Battery Selector, and the Smart Battery Charger each have an optional mechanism for notifying the system that the battery configuration or AC status has changed. ACPI requires that this interrupt mechanism be through the SMBus Alarm Notify mechanism.<A NAME="marker-1375812"></A><A NAME="marker-1375813"></A><A NAME="marker-1375814"></A><A NAME="marker-1375815"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1442975"></A>For systems using an embedded controller as the SMBus host, a battery system device issues a status change notification by either mastering the SMBus to send the notification directly to the SMBus host, or by emulating it in the embedded controller. In either case, the process is the same. After the notification is received or emulated, the embedded controller asserts an SCI. The source of the SCI is identified by a GPE that indicates the SCI was caused by the embedded controller. The embedded controller&#8217;s status register alarm bit is set, indicating that the SMBus host received an alarm message. The Alarm Address Register contains the address of the SMBus device that originated the alarm and the Alarm Data Registers contain the contents of that device&#8217;s status register.<A NAME="marker-1442976"></A></P>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1441880"></A>Smart Battery Charger</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1375828"></A>This requires a Smart Battery Charger, on a battery or AC status change, to generate an SMBus Alarm Notify. The contents of the Smart Battery Charger&#8217;s ChargerStatus() command register (0x13) is placed in the embedded controller&#8217;s Alarm Data Registers, the Smart Battery Charger&#8217;s slave address<A HREF="#pgfId-1375831" CLASS="footnote">1</A> (0x09) is placed in the embedded controller&#8217;s Alarm Address Register and the EC&#8217;s Status Register&#8217;s Alarm bit is set. The embedded controller then asserts an SCI. </P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1375834"></A>S<A NAME="_Toc489267276"></A>mart Battery Charger with optional System Manager or Selector</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1375835"></A>A Smart Battery Charger that contains the optional System Manager or Selector function (as indicated by the ChargerSpecInfo() command register, 0x11, bit 4) is required to generate an SMBus Alarm Notify on a battery or AC status change. The content of the Smart Battery Charger with an optional System Manager, the BatterySystemState() command register (0x21) (or in the case of an optional Selector, the SelectorState() (0x01) ), is placed in the EC&#8217;s Alarm Data Registers, the Smart Battery Charger&#8217;s slave address (0x09) is placed in the embedded controller&#8217;s Alarm Address Register, and the embedded controller&#8217;s Status Register&#8217;s Alarm bit is set. The embedded controller then asserts an SCI.</P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1375840"></A>S<A NAME="_Toc489267277"></A>mart Battery System Manager<A NAME="marker-1375839"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1375841"></A>The Smart Battery System Manager is required to generate an SMBus Alarm Notify on a battery or AC status change. The content of the Smart Battery System Manager&#8217;s BatterySystemState() command register (0x01) is placed in the EC&#8217;s Alarm Data Registers, the Smart Battery System Manager&#8217;s slave address (0x0A) is placed in the EC&#8217;s Alarm Address Register, and the embedded controller&#8217;s Status Register&#8217;s Alarm bit is set. The embedded controller then asserts an SCI.</P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1375846"></A>S<A NAME="_Toc489267278"></A>mart Battery Selector<A NAME="marker-1375845"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1442964"></A>The requirements for the Smart Battery Selector are the same as the requirements for the Smart Battery System Manager, with the exception that the contents of the SelectorState() command register (0x01) are used instead of BatterySystemState(). The Smart Battery Selector is a subset of the Smart Battery System Manager and does not have the added support for simultaneous charge/discharge of multiple batteries. The System Manager is the preferred implementation.</P>
+</DIV>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1442967"></A><A NAME="marker-1442965"></A>Smart Battery Objects</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1441826"></A>The Smart Battery subsystem requires a number of objects to define its interface. These are summarized below:</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1441845"></A>Smart Battery Objects</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1441829"></A>Object</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1441831"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1441834"></A>_HID<A NAME="marker-1441833"></A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1441835"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1441837"></A>This is the hardware ID named object that contains a string. For Smart Battery subsystems, this object returns the value of &#8220;ACPI0002.&#8221; This identifies the Smart Battery subsystem to the Smart Battery driver. <A NAME="marker-1441838"></A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1441841"></A>_SBS<A NAME="marker-1441840"></A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1441842"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1441844"></A>This is the Smart Battery named object that contains a DWORD. This named object returns the configuration of the Smart Battery.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1375897"></A><A NAME="_Toc375244438"></A><A NAME="_Toc375924834"></A><A NAME="_Toc423760059"></A><A NAME="_Toc457804316"></A><A NAME="_Toc486665521"></A><A NAME="_Toc489267280"></A><A NAME="_Toc489267665"></A><A NAME="_Toc489272639"></A><A NAME="RSVD_SBS"></A><A NAME="_Toc202341737"></A><A NAME="_Toc258262417"></A>_SBS (Smart Battery Subsystem) <A NAME="marker-1375911"></A><A NAME="marker-1375912"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1375914"></A>The _SBS control method returns the configuration of the Smart Battery subsystem. This named object returns a DWORD value with a number from 0 to 4. If the number of batteries is greater than 0, then the Smart Battery driver assumes that a Smart Battery System Manager or Smart Battery Selector is present. If 0, then the Smart Battery driver assumes a single Smart Battery and neither a Smart Battery System Manager nor Smart Battery Selector is present.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1375915"></A>The DWORD returned by _SBS is encoded as follows:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375916"></A>0 - Maximum of one Smart Battery and no Smart Battery System Manager or Smart Battery Selector.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375917"></A>1 - Maximum of one Smart Battery and a Smart Battery System Manager or Smart Battery Selector.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375918"></A>2 - Maximum of two Smart Batteries and a Smart Battery System Manager or Smart Battery Selector.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375919"></A>3 - Maximum of three Smart Batteries and a Smart Battery System Manager or Smart Battery Selector.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1375920"></A>4 - Maximum of four Smart Batteries and a Smart Battery System Manager or Smart Battery Selector.</LI>
+</UL>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1375921"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1375922"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1375923"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1375924"></A>An Integer containing the Smart Battery subsystem configuration:</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1442450"></A>0 -	Maximum 1 Smart Battery, system manager/selector not present</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1442451"></A>1 -	Maximum 1 Smart Battery, system manager/selector present</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1442452"></A>2 -	Maximum 2 Smart Batteries, system manager/selector present</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1378780"></A>3 -	Maximum 3 Smart Batteries, system manager/selector present</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1378781"></A>4 -	Maximum 4 Smart Batteries, system manager/selector present</P>
+<P CLASS="Body">
+<A NAME="pgfId-1375931"></A>The maximum number of batteries is for the entire system. Therefore, if the platform is capable of supporting four batteries, but only two are normally present in the system, then this field should return 4. Notice that a value of 0 indicates a maximum support of one battery and there is no Smart Battery System Manager or Smart Battery Selector present in the system</P>
+<P CLASS="Body">
+<A NAME="pgfId-1375932"></A>As the SMBus is not an enumerable bus, all devices on the bus must be declared in the ACPI name-space. As the Smart Battery driver understands Smart Battery, Smart Battery Charger, and Smart Battery System Manager or Smart Battery Selector; only a single device needs to be declared per Smart Battery subsystem. The driver gets information about the subsystem through the hardware ID (which defines a Smart Battery subsystem) and the number of Smart Batteries supported on this subsystem (_SBS named object). The ACPI Smart Battery table indicates the energy levels of the platform at which the system should warn the user and then enter a sleeping state. The Smart Battery driver then reflects these as threshold alarms for the Smart Batteries.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1375933"></A>A Smart Battery device declaration in the ACPI namespace requires the _GLK object if potentially contentious accesses to device resources are performed by non-OS code. See <A HREF="Device_Configuration.htm#_Toc489256077" CLASS="XRef">See _GLK (Global Lock).</A> &#8220;_GLK (Global Lock),&#8221; for details about the _GLK object.</P>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1375942"></A>E<A NAME="_Toc489267281"></A>xample: Single Smart Battery Subsystem<A NAME="marker-1375941"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1375943"></A>This section illustrates how to define a Smart Battery subsystem containing a single Smart Battery and charger. The platform implementation is illustrated below:</P>
+<P CLASS="spacing">
+<A NAME="pgfId-1375944"></A>&nbsp;</P>
+</DIV>
+<DIV>
+<H5 CLASS="Normal">
+<A NAME="pgfId-1375948"></A><IMG SRC="Power_Source_and_Power_Meter_Devices-3.gif" ALIGN="BASELINE" ALT="">
+&nbsp;</H5>
+<DIV>
+<H6 CLASS="FigureTitle">
+<A NAME="pgfId-1375949"></A>Single Smart Battery Subsystem</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1375950"></A>In this example, the platform is using an SMB-HC that resides within the embedded controller and meets the ACPI standard for an embedded controller interface and SMB-HC interface. The embedded controller interface sits at system I/O port addresses 0x62 and 0x66. The SMB-HC is at base address 0x80 within embedded controller address space (as defined by the ACPI embedded controller specification) and responds to events on query value 0x30.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1375951"></A>In this example the Smart Battery subsystem only supports a single Smart Battery. The ASL code for describing this interface is shown below:</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375953"></A>Device (EC0) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375954"></A>    Name (_HID, EISAID(&quot;PNP0C09&quot;))</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375955"></A>    Name (_CRS, </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375956"></A>        ResourceTemplate () {             // port 0x62 and 0x66</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375957"></A>            IO (Decode16, 0x62, 0x62, 0, 1),</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375958"></A>            IO (Decode16, 0x66, 0x66, 0, 1)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375959"></A>        }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375960"></A>    )</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375961"></A>    Name (_GPE, 0)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375962"></A>    Device (SMB0) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375963"></A>        Name (_HID, &quot;ACPI0001&quot;)            // Smart Battery Host Controller</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375964"></A>        Name (_EC, 0x8030)                 // EC offset (0x80), Query (0x30)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375965"></A>        Device (SBS0){                     // Smart Battery Subsystem</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375966"></A>            Name (_HID, &quot;ACPI0002&quot;)        // Smart Battery Subsystem ID</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375967"></A>            Name(_SBS, 0x1)                // Indicates support for one battery</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375968"></A>        } // end of SBS0    </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375969"></A>    } // end of SMB0</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375970"></A>} // end of EC</P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1375980"></A>M<A NAME="_Toc489267282"></A>ultiple Smart Battery Subsystem: Example<A NAME="marker-1375978"></A><A NAME="marker-1375979"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1375981"></A>This section illustrates how to define a Smart Battery subsystem that contains three Smart Batteries, a Smart Battery System Manager, and a Smart Battery Charger. The platform implementation is illustrated below:</P>
+<P CLASS="spacing">
+<A NAME="pgfId-1375982"></A>&nbsp;</P>
+</DIV>
+<DIV>
+<H6 CLASS="Art">
+<A NAME="pgfId-1375986"></A><IMG SRC="Power_Source_and_Power_Meter_Devices-4.gif" ALIGN="BASELINE" ALT="">
+&nbsp;</H6>
+<DIV>
+<H6 CLASS="FigureTitle">
+<A NAME="pgfId-1375987"></A>Smart Battery Subsystem</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1375988"></A>In this example, the platform is using an SMB-HC that resides within the embedded controller and meets the ACPI standard for an embedded controller interface and SMB-HC interface. The embedded controller interface sits at system I/O port addresses 0x100 and 0x101. The SMB-HC resides at base address 0x90 within embedded controller address space (as defined by the ACPI embedded controller specification) and responds to events on query value 0x31.<A NAME="marker-1375989"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1375990"></A>In this example the Smart Battery subsystem supports three Smart Batteries. The Smart Battery Charger and Smart Battery System Manager reside within the embedded controller, meet the Smart Battery System Manager and Smart Battery Charger interface specification, and respond to their 7-bit addresses (0xA and 0x9 respectively). The ASL code for describing this interface is shown below:</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375992"></A><A NAME="marker-1375991"></A>Device (EC1) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375993"></A>    </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375994"></A>Name (_HID, EISAID(&quot;PNP0C09&quot;))</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375995"></A>    Name (_CRS, </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375996"></A>        ResourceTemplate () {              // port 0x100 and 0x101</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375997"></A>            IO(Decode16, 0x100, 0x100, 0, 2) </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375998"></A>        }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1375999"></A>    )</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376000"></A>    Name (_GPE, 1)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376001"></A>    Device (SMB1) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376002"></A>        Name (_HID, &quot;ACPI0001&quot;)            // Smart Battery Host Controller</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376003"></A>        Name (_EC, 0x9031)                 // EC offset (0x90), Query (0x31)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376004"></A>        Device (SBS1){                     // Smart Battery Subsystem</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376005"></A>            Name (_HID, &quot;ACPI0002&quot;)        // Smart Battery Subsystem ID</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376006"></A>            Name (_SBS, 0x3)               // Indicates support for three batteries</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376007"></A>        } // end of SBS1    </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376008"></A>    } // end of SMB1</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376009"></A>} // end of EC</P>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1376025"></A><A NAME="_Toc489267283"></A><A NAME="_Toc489267666"></A><A NAME="_Toc489272640"></A><A NAME="_Toc202341738"></A><A NAME="_Toc258262418"></A>Control Method Batteries<A NAME="marker-1376023"></A><A NAME="marker-1376024"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1376026"></A>The following section illustrates the operation and definition of the Control Method Battery.</P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1376046"></A><A NAME="_Toc489267284"></A><A NAME="_Toc489267667"></A><A NAME="_Toc489272641"></A><A NAME="_Toc202341739"></A><A NAME="_Toc258262419"></A>Battery Events<A NAME="marker-1376043"></A><A NAME="marker-1376044"></A><A NAME="marker-1376045"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1376047"></A>The AML code handling an SCI for a battery event notifies the system of which battery&#8217;s status may have changed. The OS uses the _BST control method to determine the current status of the batteries and what action, if any, should be taken (for more information about the _BST control method, see <A HREF="Power_Source_and_Power_Meter_Devices.htm#_Toc489267285" CLASS="XRef">See Battery Control Methods.</A>, &#8220;Battery Control Methods&#8221;). The typical action is to notify applications monitoring the battery status to provide the user with an up-to-date display of the system battery state. But in some cases, the action may involve generating an alert or even forcing a system into a sleeping state. In any case, any changes in battery status should generate an SCI in a timely manner to keep the system power state UI consistent with the actual state of the system battery (or batteries).</P>
+<P CLASS="Body">
+<A NAME="pgfId-1376048"></A>Unlike most other devices, when a battery is inserted or removed from the system, the device itself (the battery bay) is still considered to be present in the system. For most systems, the _STA for this device will always return a value with bits 0-3 set and will toggle bit 4 to indicate the actual presence of a battery (see <A HREF="Device_Configuration.htm#21712" CLASS="XRef">See _STA (Status).</A>, &#8220;_STA [Status]&#8221;). When this insertion or removal occurs, the AML code handler for this event should issue a Notify(battery_device, 0x81) to indicate that the static battery information has changed. For systems that have battery slots in a docking station or batteries that cannot be surprise-removed, it may be beneficial or necessary to indicate that the entire device has been removed. In this case, the standard methods and notifications described in <A HREF="Device_Configuration.htm#_Toc489256059" CLASS="XRef">See Device Insertion, Removal, and Status Objects.</A>, &#8220;Device Insertion, Removal, and Status Objects,&#8221; should be used. <A NAME="marker-1376049"></A><A NAME="marker-1376050"></A><A NAME="marker-1376051"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1376052"></A>When the present state of the battery has changed or when the trip point set by the _BTP control method is reached or crossed, the hardware will assert a general purpose event. The AML code handler for this event issues a Notify(battery_device, 0x80) on the battery device. This notification is also sent when the Status Flags returned from _BMD change.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1376053"></A>In the case where the remaining battery capacity becomes critically low, the AML code handler issues a Notify(battery_device, 0x80) and reports the battery critical flag in the _BST object. The OS performs an emergency shutdown. For a full description of the critical battery state, see <A HREF="ACPI_Concepts.htm#_Toc489255978" CLASS="XRef">See Low Battery Levels.</A>, &#8220;Low Battery Levels.&#8221;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1376054"></A>Sometimes the value to be returned from _BST or _BIF will be temporarily unknown. In this case, the method may return the value 0xFFFFFFFF as a placeholder. When the value becomes known, the appropriate notification (0x80 for _BST or 0x81 for BIF) should be issued, in like manner to any other change in the data returned by these methods. This will cause OSPM to re-evaluate the method--obtaining the correct data value.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1376055"></A>When one or more of the status flags returned by the _BMD control method change, AML code issues a Notify(battery_device, 0x82) on the battery device unless this change occurs during a call to _BMC and the value of the status flags in _BMD match the value passed in to _BMC. If the value of the status bits cannot be set to reflect the action requested by the executing _BMC, the AML code will issue this notification. For example, calling _BMC with bit 0 set to initiate a calibration cycle while AC power is not available will cause AML to issue a Notify(battery_device, 0x82).</P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1376079"></A><A NAME="_Toc489267285"></A><A NAME="_Toc489267668"></A><A NAME="_Toc489272642"></A><A NAME="_Toc202341740"></A><A NAME="_Toc258262420"></A>Battery Control Methods</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1376080"></A>The Control Method Battery is a battery with an AML code interface between the battery and the host PC. The battery interface is completely accessed by AML code control methods, allowing the OEM to use any type of battery and any kind of communication interface supported by ACPI. OSPM requires accurate battery data to perform optimal power management policy and to provide the end user with a meaningful estimation of remaining battery life. As such, control methods that return battery information should calculate this information rather than return hard coded data.<A NAME="marker-1376081"></A><A NAME="marker-1376082"></A><A NAME="marker-1376083"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1376084"></A>A Control Method Battery is described as a device object. Each device object supporting the Control Method Battery interface contains the following additional control methods. When there are two or more batteries in the system, each battery will have an independent device object in the namespace.</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1376085"></A><A NAME="18372"></A>Battery Control Methods</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1436373"></A>Object</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1436375"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376092"></A>_BIF</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376094"></A>Returns static information about a battery (in other words, model number, serial number, design voltage, and so on).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376096"></A>_BIX</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376098"></A>Returns extended static information about a battery (in other words, model number, serial number, design voltage, and so on).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376100"></A>_OSC</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376102"></A>OSPM Capabilities conveyance for batteries.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376104"></A>_BMA</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376106"></A>Sets the averaging interval of the battery capacity measurement, in milliseconds.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376108"></A>_BMS</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376110"></A>Sets the sampling time of the battery capacity measurement, in milliseconds.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376112"></A>_BST</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376114"></A>Returns the current battery status (in other words, dynamic information about the battery, such as whether the battery is currently charging or discharging, an estimate of the remaining battery capacity, and so on).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1443457"></A>_BTH</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1443459"></A>Communicates battery thermal throttle limit set by battery thermal zone.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376116"></A>_BTP</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376118"></A>Sets the Battery Trip point, which generates an SCI when batterycapacity reaches the specified point.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376120"></A>_PCL</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376122"></A>List of pointers to the device objects representing devices powered by the battery.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376124"></A>_STA</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376126"></A>Returns general status of the battery (for a description of the _STA control method, see <A HREF="Device_Configuration.htm#21712" CLASS="XRef">See _STA (Status).</A>, &#8220;_STA (Status]&#8221;).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376128"></A>_BTM</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376130"></A>Returns battery estimated runtime at the present average rate of drain, or the runtime at a specified rate.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376132"></A>_BCT</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376134"></A>Returns battery estimated charging time.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376136"></A>_BMD</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376138"></A>Returns battery information related to battery recalibration and charging control.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376140"></A>_BMC</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376142"></A>Control calibration and charging.</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1376153"></A><A NAME="_Toc369679876"></A><A NAME="_Toc369801493"></A><A NAME="_Toc369936266"></A><A NAME="_Toc370017356"></A><A NAME="_Toc374114800"></A><A NAME="_Toc375244444"></A><A NAME="_Toc375924840"></A><A NAME="_Toc423760065"></A>A Control Method Battery device declaration in the ACPI namespace requires the _GLK object if potentially contentious accesses to device resources are performed by non-OS code. See <A HREF="Device_Configuration.htm#_Toc489256077" CLASS="XRef">See _GLK (Global Lock).</A>, &#8220;_GLK (Global Lock),&#8221; for details about the _GLK object.</P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1376159"></A><A NAME="_Toc489267286"></A><A NAME="RSVD_BIF"></A>_BIF (Battery Information)<A NAME="marker-1376157"></A><A NAME="marker-1376158"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1376160"></A>This object returns the static portion of the Control Method Battery information. This information remains constant until the battery is changed. This object is deprecated in ACPI 4.0. The _BIX object provides expanded battery information and includes all of the information provide by _BIF. See <A HREF="Power_Source_and_Power_Meter_Devices.htm#RSVD_BIX" CLASS="XRef">See _BIX (Battery Information Extended).</A>, &#8220;Battery Information Extended&#8221;). </P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1376161"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1376162"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1376163"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1376164"></A>A Package containing the battery information as described below.</P>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1376165"></A>Return Value Information:</H3>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1376166"></A>_BIF returns a package in the format below</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376167"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376168"></A>Package {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376169"></A>    Power Unit                         // Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376170"></A>    Design Capacity                    // Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376171"></A>    Last Full Charge Capacity          // Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376172"></A>    Battery Technology                 // Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376173"></A>    Design Voltage                     // Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376174"></A>    Design Capacity of Warning         // Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376175"></A>    Design Capacity of Low             // Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376176"></A>    Battery Capacity Granularity 1     // Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376177"></A>    Battery Capacity Granularity 2     // Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376178"></A>    Model Number                       // String (ASCIIZ)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376179"></A>    Serial Number                      // String (ASCIIZ)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376180"></A>    Battery Type                       // String (ASCIIZ)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376181"></A>    OEM Information                    // String (ASCIIZ)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376182"></A>}</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1378914"></A>BIF Return Package Values</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1436387"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1436389"></A>Format</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1436391"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378923"></A>Power Unit</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378925"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378927"></A>Indicates the units used by the battery to report its capacity and charge/discharge rate information to the OS.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1378928"></A>0x00000000 - Capacity information is reported in [mWh] and charge/discharge rate information in [mW].</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1378929"></A>0x00000001 - Capacity information is reported in [mAh] and charge/discharge rate information in [mA].</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378931"></A>Design Capacity</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378933"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378935"></A>Battery&#8217;s design capacity. Design Capacity is the nominal capacity of a new battery. The Design Capacity value is expressed as power [mWh] or current [mAh] depending on the Power Unit value.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1378936"></A>0x000000000 - 0x7FFFFFFF (in [mWh] or [mAh] )<BR>
+0xFFFFFFFF - Unknown design capacity</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378938"></A>Last Full Charge Capacity</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378940"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378942"></A>Predicted battery capacity when fully charged. The Last Full Charge Capacity value is expressed as power (mWh) or current (mAh) depending on the Power Unit value.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1378943"></A>0x000000000h - 0x7FFFFFFF (in [mWh] or [mAh] )<BR>
+0xFFFFFFFF - Unknown last full charge capacity</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378945"></A>Battery Technology</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378947"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378949"></A>0x00000000 - Primary (for example, non-rechargeable)<BR>
+0x00000001 - Secondary (for example, rechargeable)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378951"></A>Design Voltage</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378953"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378955"></A>Nominal voltage of a new battery.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1378956"></A>0x000000000 - 0x7FFFFFFF in [mV]<BR>
+0xFFFFFFFF - Unknown design voltage</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378958"></A>Design capacity of Warning</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378960"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378962"></A>OEM-designed battery warning capacity. See <A HREF="ACPI_Concepts.htm#_Toc489255978" CLASS="XRef">See Low Battery Levels.</A>, &#8220;Low Battery Levels.&#8221;</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1378963"></A>0x000000000 - 0x7FFFFFFF in [mWh] or [mAh]</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378965"></A>Design Capacity of Low</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378967"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378969"></A>OEM-designed low battery capacity. See <A HREF="ACPI_Concepts.htm#_Toc489255978" CLASS="XRef">See Low Battery Levels.</A>, &#8220;Low Battery Levels.&#8221;</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1378970"></A>0x000000000 - 0x7FFFFFFF in [mWh] or [mAh]</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378972"></A>Battery Capacity Granularity 1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378974"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378976"></A>Battery capacity granularity between low and warning in [mAh] or [mWh]. That is, this is the smallest increment in capacity that the battery is capable of measuring. See note below for more details</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378978"></A>Battery Capacity Granularity 2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378980"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378982"></A>Battery capacity granularity between warning and Full in [mAh] or [mWh]. That is, this is the smallest increment in capacity that the battery is capable of measuring. This may be a different value than Battery Capacity Granularity 1 to accommodate systems where the granularity accuracy may change depending on the battery level. See note below for more details.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378984"></A>Model Number</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378986"></A>String (ASCIIZ)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378988"></A>OEM-specific Control Method Battery model number</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378990"></A>Serial Number</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378992"></A>String (ASCIIZ)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378994"></A>OEM-specific Control Method Battery serial number</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378996"></A>Battery Type</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378998"></A>String (ASCIIZ)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1379000"></A>The OEM-specific Control Method Battery type</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1379002"></A>OEM Information</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1379004"></A>String (ASCIIZ)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1379006"></A>OEM-specific information for the battery that the UI uses to display the OEM information about the Battery. If the OEM does not support this information, this field should contain a NULL string.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1379015"></A><A NAME="_Toc369801494"></A><A NAME="_Toc369936267"></A><A NAME="_Toc370017357"></A><A NAME="_Toc374114801"></A><A NAME="_Toc375244445"></A><A NAME="_Toc375924841"></A><A NAME="_Toc423760066"></A>Additional Notes:</H3>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1376300"></A>A secondary-type battery should report the corresponding capacity (except for Unknown).</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1376301"></A>On a multiple-battery system, all batteries in the system should return the same granularity.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1376302"></A>Operating systems prefer these control methods to report data in terms of power (watts).</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1376303"></A>On a multiple-battery system, all batteries in the system must use the same power unit.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1376304"></A>The definition of battery capacity granularity has been clarified. For OSPM to determine if systems support the clarified definition of battery capacity granularity, OSPM may evaluate an _OSC method at the battery scope to indicate support for this capability, and for the platform to indicate if it supports these extended capabilities.</LI>
+</UL>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1376307"></A>   _BIX (Battery Information Extended)<A NAME="RSVD_BIX"></A><A NAME="marker-1376308"></A><A NAME="marker-1376309"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1376312"></A>The _BIX object returns the static portion of the Control Method Battery information. This information remains constant until the battery is changed. The _BIX object returns all information available via the _BIF object plus additional battery information. The _BIF object is deprecated in lieu of _BIX in ACPI 4.0.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1376313"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1376314"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1376315"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1376316"></A>A Package containing the battery information as described below</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1376317"></A>Return Value Information:</H3>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1376318"></A>_BIX returns a package in the format below</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443684"></A>Package {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443685"></A>    // ASCIIZ is ASCII character string terminated with a 0x00. </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443686"></A>    Revision                            //Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443687"></A>    Power Unit                          //Integer (DWORD)     </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1444152"></A>    Design Capacity                     //Integer (DWORD)     </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1444155"></A>    Last Full Charge Capacity           //Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443688"></A>    Battery Technology                  //Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443689"></A>    Design Voltage                      //Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443690"></A>    Design Capacity of Warning          //Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443691"></A>    Design Capacity of Low              //Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443692"></A>    Cycle Count                         //Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443693"></A>    Measurement Accuracy                //Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443694"></A>    Max Sampling Time                   //Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443695"></A>    Min Sampling Time                   //Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443696"></A>    Max Averaging Interval              //Integer (DWORD) </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1444146"></A>    Min Averaging Interval              //Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443697"></A>    Battery Capacity Granularity 1      //Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1444149"></A>    Battery Capacity Granularity 2      //Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443698"></A>    Model Number                        //String (ASCIIZ)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443699"></A>    Serial Number                       //String (ASCIIZ)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443700"></A>    Battery Type                        //String (ASCIIZ)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443701"></A>    OEM Information                     //String (ASCIIZ)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443702"></A>    Battery Swapping Capability         //Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1444158"></A>}</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1376351"></A><A NAME="10897"></A>BIX Return Package Values</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1436685"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1436687"></A>Format</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1436689"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436539"></A>Revision</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436541"></A>Integer</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436543"></A>Current revision is: 1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436545"></A>Power Unit</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436547"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436549"></A>Indicates the units used by the battery to report its capacity and charge/discharge rate information to the OS.</P>
+<UL>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1436550"></A>0x00000000 - Capacity information is reported in [mWh] and charge/discharge rate information in [mW].</LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1436551"></A>0x00000001 - Capacity information is reported in [mAh] and charge/discharge rate information in [mA].</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436553"></A>Design Capacity</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436555"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436557"></A>Battery&#8217;s design capacity. Design Capacity is the nominal capacity of a new battery. The Design Capacity value is expressed as power [mWh] or current [mAh] depending on the Power Unit value.</P>
+<UL>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1436558"></A>0x000000000 - 0x7FFFFFFF (in [mWh] or [mAh] )</LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1442924"></A>0xFFFFFFFF - Unknown design capacity</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436560"></A>Last Full Charge Capacity</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436562"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436564"></A>Predicted battery capacity when fully charged. The Last Full Charge Capacity value is expressed as power (mWh) or current (mAh) depending on the Power Unit value.</P>
+<UL>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1436565"></A>0x000000000h - 0x7FFFFFFF (in [mWh] or [mAh] )</LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1442914"></A>0xFFFFFFFF - Unknown last full charge capacity</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436567"></A>Battery Technology</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436569"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<UL>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1436571"></A>0x00000000 - Primary (for example, non-rechargeable)</LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1442904"></A>0x00000001 - Secondary (for example, rechargeable)</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436573"></A>Design Voltage</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436575"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436577"></A>Nominal voltage of a new battery.</P>
+<UL>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1436578"></A>0x000000000 - 0x7FFFFFFF in [mV]</LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1442894"></A>0xFFFFFFFF - Unknown design voltage</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436580"></A>Design capacity of Warning</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436582"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436587"></A>OEM-designed battery warning capacity. See <A HREF="ACPI_Concepts.htm#_Toc489255978" CLASS="XRef">See Low Battery Levels.</A>, &#8220;Low Battery Levels.&#8221;</P>
+<UL>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1436588"></A>0x000000000 - 0x7FFFFFFF in [mWh] or [mAh]</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436590"></A>Design Capacity of Low</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436592"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436597"></A>OEM-designed low battery capacity. See <A HREF="ACPI_Concepts.htm#_Toc489255978" CLASS="XRef">See Low Battery Levels.</A>, &#8220;Low Battery Levels.&#8221;</P>
+<UL>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1436598"></A>0x000000000 - 0x7FFFFFFF in [mWh] or [mAh]</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436612"></A>Cycle Count</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436614"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436616"></A>The number of cycles the battery has experienced. A cycle is defined as:</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1436617"></A>An amount of discharge approximately equal to the value of Design Capacity.</P>
+<UL>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1436618"></A>0x000000000 - 0xFFFFFFFE </LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1442887"></A>0xFFFFFFFF - Unknown cycle count</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436620"></A>Measurement Accuracy</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436622"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436624"></A>The accuracy of the battery capacity measurement, in thousandth of a percent. (0% - 100.000%) For example, The value 80000 would mean 80% accuracy.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436626"></A>Max Sampling Time</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436628"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436630"></A>The sampling time is the duration between two consecutive measurements of the battery&#8217;s capacities specified in _BST, such as present rate and remaining capacity. If the OSPM makes two succeeding readings through _BST beyond the duration, two different results will be returned. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1436631"></A>The Max Sampling Time is the maximum sampling time the battery can support, in milliseconds.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1436632"></A>0xFFFFFFFF is returned if the information is unavailable. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436634"></A>Min Sampling Time</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436636"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436638"></A>The Min Sampling Time is the minimum sampling time the battery can support, in milliseconds.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1436639"></A>0xFFFFFFFF is returned if the information is unavailable. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436641"></A>Max Averaging Interval</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436643"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436645"></A>The Average Interval is the length of time (in milliseconds) within which the battery averages the capacity measurements specified in _BST, such as remaining capacity and present rate.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1436646"></A>The Sampling time specifies the frequency of measurements, and the average interval specifies the width of the time window of every measurement.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1436647"></A>This field indicates the maximum Average Interval that the battery supports.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436649"></A>Min Averaging Interval</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436651"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436653"></A>This field indicates the minimum Average Interval that the battery supports</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1443168"></A>Battery Capacity Granularity 1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1443170"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1443172"></A>Battery capacity granularity between low and warning in [mAh] or [mWh]. That is, this is the smallest increment in capacity that the battery is capable of measuring. See note below for more details</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1443174"></A>Battery Capacity Granularity 2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1443176"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1443178"></A>Battery capacity granularity between warning and Full in [mAh] or [mWh].  That is, this is the smallest increment in capacity that the battery is capable of measuring. This may be a different value than Battery Capacity Granularity 1 to accommodate systems where the granularity accuracy may change depending on the battery level. See note below for more details.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436655"></A>Model Number</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436657"></A>String (ASCIIZ)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436659"></A>OEM-specific Control Method Battery model number</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436661"></A>Serial Number</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436663"></A>String (ASCIIZ)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436665"></A>OEM-specific Control Method Battery serial number</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436667"></A>Battery Type</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436669"></A>String (ASCIIZ)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436671"></A>The OEM-specific Control Method Battery type</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436673"></A>OEM Information</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436675"></A>String (ASCIIZ)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436677"></A>OEM-specific information for the battery that the UI uses to display the OEM information about the Battery. If the OEM does not support this information, this field should contain a NULL string.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1444162"></A>Battery Swapping Capability</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1444170"></A>Integer (DWORD)</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1444164"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<UL>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1444194"></A>0x00000000 Non swappable battery (for example, sealed internal battery not accessible to user)</LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1444195"></A>0x00000001 Cold swappable battery, i.e. batteries that require system to be shut down in order to replace the battery while on DC power (for example, phone and laptop batteries accessible to user)</LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1444196"></A>0x00000010 Hot swappable battery, i.e. batteries that do not require the system to be shut down in order to replace/remove the battery while on DC power  (for example, accessory batteries, cd tray batteries, external batteries, dock batteries, keyboard batteries)</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1376502"></A> A secondary-type battery should report the corresponding capacity (except for Unknown).</LI>
+<LI CLASS="Note">
+<A NAME="pgfId-1376503"></A>On a multiple-battery system, all batteries in the system should return the same granularity.</LI>
+<LI CLASS="Note">
+<A NAME="pgfId-1376504"></A>Operating systems prefer these control methods to report data in terms of power (watts).</LI>
+<LI CLASS="Note">
+<A NAME="pgfId-1376505"></A>On a multiple-battery system, all batteries in the system must use the same power unit.</LI>
+<LI CLASS="Note">
+<A NAME="pgfId-1376506"></A>The definition of battery capacity granularity has been clarified. For OSPM to determine if systems support the clarified definition of battery capacity granularity, OSPM may evaluate an _OSC method at the battery scope to indicate support for this capability, and for the platform to indicate if it supports these extended capabilities.</LI>
+</UL>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1376507"></A>   _OSC Definition for Control Method Battery</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1376508"></A>_OSC for control method battery is uniquely identified by the UUID: </P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1376509"></A>F18FC78B-0F15-4978-B793-53F833A1D35B</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1376510"></A>The Revision 1 capabilities described under this _OSC are defined in <A HREF="Power_Source_and_Power_Meter_Devices.htm#95955" CLASS="XRef">See Control Method Battery _OSC Capabilities DWORD2 Bit Definitions.</A>.</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1376511"></A><A NAME="95955"></A>Control Method Battery _OSC Capabilities DWORD2 Bit Definitions</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1376514"></A>Capabilities DWORD2 bits</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1376516"></A>Interpretation</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376518"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376520"></A>0 - OS does not support revised battery granularity definition.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1376521"></A>1 - OS supports revised battery granularity definition.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376523"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376525"></A>0 - OS does not support specifying wake on low battery user preference.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1376526"></A>1 - OS supports specifying wake on low battery user preference, See <A HREF="ACPIdefined_Devices_and_DeviceSpecificObjects.htm#RSVD_BLT" CLASS="XRef">See _BLT (Battery Level Threshold).</A>, _BLT Battery Level Threshold) for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376528"></A>2-31</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376530"></A><EM CLASS="Italic">
+Reserved</EM>
+</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1376533"></A>Bits defined in Capabilities DWORD2 provide information regarding OS supported features. Contents in DWORD2 are passed one-way; the OS will disregard the corresponding bits of DWORD2 in the Return Code. </P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1376537"></A><A NAME="22616"></A>_BMA (Battery Measurement Averaging Interval<A NAME="marker-1376536"></A>)</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1376543"></A><A NAME="marker-1376538"></A><A NAME="marker-1376539"></A><A NAME="marker-1376540"></A>This object is used to set the averaging interval of the battery capacity measurement, in milliseconds. The Battery Measurement Averaging Interval is the length of time within which the battery averages the capacity measurements specified in _BST, such as remaining capacity and present rate.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1376545"></A>The OSPM may read the Max Average Interval and Min Average Interval with _BIX during boot time, and set a specific average interval within the range with _BMA.</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1376546"></A>Arguments: (1)</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1376547"></A>Arg0 - AveragingInterval (Integer(DWORD)) the averaging interval of battery capacity measurement:</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1376548"></A>0x00000001 - 0xFFFFFFFF (in units of millisecond)</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1376549"></A>Return Value: </H4>
+<P CLASS="Body">
+<A NAME="pgfId-1442466"></A>An Integer (DWORD) containing a result code as follows:</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1442467"></A>0x00000000 - Success.</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1442468"></A>0x00000001 - Failure to set Battery Measurement Averaging Interval because it is out of the battery&#8217;s measurement capability.</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1442473"></A>0x00000002 - 0xFFFFFFFF - Reserved.</P>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1376557"></A><A NAME="40939"></A>_BMS (Battery Measurement Sampling Time<A NAME="marker-1376556"></A>)</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1376563"></A><A NAME="marker-1376558"></A><A NAME="marker-1376559"></A><A NAME="marker-1376560"></A>This object is used to set the sampling time of the battery capacity measurement, in milliseconds. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1376564"></A>The Sampling Time is the duration between two consecutive measurements of the battery&#8217;s capacities specified in _BST, such as present rate and remaining capacity. If the OSPM makes two succeeding readings through _BST beyond the duration, two different results will be returned. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1376565"></A>The OSPM may read the Max Sampling Time and Min Sampling Time with _BIX during boot time, and set a specific sampling time within the range with _BMS.</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1376566"></A>Arguments: (1)</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1376567"></A>Arg0 - SamplingTime (Integer(DWORD)) the sampling time of battery capacity measurement:</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1376568"></A>0x00000001 - 0xFFFFFFFF (in units of millisecond)</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1376572"></A><A NAME="_Toc215215459"></A><A NAME="_Toc215217773"></A><A NAME="_Toc215220087"></A>Return Value: </H4>
+<P CLASS="Body">
+<A NAME="pgfId-1442489"></A>An Integer (DWORD) containing a result code as follows:</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1442490"></A>0x00000000 - Success. </P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1442491"></A>0x00000001 - Failure to set Battery Measurement Sampling Time because it is out of the battery&#8217;s measurement capability.</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1376576"></A>0x00000002 - 0xFFFFFFFF - Reserved.</P>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1376584"></A><A NAME="_Toc489267287"></A><A NAME="RSVD_BST"></A>_BST (Battery Status)<A NAME="marker-1376580"></A><A NAME="marker-1376581"></A><A NAME="marker-1376582"></A><A NAME="marker-1376583"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1376585"></A>This object returns the present battery status. Whenever the Battery State value changes, the system will generate an SCI to notify the OS.</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1376586"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1376587"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1376588"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1376589"></A>A Package containing the battery status as described below</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1376590"></A>Return Value Information:</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1376591"></A>_BST returns a package in the format below</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376593"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1442071"></A>Package { </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376594"></A>    Battery State                    // Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376595"></A>    Battery Present Rate             // Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376596"></A>    Battery Remaining Capacity       // Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376597"></A>    Battery Present Voltage          // Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376598"></A>}</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1376599"></A>BST Return Package Values </H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1436697"></A>Element</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1436699"></A>Format</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1436701"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376608"></A>Battery State</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376610"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376612"></A>Bit values. Notice that the Charging bit and the Discharging bit are mutually exclusive and must not both be set at the same time. Even in critical state, hardware should report the corresponding charging/discharging state.</P>
+<UL>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1376613"></A>Bit [0] - 1 indicates the battery is discharging.</LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1442870"></A>Bit [1] - 1 indicates the battery is charging.</LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1442877"></A>Bit [2 ]- 1 indicates the battery is in the critical energy state (see <A HREF="ACPI_Concepts.htm#_Toc489255978" CLASS="XRef">See Low Battery Levels.</A>, &#8220;Low Battery Levels&#8221;). This does not mean battery failure.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376615"></A>Battery Present Rate</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376617"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376619"></A>Returns the power or current being supplied or accepted through the battery&#8217;s terminals (direction depends on the Battery State value). The Battery Present Rate value is expressed as power [mWh] or current [mAh] depending on the Power Unit value.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1376620"></A>Batteries that are rechargeable and are in the discharging state are required to return a valid Battery Present Rate value. </P>
+<UL>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1376621"></A>0x00000000 - 0x7FFFFFFF in [mW] or [mA]<BR>
+0xFFFFFFFF - Unknown rate </LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376623"></A>Battery Remaining Capacity</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376625"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376627"></A>Returns the estimated remaining battery capacity. The Battery Remaining Capacity value is expressed as power [mWh] or current [mAh] depending on the Power Unit value.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1376628"></A>Batteries that are rechargeable are required to return a valid Battery Remaining Capacity value.</P>
+<UL>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1376629"></A>0x00000000 - 0x7FFFFFFF in [mWh] or [mAh]</LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1442843"></A>0xFFFFFFFF - Unknown capacity</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376631"></A>Battery Present Voltage </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376633"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376635"></A>Returns the voltage across the battery&#8217;s terminals.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1376636"></A>Batteries that are rechargeable must report Battery Present Voltage.</P>
+<UL>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1376637"></A>0x000000000 - 0x7FFFFFFF in [mV]</LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1442854"></A>0xFFFFFFFF - Unknown voltage </LI>
+</UL>
+<P CLASS="TableBody">
+<A NAME="pgfId-1376638"></A>Note: Only a primary battery can report unknown voltage.</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1376649"></A><A NAME="_Toc369679878"></A><A NAME="_Toc369801495"></A><A NAME="_Toc369936268"></A><A NAME="_Toc370017358"></A><A NAME="_Toc374114802"></A><A NAME="_Toc375244446"></A><A NAME="_Toc375924842"></A><A NAME="_Toc423760067"></A>Notice that when the battery is a primary battery (a non-rechargeable battery such as an Alkaline-Manganese battery) and cannot provide accurate information about the battery to use in the calculation of the remaining battery life, the Control Method Battery can report the percentage directly to OS. It does so by reporting the Last Full Charged Capacity =100 and BatteryPresentRate=0xFFFFFFFF. This means that Battery Remaining Capacity directly reports the battery&#8217;s remaining capacity [%] as a value in the range 0 through 100 as follows:<A NAME="marker-1376650"></A><A NAME="marker-1376651"></A><A NAME="marker-1376652"></A></P>
+</DIV>
+<DIV>
+<H6 CLASS="Art">
+<A NAME="pgfId-1376656"></A><IMG SRC="Power_Source_and_Power_Meter_Devices-5.gif" ALIGN="BASELINE" ALT="">
+&nbsp;</H6>
+<DIV>
+<H6 CLASS="FigureTitle">
+<A NAME="pgfId-1382441"></A>Remaining Battery Percent Formula</H6>
+</DIV>
+</DIV>
+<DIV>
+<H6 CLASS="Art">
+<A NAME="pgfId-1376660"></A><IMG SRC="Power_Source_and_Power_Meter_Devices-6.gif" ALIGN="BASELINE" ALT="">
+&nbsp;</H6>
+<DIV>
+<H6 CLASS="FigureTitle">
+<A NAME="pgfId-1376661"></A>Remaining Battery Life Formula</H6>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1443523"></A><A NAME="49166"></A>_BTH (Battery Throttle Limit)</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1443524"></A>This method will communicate to the platform firmware the thermal throttle limit set by on the battery. </P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1443525"></A><EM CLASS="SC-16-266245">
+Arguments:</EM>
+</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1443526"></A>Arg0 - An integer from 0 to 100 containing the battery thermal throttle limit in percentage. At 100%, the battery can be charged at maximum current.</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1443527"></A>Return Value:</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1443528"></A>None. </P>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1443529"></A>Firmware is responsible for taking the current thermal throttle limit into account when engaging charging<EM CLASS="SC-16-266245">
+.</EM>
+</LI>
+</UL>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1443531"></A><EM CLASS="SC-16-266245">
+Example:</EM>
+</H3>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443532"></A>Scope(&#92;_SB) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443533"></A>Scope(&#92;_SB.PCI0.ISA0) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443534"></A>    Device(EC0) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443535"></A>        Name(_HID, EISAID(&quot;PNP0C09&quot;))          // ID for this EC</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443536"></A>                                               // current resource description for this EC</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443537"></A>        Name(_CRS, ResourceTemplate() {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443538"></A>            IO(Decode16,0x62,0x62,0,1)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443539"></A>            IO(Decode16,0x66,0x66,0,1)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443540"></A>        })</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443541"></A>        Name(_GPE, 0)                          // GPE index for this EC</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443542"></A>        // create EC's region and field for thermal support</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443543"></A>        OperationRegion(EC0, EmbeddedControl, 0, 0xFF) </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443544"></A>        Field(EC0, ByteAcc, Lock, Preserve) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443545"></A>            TMP,    16,                        // current temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443546"></A>            PSV,    16,                        // passive cooling temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443547"></A>            BTH     16,                        // battery charge rate limit</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443548"></A>        }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443549"></A>        // following is a method that OSPM will schedule after</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443550"></A>        // it receives an SCI and queries the EC to receive value 7</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443551"></A>        Method(_Q07) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443552"></A>            Notify (&#92;_SB.PCI0.ISA0.EC0.TZ0, 0x80)         }    // end of Notify method</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443553"></A>        // create a thermal zone</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443554"></A>        ThermalZone (TZ0) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443555"></A>            Method(_TMP) { Return (&#92;_SB.PCI0.ISA0.EC0.TMP )}          // get current temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443556"></A>            Method(_PSV) { Return (&#92;_SB.PCI0.ISA0.EC0.PSV) }          // passive cooling temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443557"></A>            Name(_TZD, Package (){&#92;_SB.PCI0.ISA0.EC0.BAT0})           // passive cooling devices</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443558"></A>            Name(_TC1, 4)                                             // bogus example constant</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443559"></A>            Name(_TC2, 3)                                             // bogus example constant </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443560"></A>            Name(_TSP, 150)                                           // passive sampling = 15 sec</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443561"></A>        } // end of TZ0</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443562"></A>        Device (BAT0) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443563"></A>                    Name(_HID, &quot;PNP0C0A&quot;)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443564"></A>            Name(_UID, One)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443565"></A>            Method (_BTH, 0x1, NotSerialized) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443566"></A>                Store(Arg0, &#92;_SB.PCI0.ISA0.EC0.BTH)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443567"></A>                    }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443568"></A>            // additional battery objects</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443569"></A>        }      </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443570"></A>    }                                                             // end of ECO</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443571"></A>}                                                                 // end of &#92;_SB.PCI0.ISA0 scope</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443511"></A>}                                                                 // end of &#92;_SB scope</P>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1379208"></A> <A NAME="_Toc489267288"></A><A NAME="RSVD_BTP"></A>_BTP (Battery Trip Point)<A NAME="marker-1444231"></A><A NAME="marker-1444232"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1376667"></A>This object is used to set a trip point to generate an SCI whenever the Battery Remaining Capacity reaches or crosses the value specified in the _BTP object. Specifically, if Battery Remaining Capacity is less than the last argument passed to _BTP, a notification must be issued when the value of Battery Remaining Capacity rises to be greater than or equal to this trip-point value. Similarly, if Battery Remaining Capacity is greater than the last argument passed to _BTP, a notification must be issued when the value of Battery Remaining Capacity falls to be less than or equal to this trip-point value. The last argument passed to _BTP will be kept by the system.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1376674"></A>If the battery does not support this function, the _BTP control method is not located in the namespace. In this case, the OS must poll the Battery Remaining Capacity value.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1376675"></A>Arguments: (1)</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1376676"></A>Arg0 - An Integer containing the new battery trip point</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1376677"></A>0 - Clear the trip point</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1376678"></A>1 - 0x7FFFFFFF - New trip point, in units of mWh or mAh depending on the Power Units value</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1376679"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1376680"></A>None</P>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1376688"></A>_<A NAME="RSVD_BTM"></A>BTM (Battery Time)<A NAME="marker-1376684"></A><A NAME="marker-1376685"></A><A NAME="marker-1376686"></A><A NAME="marker-1376687"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1376689"></A>This optional object returns the estimated runtime of the battery while it is discharging. </P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1376690"></A>Arguments: (1)</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1376691"></A>Arg0 - An Integer containing the rate at which the battery is expected to discharge</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1379277"></A>0 - Indicates that the battery will continue discharging at the current rate. The rate should be based on the average rate of drain, not the current rate of drain.	</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1379278"></A>1 - 0x7FFFFFFF	The discharge rate (in mA or mW)</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1379279"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1376695"></A>An Integer containing the estimated remaining runtime</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1376696"></A>0 - The input discharge rate (Arg0) is too large for the battery or batteries to supply. If the input argument was 0, this value indicates that the battery is critical.</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1376697"></A>1 - 0xFFFFFFFE -	Estimated runtime in seconds</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1376698"></A>0xFFFFFFFF -	Runtime is unknown</P>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1376702"></A><A NAME="34722"></A>_BCT (Battery Charge Time<A NAME="marker-1376701"></A>)<A NAME="marker-1376703"></A><A NAME="marker-1376704"></A><A NAME="marker-1376705"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1376708"></A>When the battery is charging, this optional object returns the estimated time from present to when it is charged to a given percentage of Last Full Charge Capacity.</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1376712"></A><A NAME="_Toc215215476"></A><A NAME="_Toc215217790"></A><A NAME="_Toc215220104"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1376713"></A>Arg0 - ChargeLevel (Integer (DWORD)): The queried charge level in units of percent of Last Full Charge Capacity. For example: 96 refers to 96% of Last Full Charge Capacity. Valid values are 1 - 100 (0x00000001 - 0x00000064).</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1376714"></A>Return Value: </H4>
+<P CLASS="Body">
+<A NAME="pgfId-1376715"></A>An Integer (DWORD) containing a result code as follows:</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1376716"></A>0x00000000 -	Specified targeted charging capacity is smaller than the current remaining capacity or larger than 100% of Last Full Charge Capacity. </P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1376717"></A>0x00000001 -	0xFFFFFFFE - Estimated charging time in seconds</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1376718"></A>0xFFFFFFFF -	Charging time is unknown</P>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1376726"></A>_<A NAME="RSVD_BMD"></A>BMD (Battery Maintenance Data)<A NAME="marker-1376722"></A><A NAME="marker-1376723"></A><A NAME="marker-1376724"></A><A NAME="marker-1376725"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1376727"></A>This optional object returns information about the battery&#8217;s capabilities and current state in relation to battery calibration and charger control features. If the _BMC object (defined below) is present under a battery device, this object must also be present. Whenever the Status Flags value changes, AML code will issue a Notify(battery_device, 0x82). In addition, AML will issue a Notify(battery_device, 0x82) if evaluating _BMC did not result in causing the Status Flags to be set as indicated in that argument to _BMC. AML is not required to issue Notify(battery_device, 0x82) if the Status Flags change while evaluating _BMC unless the change does not correspond to the argument passed to _BMC.</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1376728"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1376729"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1376730"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1376731"></A>A Package containing the battery maintenance data as described below</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1443006"></A>Return Value Information:</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1443007"></A>_BMD returns a package in the format below:</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1443008"></A>Package {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379370"></A>    Status Flags                    // Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376737"></A>    Capability Flags                // Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376738"></A>    Recalibrate Count               // Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376739"></A>    Quick Recalibrate Time          // Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376740"></A>    Slow Recalibrate Time           // Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376741"></A>}</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1376742"></A>BMD Return Package Values</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1436713"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1436715"></A>Format</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1436717"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376751"></A>Status Flags</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376753"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376755"></A>Bit values. Bit [0] is mutually exclusive with bit [1] and bit [2]. If the charger is being manually controlled, there cannot be an AML controlled calibration cycle.</P>
+<UL>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1376756"></A>Bit [0 ]- 1 indicates the battery is running an AML controlled calibration cycle</LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1376757"></A>Bit [1] - 1 indicates that charging has been disabled.</LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1376758"></A>Bit [2] - 1 indicates the battery is configured to discharge while AC power is available.</LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1376759"></A>Bit [3] - 1 indicates that the battery should be recalibrated.</LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1376760"></A>Bit [4 ]- 1 indicates that the OS should put the system into standby to speed charging during a calibration cycle. This is optional (based on user preference) if &#8220;Slow Recalibrate Time&#8221; is not equal to 0x00000000.</LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1376761"></A>Bit [31:5] - reserved.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376763"></A>Capability Flags</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376765"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376767"></A>Bit values that describe the capabilities of the battery system. These bits allows a battery system with more limited capabilities to still be calibrated by OSPM.</P>
+<UL>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1376768"></A>Bit [0] - 1 indicates that an AML controlled calibration cycle is supported.</LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1376769"></A>Bit [1] - 1 indicates that disabling the charger is supported.</LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1376770"></A>Bit [2 ]- 1 indicates that discharging while running on AC is supported.</LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1376771"></A>Bit [3 ]- 1 indicates that calling _BMC for one battery will affect the state of all batteries in the system. This is for battery systems that cannot control batteries individually.</LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1376772"></A>Bit [4 ]- 1 indicates that calibration should be done by first fully charging the battery and then discharging it. Not setting this bit will indicate that calibration can be done by simply discharging the battery.</LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1376773"></A>Bit [31:5] - reserved.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376775"></A>Recalibrate Count</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376777"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376779"></A>This is used by battery systems that can&#8217;t detect when calibration is required, but wish to recommend that the battery should be calibrated after a certain number of cycles. Counting the number of cycles and partial cycles is done by the OS. </P>
+<UL>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1376780"></A>0x00000000 - Only calibrate when Status Flag bit [3] is set.</LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1376781"></A>0x00000000 - 0xFFFFFFFF - calibrate battery after detecting this many battery cycles. </LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376783"></A>Quick Recalibrate Time </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376785"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376787"></A>Returns the estimated time it will take to calibrate the battery if the system is put into standby whenever Status Flags bit [4] is set. While the AML controlled calibration cycle is in progress, this returns the remaining time in the calibration cycle.</P>
+<UL>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1376788"></A>0x000000000 - indicates that standby while calibrating the battery is not supported. The system should remain in S0 until calibration is completed.</LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1376789"></A>0x00000001 - 0xFFFFFFFE - estimated recalibration time in seconds.</LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1376790"></A>0xFFFFFFFF - indicates that the estimated time to recalibrate the battery is unknown. </LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376792"></A>Slow Recalibrate Time </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376794"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376796"></A>Returns the estimated time it will take to calibrate the battery if Status Flag Bit [4] is ignored. While the AML controlled calibration cycle is in progress, this returns the remaining time in the calibration cycle.</P>
+<UL>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1376797"></A>0x000000000 - indicates that battery calibration may not be successful if Status Flags Bit [4] is ignored.</LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1376798"></A>0x00000001 - 0xFFFFFFFE - estimated recalibration time in seconds.</LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1376799"></A>0xFFFFFFFF - indicates that the estimated time to recalibrate the battery is unknown. </LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1376802"></A>See <A HREF="ACPI_Concepts.htm#_Toc202340503" CLASS="XRef">See Battery Calibration.</A>, &#8220;Battery Calibration&#8221; for an overview of Battery Calibration.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1376803"></A>The Capability Flags and Recalibration Count are used to indicate what functions are controlled by AML and what functions are controlled by OSPM as described in section 3.9.5, &#8220;Battery Calibration&#8221;. If the system does not implement an AML controlled calibration cycle (bit [0]), it may indicate using bit [1] and bit [2] that the OS can control a generic calibration cycle without prompting the user to remove the power cord. Recalibration Count may be used to indicate that the platform runtime firmware cannot determine when calibration should be preformed so bit 3 of the Status Flags will never be set. In that case, OSPM will attempt to count the number of cycles.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1376804"></A>Bit [3] is used by systems that do not have individual control over the batteries and can only perform calibration on all batteries in the system at once. On such a system, if one battery requests calibration and another battery does not, the OS may suggest that the user remove the battery that doesn&#8217;t need calibration, before initiating the calibration cycle. When this bit is set, reading the Recalibrate Time from either battery should give the time to recalibrate all batteries present in the system.</P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1376812"></A>_<A NAME="RSVD_BMC"></A>BMC (Battery Maintenance Control)<A NAME="marker-1376808"></A><A NAME="marker-1376809"></A><A NAME="marker-1376810"></A><A NAME="marker-1376811"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1376813"></A>This object is used to initiate calibration cycles or to control the charger and whether or not a battery is powering the system. This object is only present under a battery device if the _BMD Capabilities Flags field has bit 0, 1, or 2 set.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1376814"></A>Arguments: (1)</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1376815"></A>Arg0 - An Integer containing feature control flags</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1376816"></A>Bit [0] - 	Set to initiate an AML controlled calibration cycle. Clear to end the calibration cycle</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1376817"></A>Bit [1] - 	Set to disable charging. Clear to enable charging</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1376818"></A>Bit [2] - 	Set to allow the battery to discharge while AC power is available. Clear to prevent discharging while AC power is available</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1376819"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1376820"></A>None</P>
+<P CLASS="Body">
+<A NAME="pgfId-1376821"></A>See <A HREF="ACPI_Concepts.htm#_Toc202340503" CLASS="XRef">See Battery Calibration.</A> for an overview of Battery Calibration.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1376822"></A>Evaluating this object with bit0 set will initiate an AML controlled recalibration cycle if _BMD indicates that this is supported. The calibration cycle is controlled by the platform and will typically include disabling the AC adapter and discharging the battery, then charging the battery. While the battery is charging, the platform runtime firmware should set Bit [4] of the Status flags returned by _BMD if it is possible to put the system into standby during calibration to speed up charging. Evaluating this with Bit [0] equal to 0 will abort the calibration cycle if one is in process. If the platform runtime firmware determines that the calibration cycle must be aborted (for example AC power is lost), or the calibration completes successfully, the platform runtime firmware will end the cycle automatically, clear the _BMD Status Flag Bit [0], and send a notify 0x82. While the calibration cycle is in process, the battery will report data normally, so the OS must disable battery alarms.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1376823"></A>Bit [1] and Bit [2] may not be used in conjunction with the AML controlled calibration cycle. Having Bit [0] set will override Bit [1] and Bit [2]. Bit [1] will prevent the battery from charging even though AC power is connected. Bit [2] will allow the system to draw its power from the battery even though AC power is available. When the battery is no longer capable of delivering current, this setting is automatically cleared, and the system will continue running off AC power without interruption. In addition, if AC power is lost this bit will be cleared. When AC power comes back, the OS must set the bit again if the user wants to continue discharging. When the system clears this bit automatically, it will result in a change in the Status Flags returned by _BMD. This will cause a notify 0x82. Bit [1] is only cleared automatically if an AML controlled calibration cycle is initiated.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1376824"></A>When a battery is discharging because Bit [2] is set, the _PSR method of the AC adapter device will report that AC is offline because the system is not running off of the AC adapter. If the batteries are controlled individually (Bit [3] of the _BMD Capabilities Flags), setting either battery to discharge will cause _PSR to report AC offline. If more than one battery in the system has Bit [2] set to discharge the battery, it is up to the system to decide which battery to discharge, so only on a system that discharges the batteries one at a time, a battery with Bit2 set may not be discharging if another battery in the system is being discharged.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1376825"></A>If Batteries are not controlled individually, calling _BMC will initiate calibration, disable charge, and/or allow discharge on all batteries in the system. The state of these batteries will be reflected in the _BMD Status Flags for all batteries.</P>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1376844"></A><A NAME="_Toc489267289"></A><A NAME="_Toc489267669"></A><A NAME="_Toc489272643"></A><A NAME="_Toc202341741"></A><A NAME="_Toc258262421"></A>AC Adapters and Power Source Objects<A NAME="marker-1376843"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1376845"></A>The Power Source objects describe the system&#8217;s power source. These objects may be defined under a Power Source device which is declared using a hardware identifier (_HID) of &#8220;ACPI0003&#8221;. Typically there will be a power source device for each physical power supply contained within the system. However, in cases where the power supply is shared, as in a blade server configuration, this may not be possible. Instead the firmware can choose to expose a virtual power supply that represents one or more of the physical power supplies.<A NAME="marker-1376846"></A></P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1376848"></A>Power Source Objects<A NAME="marker-1376847"></A></H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1376851"></A>Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1376853"></A>Description</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376855"></A>_PSR</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376857"></A>Returns whether this power source device is currently online.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376859"></A>_PCL</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376861"></A>List of pointers to devices this power source is powering.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376863"></A>_PIF</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376865"></A>Returns static information about a power source.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376867"></A>_PRL</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376869"></A>List of pointers to all the other power source devices that belong in the same redundancy group of which the power supply device is a member.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1376893"></A><A NAME="_Toc489267290"></A><A NAME="_Toc489267670"></A><A NAME="_Toc489272644"></A><A NAME="RSVD_PSR"></A><A NAME="_Toc202341742"></A><A NAME="_Toc258262422"></A>_PSR (Power Source)<A NAME="marker-1376891"></A><A NAME="marker-1376892"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1376894"></A>Returns whether the power source device is currently in use. This can be used to determine if system is running off this power supply or adapter. On mobile systes this will report that the system is not running on the AC adapter if any of the batteries in the system is being forced to discharge. In systems that contains multiple power sources, this object reports the power source&#8217;s online or offline status.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1376895"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1376896"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1376897"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1376898"></A>An Integer containing the power source status</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1376899"></A>0 - Off-line (not on AC power)</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1376900"></A>1 - On-line </P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1376924"></A><A NAME="_Toc489267291"></A><A NAME="_Toc489267671"></A><A NAME="_Toc489272645"></A><A NAME="RSVD_PCL"></A><A NAME="_Toc202341747"></A><A NAME="_Toc258262423"></A>_PCL (Power Consumer List)<A NAME="marker-1376922"></A><A NAME="marker-1376923"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1376925"></A>This object evaluates to a list of pointers, each pointing to a device or a bus powered by the power source device. Pointing to a bus indicates that all devices under the bus are powered by the power source device.</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1376926"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1376927"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1376928"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1376929"></A>A variable-length Package containing a list of References to devices or buses</P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1376934"></A>_<A NAME="_Toc258262424"></A>PIF (Power Source Information)</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1376935"></A>This object returns information about the Power Source, which remains constant until the Power Source is changed. When the power source changes, the platform issues a Notify(0x0) (Bus Check) to the Power Source device to indicate that OSPM must re-evaluate the _PIF object.</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1376936"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1376937"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1376938"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1376939"></A>A Package with the following format:</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376941"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1441920"></A>Package {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376942"></A>    Power Source State                    // Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376943"></A>    Maximum Output Power                  // Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376944"></A>    Maximum Input Power                   // Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376945"></A>    Model Number                          // String (ASCIIZ)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376946"></A>    Serial Number                         // String (ASCIIZ)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376947"></A>    OEM Information                       // String (ASCIIZ)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1376948"></A>}</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1376956"></A>PIF Method Result Codes</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1376959"></A>Element</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1376961"></A>Object Type</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1376963"></A>Description</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376965"></A>Power Source State</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376967"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376969"></A>Bit values that describe the type of this Power Source. These bits are especially useful in server scenarios.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1376970"></A>Bit [0] - indicates the power source is a redundant one. If this bit is set, this Power Source device should have a _PRL object.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1376971"></A>Bit [1] - indicates the power source is being shared across multiple machines.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1376972"></A>Bit [31:2] - Reserved.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376974"></A>Maximum Output Power</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376976"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376978"></A>The maximum rated output wattage of the power source device. [mW]</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1376979"></A> 0xFFFFFFFF is returned if the information is unavailable.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376981"></A>Maximum Input Power</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376983"></A>Integer</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1376984"></A>(DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376986"></A>The maximum rated input wattage of the power source device. [mW]</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1376987"></A>0xFFFFFFFF is returned if the information is unavailable.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376989"></A>Model Number</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376991"></A>String (ASCIIZ)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376993"></A>OEM-specific Power Source model number. This element is optional and an empty string (a null character) should be used if this is not supported.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376995"></A>Serial Number</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376997"></A>String (ASCIIZ)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376999"></A>OEM-specific Power Source serial number. This element is optional and an empty string (a null character) should be used if this is not supported.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377001"></A>OEM Information</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377003"></A>String (ASCIIZ)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377005"></A>OEM-specific information that the UI uses to display about the Power Source device. This element is optional and a NULL string should be used if this is not supported.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1377017"></A><A NAME="_Toc258262425"></A>_PRL (Power Source Redundancy List)</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1377018"></A>This optional object evaluates to a list of Power Source devices that are in the same redundancy grouping as Power Source device under which this object is defined. A redundancy grouping is a group of power supplies that together provide redundancy. For example, on a system that contains two power supplies that each could independently power the system, both power supplies would be part of the same redundancy group. This is used in conjunction with the Power Source State values specified by the _PIF object.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1377019"></A>The entries should be in the format of a fully qualified ACPI namespace path.</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1377020"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1377021"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1377022"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1377023"></A>A variable-length Package containing a list of References to power source devices. It has the following format:</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1377025"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1441934"></A>Package {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1377026"></A>    Power source[0],            // Reference</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1377027"></A>    Power source[1],            // Reference</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1377028"></A>    </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1436720"></A>    Power source[n]             // Reference</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1436721"></A>}</P>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1436723"></A>P<A NAME="_Toc258262426"></A>ower Meters</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1377034"></A>The following section describes Power Metering objects. These objects may be defined under a Power Meter device which is declared using the ACPI000D hardware identifier (_HID).</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1377036"></A>Power Meter Objects<A NAME="marker-1377035"></A></H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1443028"></A>Object</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1443030"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436731"></A>_GAI</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436733"></A>Gets the averaging interval used by the power meter.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436735"></A>_GHL</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436737"></A>Gets the hardware power consumption limit that is enforced by the Power Meter.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436739"></A>_PAI</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436741"></A>Sets the power averaging interval used by the Power Meter.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436743"></A>_PMC</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436745"></A>Returns Power Meter capabilities.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436747"></A>_PMD</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436749"></A>Returns a list of devices whose power consumption is measured by the Power Meter.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436751"></A>_PMM</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436753"></A>Returns the power consumption measured by the Power Meter.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436755"></A>_PTP</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436757"></A>Sets Power Meter device trip points.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436759"></A>_SHL</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1436761"></A>Sets the hardware power consumption limit that is enforced by the Power Meter.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1377075"></A><A NAME="RSVD_PMC"></A>_<A NAME="_Toc258262427"></A>PMC (Power Meter Capabilities) </H6>
+<P CLASS="Body">
+<A NAME="pgfId-1377082"></A>This object returns the capabilities of a power meter. This information remains constant unless either the power meter&#8217;s firmware or the BMC hardware changes, at which time the platform is required to send Notify(power_meter, 0x80) for the OSPM to re-evaluate _PMC.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1377083"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1377084"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1377085"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1377086"></A>A Package with the following format:</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1441948"></A>Package {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1377089"></A>    Supported Capabilities                // Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1377090"></A>    Measurement Unit                      // Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1377091"></A>    Measurement Type                      // Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1377092"></A>    Measurement Accuracy                  // Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1377093"></A>    Measurement Sampling Time             // Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1377094"></A>    Minimum Averaging Interval            // Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1377095"></A>    Maximum Averaging Interval            // Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1377096"></A>    Hysteresis Margin                     // Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1377097"></A>    Hardware Limit Is Configurable        // Boolean (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1377098"></A>    Min Configurable Hardware Limit       // Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1377099"></A>    Max Configurable Hardware Limit       // Integer (DWORD)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1377100"></A>    Model Number                          // String</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1377101"></A>    Serial Number                         // String</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1377102"></A>    OEM Information                       // String</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1377103"></A>}</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1377105"></A><A NAME="18171"></A>PMC Method Result Codes</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1436769"></A>Element</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1436771"></A>Object Type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1436773"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377114"></A>Supported Capabilities</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377116"></A>Integer </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1377117"></A>(DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377119"></A>A bitmask that represents the capability flags:</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1377120"></A>Bit [0] - indicates the power meter supports measurement.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1377121"></A>Bit [1] - indicates the power meter supports trip points.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1377122"></A>Bit [2] - indicates the power meter supports hardware enforced limit. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1377123"></A>Bit [3 ]- indicates that the power meter supports notifications when the hardware limit is enforced.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1377124"></A>Bit [7:4] - reserved.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1377125"></A>Bit [8] - indicates the power meter only reports data when discharging. This applies to power meters that are battery-type devices. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1445379"></A> Bit [9:31]  Reserved</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377127"></A>Measurement Unit</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377129"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377131"></A>The units used by the power meter to report measurement and configure trip points and hardware enforced limits.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1377132"></A>0x00000000 - indicates measurements are reported in [mW].</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377134"></A>Measurement Type</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377136"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377138"></A>The type of measurement the power meter is measuring. A power meter may measure either input or output power, not both.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1377139"></A>0x00000000 - indicates the power meter is measuring input power.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1377140"></A>0x00000001 - indicates the power meter is measuring output power.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377142"></A>Measurement Accuracy</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377144"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377146"></A>The accuracy of the power meter device, in thousandth of a percent. (0% - 100.000%) For example, The value 80000 would mean 80% accuracy.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377148"></A>Measurement Sampling Time</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377150"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377152"></A>The sampling time of the power meter device, in milliseconds. This is the minimum amount of time at which the measurement value will change. In other words, the same reading will be returned by _PMM if OSPM makes 2 consecutive reads within a measurement sampling time. 0xFFFFFFFF is returned if the information is unavailable. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377154"></A>Minimum Averaging Interval</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377156"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377158"></A>This is the minimum length of time (in milliseconds) within which the power meter firmware is capable of averaging the measurements within it.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377160"></A>Maximum Averaging Interval</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377162"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377164"></A>This is the maximum length of time (in milliseconds) within which the power meter firmware is capable of averaging the measurements within it.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377166"></A>Hysteresis Margin</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377168"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377170"></A>The margin used by the BMC for hysteresis, in the unit of [Measurement Unit / Measurement Sampling Time]. This indicates the margin built around the trip points and hardware limit notifications. This margin prevents unnecessary notifies to the OSPM when the reading is fluctuating very close to one of the trip points or the hardware limit. 0xFFFFFFFF is returned if the information is unavailable.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377172"></A>Hardware Limit Is Configurable</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377174"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377176"></A>This boolean value represents whether hardware enforced limit is configurable by the OSPM. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1377177"></A>0x00000000 (zeros) - indicates the limit is read-only.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1377178"></A>0xFFFFFFFF (ones) - indicates the limit is writable.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377180"></A>Minimum Configurable Hardware Limit</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377182"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377184"></A>The minimum value that can be configured into the hardware enforced limit, expressed in the units as specified by Measurement Unit.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377186"></A>Maximum Configurable Hardware Limit</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377188"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377190"></A>The maximum value that can be configured into the hardware enforced limit, expressed in the units as specified by Measurement Unit.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377192"></A>Model Number</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377194"></A>String (ASCIIZ)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377196"></A>OEM-specific Power meter model number. This element is optional and an empty string (a null character) should be used if this is not supported.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377198"></A>Serial Number</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377200"></A>String (ASCIIZ)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377202"></A>OEM-specific Power meter serial number. This element is optional and an empty string (a null character) should be used if this is not supported.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377204"></A>OEM Information</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377206"></A>String (ASCIIZ)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377208"></A>OEM-specific information that the UI uses to display about the Power meter device. This element is optional and a NULL string should be used if this is not supported.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1377216"></A>_<A NAME="_Toc258262428"></A>PTP (Power Trip Points)</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1377217"></A>This object sets the upper and lower trip points for the power meter device. These 2 trip points define a hysteresis range for which the OSPM can tolerate without re-reading the current measurement via _PMM. When the power meter draw goes outside the range, a Notify(power_meter, 0x81) should be sent to notify the OSPM, at which time the OSPM should re-evaluate _PMM and also set a pair of trip points around the newest reading. If the latest value measured by the power meter is outside of the range defined by the trip points by the time _PTP is called, a result code is returned. </P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1377218"></A>Arguments: (2)</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1377219"></A>Arg0 (Integer) : Upper Trip Point </P>
+<P CLASS="Body">
+<A NAME="pgfId-1377220"></A>Arg1 (Integer) : Lower Trip Point</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1377221"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1377222"></A>An Integer containing the status of the operation:</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1377223"></A>0x00000000 - Success</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1377224"></A>0x00000001 - Failure to set trip points because latest measurement is out of range</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1377225"></A>0x00000002 - Failure to set trip points due to hardware timeout</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1377226"></A>0x00000003 - Failure to set trip points due to unknown hardware error</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1377227"></A>0x00000004 - 0xFFFFFFFF - Reserved </P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1377232"></A>_<A NAME="_Toc258262429"></A>PMM (Power Meter Measurement)</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1377233"></A>This object returns the latest measurement reading from the power meter device. The value returned represents real power (i.e. power factor is included in the value). In most cases this is a rolling average value that is computed by the firmware over an averaging interval. On systems where this interval can be configured, the _PAI object should be present under the power meter device (see <A HREF="Power_Source_and_Power_Meter_Devices.htm#_Toc258262430" CLASS="XRef">See _PAI (Power Averaging Interval).</A>).</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1377234"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1377235"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1377236"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1377237"></A>An Integer is returned to represent the latest measurement reading from the power meter device. This value should be in the unit specified in the power meter capabilities (typically in milliwatts), and is required to be the RMS value if the power meter is measuring in AC. If an error occurs while obtaining the meter reading or if the value is not available then an Integer with all bits set is returned.  </P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1377243"></A>_<A NAME="_Toc258262430"></A>PAI (Power Averaging Interval)</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1377244"></A>This object sets the averaging interval used by the power meter. The averaging interval is the total time the power meter will take instantaneous measurement samples for, before averaging them to produce the average power measurement as returned by _PMM. If  the platform changes the averaging interval independently from OSPM, the platform must issue a Notify(power_meter, 0x84) to indicate the change to the OSPM. Upon receiving the notification, OSPM evaluates the _GAI object to read the new averaging interval.</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1377245"></A>Arguments: (1)</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1377246"></A>Arg0 - An Integer that represents the desired value OSPM chose to be the power averaging interval, in milliseconds. This value needs to be within the minimum and maximum averaging interval as specified by _PMC. Otherwise, a failure result code is returned. </P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1377247"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1377248"></A>An Integer containing the status of the operation:</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1377249"></A>0x00000000 - Success </P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1377250"></A>0x00000001 - Failure to set power averaging interval because it is out of range</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1377251"></A>0x00000002 - Failure to set power averaging interval due to hardware timeout</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1377252"></A>0x00000003 - Failure to set power averaging interval due to unknown hardware error</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1377253"></A>0x00000004 - 0xFFFFFFFF - Reserved</P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1377258"></A>_<A NAME="_Toc258262431"></A>GAI (Get Averaging Interval)</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1377259"></A>This object gets the averaging interval used by the power meter. The averaging interval is the total time the power meter will take instantaneous measurement samples for, before averaging them to produce the average power measurement as returned by _PMM. If  the platform changes the averaging interval independently from OSPM, the platform must issue a Notify(power_meter, 0x84) to indicate the change to the OSPM. Upon receiving the notification, OSPM evaluates the _GAI object to read the new averaging interval.</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1377260"></A>Arguments: </H4>
+<P CLASS="Body">
+<A NAME="pgfId-1377261"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1377262"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1377263"></A>An Integer containing the currently configured power averaging interval, in milliseconds. If an error occurs while obtaining the averaging interval or if the value is not available then an Integer with all bits set is returned.</P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1377268"></A>_<A NAME="_Toc258262432"></A>SHL (Set Hardware Limit)</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1377269"></A>This object sets the hardware limit enforced by the power meter. This limit, if supported, will be enforced by the circuitry on the platform hardware, to the best of its effort. This value is typically also configurable via other out-of-band management mechanism. When the enforcement happens, the platform should send a Notify(power_meter, 0x83) to the OSPM.</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1377270"></A>Arguments: (1)</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1377271"></A>Arg0 - An Integer value that represent the desired value OSPM chose as the hardware enforced limit of this power meter, in the unit specified in _PMC. This value needs to be within the minimum and maximum hardware limit as specified by _PMC. Otherwise, a failure result code is returned.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1377272"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1377273"></A>An Integer containing the status of the operation:</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1377274"></A>0x00000000 - Success </P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1377275"></A>0x00000001 - Failure to set hardware limit because it is out of range</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1442545"></A>0x00000002 - Failure to set hardware limit due to the hardware timeout</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1377277"></A>0x00000003 - Failure to set hardware limit due to unknown hardware error</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1377278"></A>0x00000004 - 0xFFFFFFFF - Reserved</P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1377283"></A>_<A NAME="_Toc258262433"></A>GHL (Get Hardware Limit)</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1377284"></A>This object gets the hardware limit enforced by the power meter. This limit can be changed by either the OSPM or by the platform through some out-of-band mechanism. When this value is changed, a Notify(power_meter, 0x82) should be sent to notify the OSPM to re-read the hardware limit. If an error occurs while obtaining the hardware limit or if the value is not available then an Integer with all bits set is returned.  </P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1377285"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1377286"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1377287"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1377288"></A>An Integer is returned to represent the currently configured hardware enforced limit of the power meter, in the unit specified in _PMC.</P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1377293"></A>_<A NAME="_Toc258262434"></A>PMD (Power Metered Devices)</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1377294"></A>This object evaluates to a package of device names. Each name corresponds to a device in the ACPI namespace that is being measured by the power meter device. The measurement reported by the power meter is roughly correspondent to the total power draw of all the devices returned. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1377295"></A>If this control method is present, the package needs to contain at least 1 device. On a system that supports power metering, a system power meter that measures the power draw of the entire system should always be present and have a _PMD that contains &#92;_SB as its sole entry.</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1377296"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1377297"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1377298"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1377299"></A>A variable-length Package consisting of references to devices being measured by the power meter.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1377301"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1441962"></A>Package {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1377302"></A>    Power Meter[0]                        // NamePath</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1377303"></A>    Power Meter[1]                        // NamePath</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1377304"></A>    ...        </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1377305"></A>    Power Meter[n]                        // NamePath</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1377306"></A>}</P>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1444975"></A><A NAME="37425"></A>Wireless Power Controllers</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1444982"></A>FCC regulations dictate reduced output power levels for wireless devices in the presence of a human body. To get platform certifications and for regulatory compliance, wireless devices put static transmit power limit data in device memory (either EEPROM or flash) and apply it on a per band/country basis. FCC regulations allow devices to dynamically reduce Effective Isotropically Radiated Power (EIRP) when in close proximity to a human body to mitigate its adverse effects.  </P>
+<P CLASS="Body">
+<A NAME="pgfId-1444983"></A>On current platforms, a dedicated Specific Absorption Rate (SAR) sensor for each wireless device is used for notifying the wireless device that the system is in close proximity to a human body. This solution requires multiple SAR sensors for systems that have multiple wireless devices, and doesn&#8217;t provide any mechanism for the wireless devices to collaborate for better efficiency.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1444985"></A>The idea is to create a well-defined Wireless Power Calibration ACPI device with an ACPI event which can constitute the basis for notifying the Operating System (OS) and all other wireless devices on a given system. Wireless Power Calibration device event can be triggered from any proximity sensor device or by wireless device to mitigate interference from other wireless devices as well. The OS can then map specific notifications to each wireless device to invoke specific actions.</P>
+<DIV>
+<H6 CLASS="StepNumList-1">
+<A NAME="pgfId-1444987"></A>Define Plug and play ID for Wireless Power Calibration device(ACPI0014)</H6>
+<P CLASS="StepPara">
+<A NAME="pgfId-1444988"></A>Wireless Power Calibration Device. This device can have a control method to sense proximity using platform defined sensor such as SAR, depth camera, touch device etc. </P>
+<P CLASS="StepPara">
+<A NAME="pgfId-1444989"></A>Device can also have control method to broadcast other wireless device notifying the user proximity change or in band interference. </P>
+<OL>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1444990"></A>Define a notification value for the device<BR>
+Notifying the Wireless Power Calibration device with specific ACPI notify event id will enable wireless device or platform drivers to notify if EIRP needs to be regulated.</LI>
+</OL>
+</DIV>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1445004"></A>Wireless Power Calibration</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1445007"></A>Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1445009"></A>Description</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1445011"></A>_WPC</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1445013"></A>Indicate the WPC device current operational state.[Required]</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1445015"></A>_WPP</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1445017"></A>Evaluate the WPC object and return the status of last operational state.[Optional]</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1445021"></A><A NAME="26299"></A>Wireless Power Calibration Device</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1445022"></A>The following sections illustrate the operation and definition of the control method based Wireless Power Calibration Device (WPC). </P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1445024"></A>Wireless Power Calibration (_WPC)</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1445025"></A>The wireless power calibration can support the _WPC methods per participant device to calibrate power and notify the participant device as the case me be. (i.e. Either direct proximity based power calibration or notification for interference mitigation). </P>
+<P CLASS="Body">
+<A NAME="pgfId-1445026"></A>The _WPC method of the WPC device functions as a notifier to the participant wireless devices and indicates either the messaging is for interference mitigation or direct power calibration. </P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1445028"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1445029"></A>0x00 - Direct Proximity Power Control  </P>
+<P CLASS="Body">
+<A NAME="pgfId-1445030"></A>0x01 - Interference Mitigation Control</P>
+<P CLASS="Body">
+<A NAME="pgfId-1445031"></A>0x02 - Operational Band Change Control</P>
+<P CLASS="Body">
+<A NAME="pgfId-1445032"></A>0xFF - Reserved</P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1445034"></A><A NAME="51400"></A>Wireless Power Polling (_WPP)</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1445035"></A>This optional method evaluates the recommended polling frequency (in tenths of seconds) for this Wireless Power Calibration device. A value of zero - or the absence of this object when other WPC objects are defined - indicates that the OS does not need to poll the WPC device in order to detect meaningful changes in Wireless power calibration (the hardware is capable of generating asynchronous notifications). </P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1445037"></A>Argument:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1445038"></A>None </P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1445039"></A>Return:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1445040"></A>An Integer containing the recommended polling frequency in tenths of seconds. A value of zero indicates that polling is not required.</P>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1445043"></A><A NAME="88541"></A>Wireless Power Calibration Event 	</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1445044"></A>To communicate the changes in wireless power transmission or interference mitigation to the OSPM. AML code should issue a Notify (wpc_device, 0xXX) whenever a change in power calibration or interference mitigation is required to happen. The OS receives this notification and may call the _WPD control method to determine the notification action associated with it. Event generated may contain the information related to associate action that recipient devices need to take.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1445045"></A>WPD notification should occur whenever a change in power transmission needed either as a result of human proximity or interference mitigation. The granularity of the interference mitigation and power transmission can be address as per the operational device characteristics.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1445046"></A>The WPC notification for interference mitigation will generate pairwise event among participant devices or multicast is if the interference is observed in all the bands of operations involving the wireless devices. </P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1445048"></A>Wireless Power Control Notification Values:</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1445051"></A>Hex Value</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1445053"></A>Description</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1445055"></A>0x80</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1445057"></A>Proximity based power calibration</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1445059"></A>0x81</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1445061"></A>Interference mitigation between Wifi (802.11) and Bluetooth devices</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1445063"></A>0x82-85</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1445065"></A>Reserved for Wifi/BT interference mitigation for later use</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1445067"></A>0x86</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1445069"></A>Interference mitigation between Wifi (802.11) and LTE/3GPP bands</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1445071"></A>0x87-90</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1445073"></A>Reserved for Wifi/LTE/3GPP interference mitigation for later use</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1445075"></A>0x91</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1445077"></A>Interference mitigation between Bluetooth and LTE/3GPP devices</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1445079"></A>0x92-0x95</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1445081"></A>Reserved for Bluetooth and LTE/3GPP interference mitigation for later use</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1377330"></A><A NAME="_Toc489267292"></A><A NAME="_Toc489267672"></A><A NAME="_Toc489272646"></A><A NAME="_Toc202341748"></A><A NAME="_Toc258262435"></A>Example: Power Source and Power Meter Namespace</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1442580"></A><A HREF="Power_Source_and_Power_Meter_Devices.htm#25134" CLASS="XRef">See Power Meter and Power Source/Docking Namespace Example.</A> below shows the ACPI namespace for a computer with a power meter,  AC adapter and two batteries associated with a docking station which itself has an AC adapter.</P>
+<P CLASS="spacing">
+<A NAME="pgfId-1442586"></A>&nbsp;</P>
+<P CLASS="spacing">
+<A NAME="pgfId-1442587"></A>&nbsp;</P>
+<P CLASS="spacing">
+<A NAME="pgfId-1442566"></A>&nbsp;</P>
+<P CLASS="spacing">
+<A NAME="pgfId-1382604"></A>&nbsp;</P>
+<P CLASS="spacing">
+<A NAME="pgfId-1382618"></A>&nbsp;</P>
+<DIV>
+<IMG SRC="Power_Source_and_Power_Meter_Devices-7.gif" ALT="">
+</DIV>
+<DIV>
+<IMG SRC="Power_Source_and_Power_Meter_Devices-8.gif" ALT="">
+</DIV>
+<DIV>
+<IMG SRC="Power_Source_and_Power_Meter_Devices-9.gif" ALT="">
+</DIV>
+<P CLASS="spacing">
+<A NAME="pgfId-1382589"></A>&nbsp;</P>
+<DIV>
+<H6 CLASS="FigureTitle">
+<A NAME="pgfId-1377505"></A><A NAME="25134"></A>Power Meter and Power Source/Docking Namespace Example </H6>
+</DIV>
+</DIV>
+</DIV>
+<HR>
+<DIV CLASS="footnotes">
+<DIV CLASS="footnote">
+<P CLASS="footnote-text">
+<SPAN CLASS="footnoteNumber">
+1.</SPAN>
+<A NAME="pgfId-1375831"></A> Notice that the 1.0 SMBus protocol specification is ambiguous about the definition of the &#8220;slave address&#8221; written into the command field of the host controller. In this case, the slave address is actually the combination of the 7-bit slave address and the Write protocol bit. Therefore, bit 0 of the initiating device&#8217;s slave address is aligned to bit 1 of the host controller&#8217;s slave command register, bit 1 of the slave address is aligned to bit 2 of the controller&#8217;s slave command register, and so on.</P>
+</DIV>
+</DIV>
+</BODY>
+</HTML>

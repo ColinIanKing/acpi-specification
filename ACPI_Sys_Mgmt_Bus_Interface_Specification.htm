@@ -1,0 +1,950 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2016/HTML Export Filter">
+<LINK REL="STYLESHEET" HREF="ACPI_Sys_Mgmt_Bus_Interface_Specification.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE> 13 ACPI System Management Bus Interface Specification</TITLE></HEAD>
+<BODY>
+<DIV>
+<H1 CLASS="Heading-1">
+<A NAME="pgfId-1348521"></A><A NAME="78977"></A>ACPI System Management Bus Interface Specification<DIV>
+<IMG SRC="ACPI_Sys_Mgmt_Bus_Interface_Specification-1.gif" ALT="">
+</DIV>
+</H1>
+<P CLASS="Body">
+<A NAME="pgfId-1348522"></A>This section describes the System Management Bus (SMBus) generic address space and the use of this address space to access SMBus devices from AML. <A NAME="marker-1348523"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1347768"></A>Unlike other address spaces, SMBus operation regions are inherently non-linear, where each offset within an SMBus address space represents a variable-sized (from 0 to 32 bytes) field. Given this uniqueness, SMBus operation regions include restrictions on their field definitions and require the use of an SMBus-specific data buffer for all transactions.<A NAME="marker-1347769"></A><A NAME="marker-1347770"></A><A NAME="marker-1347771"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1347772"></A>The SMBus interface presented in this section is intended for use with any hardware implementation compatible with the SMBus specification. SMBus hardware is broadly classified as either non-EC-based or EC-based. EC-based SMBus implementations comply with the standard register set defined in <A HREF="ACPI_Embedded_Controller_Interface_Specification.htm#71995" CLASS="XRef">See ACPI Embedded Controller Interface Specification.</A>, ACPI Embedded Controller Interface Specification.&#8221; </P>
+<P CLASS="Body">
+<A NAME="pgfId-1351058"></A>Non-EC SMBus implementations can employ any hardware interface and are typically used for their cost savings when SMBus security is not required. Non-EC-based SMBus implementations require the development of hardware specific drivers for each OS implementation. See <A HREF="ACPI_Sys_Mgmt_Bus_Interface_Specification.htm#_Toc489267383" CLASS="XRef">See Declaring SMBus Host Controller Objects.</A>, &#8220;Declaring SMBus Host Controller Objects,&#8221; for more information.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1351059"></A>Support of the SMBus generic address space by ACPI-compatible operating systems is optional. As such, the Smart Battery System Implementer&#8217;s Forum (SBS-IF) has defined an SMBus interface based on a standard set of control methods. This interface is documented in the SMBus Control Method Interface Specification, available at &#8220;Links to ACPI-Related Documents&#8221; (<EM CLASS="Hyperlink">
+http://uefi.org/acpi</EM>
+) under the heading &quot;Smart Battery System Components and SMBus Specification&quot;..<A NAME="marker-1351060"></A></P>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1347786"></A><A NAME="_Toc489267378"></A><A NAME="_Toc489267732"></A><A NAME="_Toc489272706"></A><A NAME="_Toc202341891"></A><A NAME="_Toc258262509"></A>SMBus Overview<A NAME="marker-1347785"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1347787"></A>SMBus is a two-wire interface based upon the I&#178;C protocol. The SMBus is a low-speed bus that provides positive addressing for devices, as well as bus arbitration. For more information, refer to the complete set of SMBus specifications published by the SBS-IF.</P>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1347800"></A><A NAME="_Toc489267379"></A><A NAME="_Toc489267733"></A><A NAME="_Toc489272707"></A><A NAME="_Toc202341892"></A><A NAME="_Toc258262510"></A>SMBus Slave Addresses<A NAME="marker-1347797"></A><A NAME="marker-1347798"></A><A NAME="marker-1347799"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1347801"></A>Slave addresses are specified using a 7-bit non-shifted notation. For example, the slave address of the Smart Battery Selector device would be specified as 0x0A (1010b), not 0x14 (10100b) as might be found in other documents. These two different forms of addresses result from the format in which addresses are transmitted on the SMBus. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1347802"></A>During transmission over the physical SMBus, the slave address is formatted in an 8-bit block with bits 7-1 containing the address and bit 0 containing the read/write bit. ASL code, on the other hand, presents the slave address simply as a 7-bit value making it the responsibility of the OS (driver) to shift the value if needed. For example, the ASL value would have to be shifted left 1 bit before being written to the SMB_ADDR register in the EC based SMBus as described in <A HREF="ACPI_Embedded_Controller_Interface_Specification.htm#_Toc489267350" CLASS="XRef">See Address Register, SMB_ADDR.</A>, &#8220;Address Register, SMB_ADDR.&#8221; </P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1347817"></A><A NAME="_Toc489267380"></A><A NAME="_Toc489267734"></A><A NAME="_Toc489272708"></A><A NAME="_Toc202341893"></A><A NAME="_Toc258262511"></A>SMBus Protocols<A NAME="marker-1347813"></A><A NAME="marker-1347814"></A><A NAME="marker-1347815"></A><A NAME="marker-1347816"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1347818"></A>There are seven possible command protocols for any given SMBus slave device, and a device may use any or all of the protocols to communicate. The protocols and associated access type indicators are listed below. Notice that the protocols values are similar to those defined for the EC-based SMBus in <A HREF="ACPI_Embedded_Controller_Interface_Specification.htm#_Toc489267349" CLASS="XRef">See Protocol Register, SMB_PRTCL.</A>, &#8220;Protocol Register, SMB_PRTCL,&#8221; except that protocol pairs (for example, Read Byte, Write Byte) have been joined.</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1347825"></A>SMBus Protocol Types</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1347828"></A>Value</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1347830"></A>Type</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1347832"></A>Description</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347834"></A>0x02</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347836"></A>SMBQuick</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347838"></A>SMBus Read/Write Quick Protocol</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347840"></A>0x04</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347842"></A>SMBSendReceive</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347844"></A>SMBus Send/Receive Byte Protocol</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347846"></A>0x06</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347848"></A>SMBByte</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347850"></A>SMBus Read/Write Byte Protocol</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347852"></A>0x08</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347854"></A>SMBWord</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347856"></A>SMBus Read/Write Word Protocol</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347858"></A>0x0A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347860"></A>SMBBlock</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347862"></A>SMBus Read/Write Block Protocol</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347864"></A>0x0C</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347866"></A>SMBProcessCall</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347868"></A>SMBus Process Call Protocol</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347870"></A>0x0D</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347872"></A>SMBBlockProcessCall</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347874"></A>SMBus Write Block-Read Block Process Call Protocol</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1347877"></A>All other protocol values are reserved.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1347878"></A>Notice that bit 7 of the protocol value is used by this interface to indicate to the SMB-HC whether or not packet error checking (PEC) should be employed for a transaction. Packet error checking is described in section 7.4 of the System Management Bus Specification, Version 1.1. This highly desirable capability improves the reliability and robustness of SMBus communications. <A NAME="marker-1347879"></A><A NAME="marker-1347880"></A><A NAME="marker-1347881"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1347882"></A>The bit encoding of the protocol value is shown below. For example, the value 0x86 would be used to specify the PEC version of the SMBus Read/Write Byte protocol.</P>
+<DIV>
+<H6 CLASS="spacing">
+<A NAME="pgfId-1347883"></A>&nbsp;</H6>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Art">
+<A NAME="pgfId-1347887"></A><IMG SRC="ACPI_Sys_Mgmt_Bus_Interface_Specification-2.gif" ALIGN="BASELINE" ALT="">
+&nbsp;</H3>
+<DIV>
+<H6 CLASS="FigureTitle">
+<A NAME="pgfId-1347890"></A>Bit Encoding Example<A NAME="marker-1347888"></A><A NAME="marker-1347889"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1347891"></A>Notice that bit 0 of the protocol value is always zero (even number hexadecimal values). In a manner similar to the slave address, software that implements the SMBus interface is responsible for setting this bit to indicate whether the transaction is a read (for example, Read Byte) or write (for example, Write Byte) operation. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1347892"></A>For example, software implanting this interface for EC-SMBus segments would set bit 0 for read transactions. For the SMBByte protocol (0x06), this would result in the value 0x07 being placed into the SMB_PRTCL register<A NAME="_Ref460388997"></A> (or 0x87 if PEC is requested) for write transactions.</P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1347903"></A><A NAME="_Toc489267381"></A><A NAME="_Toc489267735"></A><A NAME="_Toc489272709"></A><A NAME="_Toc202341894"></A><A NAME="_Toc258262512"></A>SMBus Status Codes</H5>
+<P CLASS="Body">
+<A NAME="pgfId-1347904"></A>The use of status codes helps AML determine whether an SMBus transaction was successful. In general, a status code of zero indicates success, while a non-zero value indicates failure. The SMBus interface uses the same status codes defined for the EC-SMBus (see <A HREF="ACPI_Embedded_Controller_Interface_Specification.htm#_Toc489267348" CLASS="XRef">See Status Register, SMB_STS.</A>, &#8220;Status Register, SMB_STS&#8221;). <A NAME="marker-1347905"></A><A NAME="marker-1347906"></A><A NAME="marker-1347907"></A><A NAME="marker-1347908"></A></P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1347922"></A><A NAME="_Toc489267382"></A><A NAME="_Toc489267736"></A><A NAME="_Toc489272710"></A><A NAME="_Toc202341895"></A><A NAME="_Toc258262513"></A>SMBus Command Values<A NAME="marker-1347919"></A><A NAME="marker-1347920"></A><A NAME="marker-1347921"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1347923"></A>SMBus devices may optionally support up to 256 device-specific commands. For these devices, each command value supported by the device is modeled by this interface as a separate virtual register. Protocols that do not transmit a command value (for example, Read/Write Quick and Send/Receive Byte) are modeled using a single virtual register (with a command value = 0x00). </P>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1347935"></A><A NAME="_Toc258262514"></A>Accessing the SMBus from ASL Code</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1347936"></A>The following sections demonstrate how to access and use the SMBus from ASL code.</P>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1347947"></A><A NAME="_Toc489267383"></A><A NAME="_Toc489267737"></A><A NAME="_Toc489272711"></A><A NAME="_Toc202341896"></A><A NAME="_Toc258262515"></A>Declaring SMBus Host Controller Objects<A NAME="marker-1347943"></A><A NAME="marker-1347944"></A><A NAME="marker-1347945"></A><A NAME="marker-1347946"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1347948"></A>EC-based SMBus 1.0-compatible HCs should be modeled in the ACPI namespace as described in <A HREF="ACPI_Embedded_Controller_Interface_Specification.htm#_Toc489267373" CLASS="XRef">See Defining an Embedded Controller Device in ACPI Namespace.</A>, &#8220;Defining an Embedded Controller SMBus Host Controller in ACPI Namespace.&#8221; An example definition is given below. Using the HID value &#8220;ACPI0001&#8221; identifies that this SMB-HC is implemented on an embedded controller using the standard SMBus register set defined in <A HREF="ACPI_Embedded_Controller_Interface_Specification.htm#37345" CLASS="XRef">See  SMBus Host Controller Interface via Embedded Controller.</A>, SMBus Host Controller Interface via Embedded Controller.&#8221;</P>
+</DIV>
+<DIV>
+<H4 CLASS="code-Ex-CODE-PRE-CITE">
+<A NAME="pgfId-1347949"></A>&nbsp;</H4>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1347950"></A>Device (SMB0) </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1347951"></A>{</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1347952"></A>    Name(_HID, &quot;ACPI0001&quot;)            // EC-based SMBus 1.0 compatible Host Controller</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1347953"></A>    Name(_EC, 0x2030)                 // EC offset 0x20, query bit 0x30</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1347954"></A>      :</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1347955"></A>}</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380628"></A>&nbsp;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1347956"></A>EC-based SMBus 2.0-compatible host controllers should be defined similarly in the namespace as follows:</P>
+</DIV>
+<DIV>
+<H4 CLASS="code-Ex-CODE-PRE-CITE">
+<A NAME="pgfId-1347957"></A>&nbsp;</H4>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1347958"></A>Device (SMB0) </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1347959"></A>{</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1347960"></A>    Name(_HID, &quot;ACPI0005&quot;)            // EC-based SMBus 2.0 compatible Host Controller</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1347961"></A>    Name(_EC, 0x2030)                 // EC offset 0x20, query bit 0x30</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1347962"></A>      :</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1347963"></A>}</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380639"></A>&nbsp;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1347964"></A>Non-EC-based SMB-HCs should be modeled in a manner similar to the EC-based SMBus HC. An example definition is given below. These devices use a vendor-specific hardware identifier (HID) to specify the type of SMB-HC (do not use &#8220;ACPI0001&#8221; or &#8220;ACPI0005&#8221;). Using a vendor-specific HID allows the correct software to be loaded to service this segment&#8217;s SMBus address space.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1347966"></A>Device(SMB0) </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1347967"></A>{</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1347968"></A>    Name(_HID, &quot;&lt;Vendor-Specific HID&gt;&quot;)    // Vendor-Specific HID</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1347969"></A>      :</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1347970"></A>}</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380646"></A>&nbsp;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1347971"></A>Regardless of the type of hardware, some OS software element (for example, the SMBus HC driver) must register with OSPM to support all SMBus operation regions defined for the segment. This software allows the generic SMBus interface defined in this section to be used on a specific hardware implementation by translating between the conceptual (for example, SMBus address space) and physical (for example, process of writing/reading registers) models. Because of this linkage, SMBus operation regions must be defined immediately within the scope of the corresponding SMBus device.<A NAME="marker-1347972"></A></P>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1347984"></A><A NAME="_Toc489267384"></A><A NAME="_Toc489267738"></A><A NAME="_Toc489272712"></A><A NAME="_Toc202341897"></A><A NAME="_Toc258262516"></A>Declaring SMBus Devices<A NAME="marker-1347981"></A><A NAME="marker-1347982"></A><A NAME="marker-1347983"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1347985"></A>The SMBus, as defined by the SMBus 1.0 Specification, is not an enumerable bus. As a result, an SMBus 1.0-compatible SMB-HC driver cannot discover child devices on the SMBus and load the appropriate corresponding device drivers. As such, SMBus 1.0-compatible devices are declared in the ACPI namespace, in like manner to other motherboard devices, and enumerated by OSPM.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1347986"></A>The SMBus 2.0 specification adds mechanisms enabling device enumeration on the bus while providing compatibility with existing devices. ACPI defines and associates the &#8220;ACPI0005&#8221; HID value with an EC-based SMBus 2.0-compatible host controller. OSPM will enumerate SMBus 1.0-compatible devices when declared in the namespace under an SMBus 2.0-compatible host controller.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1347987"></A>The responsibility for the definition of ACPI namespace objects, required by an SMBus 2.0-compatible host controller driver to enumerate non-bus-enumerable devices, is relegated to the Smart Battery System Implementers Forum. See &#8220;Links to ACPI-Related Documents&#8221; (<EM CLASS="Hyperlink">
+http://uefi.org/acpi</EM>
+) under the heading &quot;Smart Battery System Components and SMBus Specification&quot;..</P>
+<P CLASS="Body">
+<A NAME="pgfId-1347988"></A>Starting in ACPI 2.0, _ADR is used to associate SMBus devices with their lowest SMBus slave address.</P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1348009"></A><A NAME="marker-1348006"></A>Declaring SMBus Operation Regions</H5>
+<P CLASS="Body">
+<A NAME="pgfId-1348010"></A>Each SMBus operation region definition identifies a single SMBus slave address. Operation regions are defined only for those SMBus devices that need to be accessed from AML. As with other regions, SMBus operation regions are only accessible via the Field term (see <A HREF="ACPI_Sys_Mgmt_Bus_Interface_Specification.htm#_Toc489267384" CLASS="XRef">See Declaring SMBus Devices.</A>, &#8220;Declaring SMBus Fields&#8221;).</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348011"></A>This interface models each SMBus device as having a 256-byte linear address range. Each byte offset within this range corresponds to a single command value (for example, byte offset 0x12 equates to command value 0x12), with a maximum of 256 command values. By doing this, SMBus address spaces appear linear and can be processed in a manner similar to the other address space types.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348012"></A>The syntax for the OperationRegion term (from <A HREF="ACPI_Source_Language_Reference.htm#_Toc489267440" CLASS="XRef">See OperationRegion (Declare Operation Region).</A>, &#8220;OperationRegion (Declare Operation Region]&#8221;) is described below.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380653"></A><A NAME="marker-1348013"></A>OperationRegion (<BR>
+    RegionName,        // NameString<BR>
+    RegionSpace,       // RegionSpaceKeyword<BR>
+    Offset,            // TermArg=&gt;Integer<BR>
+    Length             // TermArg=&gt;Integer<BR>
+)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380660"></A>&nbsp;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348017"></A>Where: </P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348018"></A>RegionName specifies a name for this slave device (for example, &#8220;SBD0&#8221;).</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348019"></A>RegionSpace must be set to SMBus (operation region type value 0x04).</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348020"></A>Offset is a word-sized value specifying the slave address and initial command value offset for the target device. The slave address is stored in the high byte and the command value offset is stored in the low byte. For example, the value 0x4200 would be used for an SMBus device residing at slave address 0x42 with an initial command value offset of zero (0).</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348021"></A>Length is set to the 0x100 (256), representing the maximum number of possible command values, for regions with an initial command value offset of zero (0). The difference of these two values is used for regions with non-zero offsets. For example, a region with an Offset value of 0x4210 would have a corresponding Length of 0xF0 (0x100 minus 0x10).</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1348022"></A>For example, the Smart Battery Subsystem (illustrated below) consists of the Smart Battery Charger at slave address 0x09, the Smart Battery System Manager at slave address 0x0A, and one or more batteries (multiplexed) at slave address 0x0B. (Notice that Figure 13-2 represents the logical connection of a Smart Battery Subsystem. The actual physical connections of the Smart Battery(s) and the Smart Battery Charger are made through the Smart Battery System Manager.) All devices support the Read/Write Word protocol. Batteries also support the Read/Write Block protocol.<A NAME="marker-1348023"></A></P>
+<DIV>
+<H6 CLASS="spacing">
+<A NAME="pgfId-1348024"></A>&nbsp;</H6>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Art">
+<A NAME="pgfId-1348028"></A><IMG SRC="ACPI_Sys_Mgmt_Bus_Interface_Specification-3.gif" ALIGN="BASELINE" ALT="">
+&nbsp;</H3>
+<DIV>
+<H6 CLASS="FigureTitle">
+<A NAME="pgfId-1348029"></A>Smart Battery Subsystem Devices</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348039"></A><A NAME="marker-1348036"></A>The following ASL code shows the use of the OperationRegion term to describe these SMBus devices:</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380667"></A>Device (SMB0) </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348042"></A>{</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348043"></A>    Name(_HID, &quot;ACPI0001&quot;)                         // EC-SMBus Host Controller</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348044"></A>    Name(_EC, 0x2030)                              // EC offset 0x20, query bit 0x30</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348045"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348046"></A>OperationRegion(SBC0, SMBus, 0x0900, 0x100)        // Smart Battery Charger</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348047"></A>OperationRegion(SBS0, SMBus, 0x0A00, 0x100)        // Smart Battery Selector</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348048"></A>OperationRegion(SBD0, SMBus, 0x0B00, 0x100)        // Smart Battery Device(s)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348049"></A>      :</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348050"></A>}</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348051"></A>Notice that these operation regions in this example are defined within the immediate context of the &#8216;owning&#8217; EC-SMBus device. Each definition corresponds to a separate slave address (device), and happens to use an initial command value offset of zero (0).</P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1348065"></A><A NAME="_Toc489267386"></A><A NAME="_Toc489267740"></A><A NAME="_Toc489272714"></A><A NAME="_Ref42578964"></A><A NAME="_Toc202341899"></A><A NAME="_Toc258262518"></A>Declaring SMBus Fields<A NAME="marker-1348063"></A><A NAME="marker-1348064"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1348066"></A>As with other regions, SMBus operation regions are only accessible via the Field term. Each field element is assigned a unique command value and represents a virtual register on the targeted SMBus device. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1348067"></A>The syntax for the Field term (from <A HREF="ACPI_Source_Language_Reference.htm#_Toc489267428" CLASS="XRef">See Event (Declare Event Synchronization Object).</A>, &#8220;Event (Declare Event Synchronization Object]&#8221;) is described below. </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380681"></A>Field(<BR>
+    RegionName,        // NameString=&gt;OperationRegion<BR>
+    AccessType,        // AccessTypeKeyword<BR>
+    LockRule,          // LockRuleKeyword<BR>
+    UpdateRule         // UpdateRuleKeyword - ignored<BR>
+) {FieldUnitList}</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348070"></A>Where:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348071"></A>RegionName specifies the operation region name previously defined for the device.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348072"></A>AccessType must be set to BufferAcc. This indicates that access to field elements will be done using a region-specific data buffer. For this access type, the field handler is not aware of the data buffer&#8217;s contents which may be of any size. When a field of this type is used as the source argument in an operation it simply evaluates to a buffer. When used as the destination, however, the buffer is passed bi-directionally to allow data to be returned from write operations. The modified buffer then becomes the execution result of that operation. This is slightly different than the normal case in which the execution result is the same as the value written to the destination. Note that the source is never changed, since it could be a read only object (see <A HREF="ACPI_Sys_Mgmt_Bus_Interface_Specification.htm#_Toc489267387" CLASS="XRef">See Declaring and Using an SMBus Data Buffer.</A>, &#8220;Declaring an SMBus Data Buffer&#8221; and <A HREF="ACPI_Source_Language_Reference.htm#_Toc202341942" CLASS="XRef">See ASL Opcode Terms.</A>, &#8220;Opcode Terms&#8221;).</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348073"></A>LockRule indicates if access to this operation region requires acquisition of the Global Lock for synchronization. This field should be set to Lock on system with firmware that may access the SMBus, and NoLock otherwise.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348074"></A>UpdateRule is not applicable to SMBus operation regions since each virtual register is accessed in its entirety. This field is ignored for all SMBus field definitions.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1348075"></A>SMBus operation regions require that all field elements be declared at command value granularity. This means that each virtual register cannot be broken down to its individual bits within the field definition. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1348076"></A>Access to sub-portions of virtual registers can be done only outside of the field definition. This limitation is imposed both to simplify the SMBus interface and to maintain consistency with the physical model defined by the SMBus specification.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348077"></A>SMBus protocols are assigned to field elements using the AccessAs term within the field definition. The syntax for this term (from <A HREF="ACPI_Source_Language_Reference.htm#_Toc489272735" CLASS="XRef">See ASL Root and Secondary Terms.</A>, &#8220;ASL Root and SecondaryTerms&#8221;) is described below.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348079"></A>AccessAs(</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348080"></A>    AccessType,        //AccessTypeKeyword</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348081"></A>    AccessAttribute    //Nothing | ByteConst | AccessAttribKeyword</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348082"></A>)</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348083"></A>Where:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348084"></A>AccessType must be set to BufferAcc.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348085"></A>AccessAttribute indicates the SMBus protocol to assign to command values that follow this term. See <A HREF="ACPI_Sys_Mgmt_Bus_Interface_Specification.htm#_Toc489267380" CLASS="XRef">See SMBus Protocols.</A>, &#8220;SMBus Protocols,&#8221; for a listing of the SMBus protocol types and values.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1348086"></A>An AccessAs term must appear as the first entry in a field definition to set the initial SMBus protocol for the field elements that follow. A maximum of one SMBus protocol may be defined for each field element. Devices supporting multiple protocols for a single command value can be modeled by specifying multiple field elements with the same offset (command value), where each field element is preceded by an AccessAs term specifying an alternate protocol.<A NAME="marker-1348087"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1348088"></A>For example, the register at command value 0x08 for a Smart Battery device (illustrated below) represents a word value specifying the battery temperature (in degrees Kelvin), while the register at command value 0x20 represents a variable-length (0 to 32 bytes) character string specifying the name of the company that manufactured the battery.</P>
+<DIV>
+<H6 CLASS="spacing">
+<A NAME="pgfId-1348089"></A>&nbsp;</H6>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Art">
+<A NAME="pgfId-1348093"></A><IMG SRC="ACPI_Sys_Mgmt_Bus_Interface_Specification-4.gif" ALIGN="BASELINE" ALT="">
+&nbsp;</H3>
+<DIV>
+<H6 CLASS="FigureTitle">
+<A NAME="pgfId-1348094"></A>Smart Battery Device Virtual Registers</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1350963"></A>The following ASL code shows the use of the OperationRegion, Field, AccessAs, and Offset terms to represent these Smart Battery device virtual registers:<A NAME="marker-1350964"></A><A NAME="marker-1350965"></A><A NAME="marker-1350966"></A>	</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380702"></A>OperationRegion(SBD0, SMBus, 0x0B00, 0x0100)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348101"></A>Field(SBD0, BufferAcc, NoLock, Preserve)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348102"></A>{</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348103"></A>    AccessAs(BufferAcc, SMBWord)    // Use the SMBWord protocol for the following...</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348104"></A>    MFGA, 8,                        // ManufacturerAccess() [command value 0x00]</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348105"></A>    RCAP, 8,                        // RemainingCapacityAlarm() [command value 0x01]</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348106"></A>    Offset(0x08)                    // Skip to command value 0x08...</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348107"></A>    BTMP, 8,                        // Temperature() [command value 0x08]</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348108"></A>    Offset(0x20)                    // Skip to command value 0x20...</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348109"></A>    AccessAs(BufferAcc, SMBBlock)   // Use the SMBBlock protocol for the following...</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348110"></A>    MFGN, 8,                        // ManufacturerName() [command value 0x20]</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348111"></A>    DEVN, 8                         // DeviceName() [command value 0x21]</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348112"></A>}</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348113"></A>Notice that command values are equivalent to the field element&#8217;s byte offset (for example, MFGA=0, RCAP=1, BTMP=8). The AccessAs term indicates which SMBus protocol to use for each command value.</P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1348129"></A><A NAME="_Toc489267387"></A><A NAME="_Toc489267741"></A><A NAME="_Toc489272715"></A><A NAME="_Ref42579074"></A><A NAME="_Toc202341900"></A><A NAME="_Toc258262519"></A>Declaring and Using an SMBus Data Buffer<A NAME="marker-1348126"></A><A NAME="marker-1348127"></A><A NAME="marker-1348128"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1348130"></A>The use of a data buffer for SMBus transactions allows AML to receive status and data length values, as well as making it possible to implement the Process Call protocol. As previously mentioned, the BufferAcc access type is used to indicate to the field handler that a region-specific data buffer will be used. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1348134"></A><A NAME="marker-1348131"></A><A NAME="marker-1348132"></A>For SMBus operation regions, this data buffer is defined as a fixed-length 34-byte buffer that, if represented using a &#8216;C&#8217;-styled declaration, would be modeled as follows:</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348136"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380716"></A>typedef struct</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348137"></A>{</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348138"></A>    BYTE        Status;        // Byte 0 of the data buffer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348139"></A>    BYTE        Length;        // Byte 1 of the data buffer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348140"></A>    BYTE[32]    Data;          // Bytes 2 through 33 of the data buffer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348141"></A>}</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380723"></A>&nbsp;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348142"></A>Where:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348143"></A>Status (byte 0) indicates the status code of a given SMBus transaction. See <A HREF="ACPI_Sys_Mgmt_Bus_Interface_Specification.htm#_Toc489267381" CLASS="XRef">See SMBus Status Codes.</A>, &#8220;SMBus Status Code,&#8221; for more information. </LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348144"></A>Length (byte 1) specifies the number of bytes of valid data that exists in the data buffer. Use of this field is only defined for the Read/Write Block protocol, where valid Length values are 0 through 32. For other protocols--where the data length is implied by the protocol--this field is reserved. </LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348145"></A>Data (bytes 33-2) represents a 32-byte buffer, and is the location where actual data is stored.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1348146"></A>For example, the following ASL shows the use of the SMBus data buffer for performing transactions to a Smart Battery device. This code is based on the example ASL presented in <A HREF="ACPI_Sys_Mgmt_Bus_Interface_Specification.htm#_Toc489267386" CLASS="XRef">See Declaring SMBus Fields.</A>, &#8220;Declaring SMBus Fields,&#8221; which lists the operation region and field definitions for the Smart Battery device.<A NAME="marker-1348147"></A><A NAME="marker-1348148"></A></P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348150"></A>/* Create the SMBus data buffer */</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348151"></A>Name(BUFF, Buffer(34){})                // Create SMBus data buffer as BUFF</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348152"></A>CreateByteField(BUFF, 0x00, OB1)        // OB1 = Status (Byte)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348153"></A>CreateByteField(BUFF, 0x01, OB2)        // OB2 = Length (Byte)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348154"></A>CreateWordField(BUFF, 0x02, OB3)        // OB3 = Data (Word - Bytes 2 &amp; 3)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348155"></A>CreateField(BUFF, 0x10, 256, OB4)       // OB4 = Data (Block - Bytes 2-33)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348156"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348157"></A>/* Read the battery temperature */</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348158"></A>Store(BTMP, BUFF)                       // Invoke Read Word transaction</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348159"></A>If(LEqual(OB1, 0x00))                   // Successful?</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348160"></A>{</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348161"></A>                                        // OB3 = Battery temperature in 1/10th degrees Kelvin</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348162"></A>}</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348163"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348164"></A>/* Read the battery manufacturer name */</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348165"></A>Store(MFGN, BUFF)                       // Invoke Read Block transaction</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348166"></A>If(LEqual(OB1, 0x00))                   // Successful?</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348167"></A>{</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348168"></A>                                        // OB2 = Length of the manufacturer name</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348169"></A>                                        // OB4 = Manufacturer name (as a counted string)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348170"></A>}</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348171"></A>Notice the use of the CreateField primitives to access the data buffer&#8217;s sub-elements (Status, Length, and Data), where Data (bytes 33-2) is &#8216;typecast&#8217; as both word (OB3) and block (OB4) data.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348172"></A>The example above demonstrates the use of the Store() operator to invoke a Read Block transaction to obtain the name of the battery manufacturer. Evaluation of the source operand (MFGN) results in a 34-byte buffer that gets copied by Store() to the destination buffer (BUFF).</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348173"></A>Capturing the results of a write operation, for example to check the status code, requires an additional Store() operator, as shown below.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380737"></A>Store(Store(BUFF, MFGN), BUFF)           // Invoke Write Block transaction</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348176"></A>If(LEqual(OB1, 0x00)) {...}                // Transaction successful?</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348178"></A>Note that the outer Store() copies the results of the Write Block transaction back into BUFF. This is the nature of BufferAcc&#8217;s bi-directionality described in <A HREF="ACPI_Sys_Mgmt_Bus_Interface_Specification.htm#_Toc489267386" CLASS="XRef">See Declaring SMBus Fields.</A>, &#8220;Declaring SMBus Fields&#8221; It should be noted that storing (or parsing) the result of an SMBus Write transaction is not required although useful for ascertaining the outcome of a transaction.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348179"></A>SMBus Process Call protocols require similar semantics due to the fact that only destination operands are passed bi-directionally. These transactions require the use of the double-Store() semantics to properly capture the return results.</P>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1348192"></A><A NAME="_Toc489267388"></A><A NAME="_Toc489267742"></A><A NAME="_Toc489272716"></A><A NAME="_Ref42579091"></A><A NAME="_Toc202341901"></A><A NAME="_Toc258262520"></A>Using the SMBus Protocols<A NAME="marker-1348190"></A><A NAME="marker-1348191"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1348193"></A>This section provides information and examples on how each of the SMBus protocols can be used to access SMBus devices from AML.<A NAME="marker-1348194"></A></P>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1348206"></A><A NAME="_Toc489267389"></A><A NAME="_Toc489267743"></A><A NAME="_Toc489272717"></A><A NAME="_Toc202341902"></A><A NAME="_Toc258262521"></A>Read/Write Quick (SMBQuick)<A NAME="marker-1348204"></A><A NAME="marker-1348205"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1348207"></A>The SMBus Read/Write Quick protocol (SMBQuick) is typically used to control simple devices using a device-specific binary command (for example, ON and OFF). Command values are not used by this protocol and thus only a single element (at offset 0) can be specified in the field definition. This protocol transfers no data.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348208"></A>The following ASL code illustrates how a device supporting the Read/Write Quick protocol should be accessed:<A NAME="marker-1348209"></A></P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348211"></A>OperationRegion(SMBD, SMBus, 0x4200, 0x100)    // SMBus device at slave address 0x42</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348212"></A>Field(SMBD, BufferAcc, NoLock, Preserve)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348213"></A>{</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348214"></A>    AccessAs(BufferAcc, SMBQuick)              // Use the SMBus Read/Write Quick protocol</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348215"></A>    FLD0, 8                                    // Virtual register at command value 0.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348216"></A>}</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348217"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348218"></A>/* Create the SMBus data buffer */</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348219"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348220"></A>Name(BUFF, Buffer(34){})                       // Create SMBus data buffer as BUFF</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348221"></A>CreateByteField(BUFF, 0x00, OB1)               // OB1 = Status (Byte)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348222"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348223"></A>/* Signal device (e.g. OFF) */</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348224"></A>Store(FLD0, BUFF)                              // Invoke Read Quick transaction</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348225"></A>If(LEqual(OB1, 0x00)) {...}                      // Successful?</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348226"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348227"></A>/* Signal device (e.g. ON) */</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348228"></A>Store(BUFF, FLD0)                              // Invoke Write Quick transaction</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348229"></A>In this example, a single field element (FLD0) at offset 0 is defined to represent the protocol&#8217;s read/write bit. Access to FLD0 will cause an SMBus transaction to occur to the device. Reading the field results in a Read Quick, and writing to the field results in a Write Quick. In either case data is not transferred--access to the register is simply used as a mechanism to invoke the transaction.</P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1348241"></A><A NAME="_Toc489267390"></A><A NAME="_Toc489267744"></A><A NAME="_Toc489272718"></A><A NAME="_Toc202341903"></A><A NAME="_Toc258262522"></A>Send/Receive Byte (SMBSendReceive)<A NAME="marker-1348239"></A><A NAME="marker-1348240"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1348242"></A>The SMBus Send/Receive Byte protocol (SMBSendReceive) transfers a single byte of data. Like Read/Write Quick, command values are not used by this protocol and thus only a single element (at offset 0) can be specified in the field definition.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348243"></A>The following ASL code illustrates how a device supporting the Send/Receive Byte protocol should be accessed:<A NAME="marker-1348244"></A></P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348246"></A>OperationRegion(SMBD, SMBus, 0x4200, 0x100) // SMBus device at slave address 0x42</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348247"></A>Field(SMBD, BufferAcc, NoLock, Preserve)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348248"></A>{</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348249"></A>    AccessAs(BufferAcc, SMBSendReceive)     // Use the SMBus Send/Receive Byte protocol</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348250"></A>    FLD0, 8                                 // Virtual register at command value 0.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348251"></A>}</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348252"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348253"></A>// Create the SMBus data buffer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348254"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348255"></A>Name(BUFF, Buffer(34){})                    // Create SMBus data buffer as BUFF</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348256"></A>CreateByteField(BUFF, 0x00, STAT)           // STAT = Status (Byte)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348257"></A>CreateByteField(BUFF, 0x02, DATA)           // DATA = Data (Byte)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1383969"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348259"></A>// Receive a byte of data from the device</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348260"></A>Store(FLD0, BUFF)                           // Invoke a Receive Byte transaction</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348261"></A>If(LEqual(STAT, 0x00))                      // Successful?</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348262"></A>{</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348263"></A>    // DATA = Received byte...</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348264"></A>}</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348265"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348266"></A>// Send the byte &#8216;0x16&#8217; to the device</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348267"></A>Store(0x16, DATA)                           // Save 0x16 into the data buffer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348268"></A>Store(BUFF, FLD0)                           // Invoke a Send Byte transaction</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380758"></A>&nbsp;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348269"></A>In this example, a single field element (FLD0) at offset 0 is defined to represent the protocol&#8217;s data byte. Access to FLD0 will cause an SMBus transaction to occur to the device. Reading the field results in a Receive Byte, and writing to the field results in a Send Byte.</P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1348281"></A><A NAME="_Toc489267391"></A><A NAME="_Toc489267745"></A><A NAME="_Toc489272719"></A><A NAME="_Toc202341904"></A><A NAME="_Toc258262523"></A>Read/Write Byte (SMBByte)<A NAME="marker-1348279"></A><A NAME="marker-1348280"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1348282"></A>The SMBus Read/Write Byte protocol (SMBByte) also transfers a single byte of data. But unlike Send/Receive Byte, this protocol uses a command value to reference up to 256 byte-sized virtual registers.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348283"></A>The following ASL code illustrates how a device supporting the Read/Write Byte protocol should be accessed:<A NAME="marker-1348284"></A></P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348286"></A>OperationRegion(SMBD, SMBus, 0x4200, 0x100)    // SMBus device at slave address 0x42</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348287"></A>Field(SMBD, BufferAcc, NoLock, Preserve)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348288"></A>{</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348289"></A>    AccessAs(BufferAcc, SMBByte)              // Use the SMBus Read/Write Byte protocol</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348290"></A>    FLD0, 8,                                  // Virtual register at command value 0.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348291"></A>    FLD1, 8,                                  // Virtual register at command value 1.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348292"></A>    FLD2, 8                                   // Virtual register at command value 2.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348293"></A>}</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348294"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348295"></A>                                              // Create the SMBus data buffer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348296"></A>Name(BUFF, Buffer(34){})                      // Create SMBus data buffer as BUFF</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348297"></A>CreateByteField(BUFF, 0x00, STAT)             // STAT = Status (Byte)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348298"></A>CreateByteField(BUFF, 0x02, DATA)             // DATA = Data (Byte)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348299"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348300"></A>// Read a byte of data from the device using command value 1</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348301"></A>Store(FLD1, BUFF)                             // Invoke a Read Byte transaction</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348302"></A>If(LEqual(STAT, 0x00))                        // Successful?</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348303"></A>{</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348304"></A>                                              // DATA = Byte read from FLD1...</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348305"></A>}</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348306"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348307"></A>// Write the byte &#8216;0x16&#8217; to the device using command value 2</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348308"></A>Store(0x16, DATA)                            // Save 0x16 into the data buffer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348309"></A>Store(BUFF, FLD2)                            // Invoke a Write Byte transaction</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380765"></A>&nbsp;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348311"></A>In this example, three field elements (FLD0, FLD1, and FLD2) are defined to represent the virtual registers for command values 0, 1, and 2. Access to any of the field elements will cause an SMBus transaction to occur to the device. Reading FLD1 results in a Read Byte with a command value of 1, and writing to FLD2 results in a Write Byte with command value 2.</P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1348323"></A><A NAME="_Toc489267392"></A><A NAME="_Toc489267746"></A><A NAME="_Toc489272720"></A><A NAME="_Toc202341905"></A><A NAME="_Toc258262524"></A>Read/Write Word (SMBWord)<A NAME="marker-1348321"></A><A NAME="marker-1348322"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1348324"></A>The SMBus Read/Write Word protocol (SMBWord) transfers 2 bytes of data. This protocol also uses a command value to reference up to 256 word-sized virtual device registers. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1348325"></A>The following ASL code illustrates how a device supporting the Read/Write Word protocol should be accessed:<A NAME="marker-1348326"></A></P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348328"></A>OperationRegion(SMBD, SMBus, 0x4200, 0x100)    // SMBus device at slave address 0x42</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348329"></A>Field(SMBD, BufferAcc, NoLock, Preserve)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348330"></A>{</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348331"></A>    AccessAs(BufferAcc, SMBWord)               // Use the SMBus Read/Write Word protocol</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348332"></A>    FLD0, 8,                                   // Virtual register at command value 0.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348333"></A>    FLD1, 8,                                   // Virtual register at command value 1.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348334"></A>    FLD2, 8                                    // Virtual register at command value 2.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348335"></A>}</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348336"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348337"></A>// Create the SMBus data buffer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348338"></A>Name(BUFF, Buffer(34){})                       // Create SMBus data buffer as BUFF</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348339"></A>CreateByteField(BUFF, 0x00, STAT)              // STAT = Status (Byte)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348340"></A>CreateWordField(BUFF, 0x02, DATA)              // DATA = Data (Word)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348341"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348342"></A>// Read two bytes of data from the device using command value 1</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348343"></A>Store(FLD1, BUFF)                              // Invoke a Read Word transaction</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348344"></A>If(LEqual(STAT, 0x00))                         // Successful?</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348345"></A>{</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348346"></A>    // DATA = Word read from FLD1...</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348347"></A>}</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348348"></A>// Write the word &#8216;0x5416&#8217; to the device using command value 2</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348349"></A>Store(0x5416, DATA)                            // Save 0x5416 into the data buffer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348350"></A>Store(BUFF, FLD2)                              // Invoke a Write Word transaction</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380772"></A>&nbsp;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348351"></A>In this example, three field elements (FLD0, FLD1, and FLD2) are defined to represent the virtual registers for command values 0, 1, and 2. Access to any of the field elements will cause an SMBus transaction to occur to the device. Reading FLD1 results in a Read Word with a command value of 1, and writing to FLD2 results in a Write Word with command value 2.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348352"></A>Notice that although accessing each field element transmits a word (16 bits) of data, the fields are listed as 8 bits each. The actual data size is determined by the protocol. Every field element is declared with a length of 8 bits so that command values and byte offsets are equivalent.</P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1348364"></A><A NAME="_Toc489267393"></A><A NAME="_Toc489267747"></A><A NAME="_Toc489272721"></A><A NAME="_Toc202341906"></A><A NAME="_Toc258262525"></A>Read/Write Block (SMBBlock)<A NAME="marker-1348362"></A><A NAME="marker-1348363"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1348365"></A>The SMBus Read/Write Block protocol (SMBBlock) transfers variable-sized (0-32 bytes) data. This protocol uses a command value to reference up to 256 block-sized virtual registers. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1351023"></A>The following ASL code illustrates how a device supporting the Read/Write Block protocol should be accessed:<A NAME="marker-1351024"></A></P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348369"></A>OperationRegion(SMBD, SMBus, 0x4200, 0x100)   // SMBus device at slave address 0x42</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348370"></A>Field(SMBD, BufferAcc, NoLock, Preserve)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348371"></A>{</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348372"></A>    AccessAs(BufferAcc, SMBBlock)             // Use the SMBus Read/Write Block protocol</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348373"></A>    FLD0, 8,                                  // Virtual register at command value 0.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348374"></A>    FLD1, 8,                                  // Virtual register at command value 1.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348375"></A>    FLD2, 8                                   // Virtual register at command value 2.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348376"></A>}</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348377"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348378"></A>// Create the SMBus data buffer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348379"></A>Name(BUFF, Buffer(34){})                     // Create SMBus data buffer as BUFF</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348380"></A>CreateByteField(BUFF, 0x00, STAT)            // STAT = Status (Byte)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348381"></A>CreateByteField(BUFF, 0x01, SIZE)            // SIZE = Length (Byte)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348382"></A>CreateField(BUFF, 0x10, 256, DATA)           // DATA = Data (Block)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348383"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348384"></A>// Read block data from the device using command value 1</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348385"></A>Store(FLD1, BUFF)                            // Invoke a Read Block transaction</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348386"></A>If(LEqual(STAT, 0x00))                       // Successful?</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348387"></A>{</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348388"></A>    // SIZE = Size (number of bytes) of the block data read from FLD1...</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348389"></A>    // DATA = Block data read from FLD1...</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348390"></A>}</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348391"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348392"></A>// Write the block &#8216;TEST&#8217; to the device using command value 2</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348393"></A>Store(&#8220;TEST&#8221;, DATA)                          // Save &#8220;TEST&#8221; into the data buffer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348394"></A>Store(4, SIZE)                               // Length of valid data in the data buffer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348395"></A>Store(BUFF, FLD2)                            // Invoke a Write Word transaction</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380779"></A>&nbsp;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348396"></A>In this example, three field elements (FLD0, FLD1, and FLD2) are defined to represent the virtual registers for command values 0, 1, and 2. Access to any of the field elements will cause an SMBus transaction to occur to the device. Reading FLD1 results in a Read Block with a command value of 1, and writing to FLD2 results in a Write Block with command value 2.</P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1348408"></A><A NAME="_Toc489267394"></A><A NAME="_Toc489267748"></A><A NAME="_Toc489272722"></A><A NAME="_Toc202341907"></A><A NAME="_Toc258262526"></A>Word Process Call (SMBProcessCall)<A NAME="marker-1348406"></A><A NAME="marker-1348407"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1348409"></A>The SMBus Process Call protocol (SMBProcessCall) transfers 2 bytes of data bi-directionally (performs a Write Word followed by a Read Word as an atomic transaction). This protocol uses a command value to reference up to 256 word-sized virtual registers. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1348411"></A>The following ASL code illustrates how a device supporting the Process Call protocol should be accessed:<A NAME="marker-1348410"></A></P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348413"></A>OperationRegion(SMBD, SMBus, 0x4200, 0x100)    // SMBus device at slave address 0x42</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348414"></A>Field(SMBD, BufferAcc, NoLock, Preserve)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348415"></A>{</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348416"></A>    AccessAs(BufferAcc, SMBProcessCall)        // Use the SMBus Process Call protocol</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348417"></A>    FLD0, 8,                                   // Virtual register at command value 0.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348418"></A>    FLD1, 8,                                   // Virtual register at command value 1.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348419"></A>    FLD2, 8                                    // Virtual register at command value 2.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348420"></A>}</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348421"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348422"></A>                                               // Create the SMBus data buffer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348423"></A>Name(BUFF, Buffer(34){})                       // Create SMBus data buffer as BUFF</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348424"></A>CreateByteField(BUFF, 0x00, STAT)              // STAT = Status (Byte)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348425"></A>CreateWordField(BUFF, 0x02, DATA)              // DATA = Data (Word)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348426"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348427"></A>// Process Call with input value &#8216;0x5416&#8217; to the device using command value 1</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348428"></A>Store(0x5416, DATA)                           // Save 0x5416 into the data buffer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348429"></A>Store(Store(BUFF, FLD1), BUFF)                // Invoke a Process Call transaction</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348430"></A>If(LEqual(STAT, 0x00))                        // Successful?</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348431"></A>{</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348432"></A>                                              // DATA = Word returned from FLD1...</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348433"></A>}</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380786"></A>&nbsp;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348434"></A>In this example, three field elements (FLD0, FLD1, and FLD2) are defined to represent the virtual registers for command values 0, 1, and 2. Access to any of the field elements will cause an SMBus transaction to occur to the device. Reading or writing FLD1 results in a Process Call with a command value of 1. Notice that unlike other protocols, Process Call involves both a write and read operation in a single atomic transaction. This means that the Data element of the SMBus data buffer is set with an input value before the transaction is invoked, and holds the output value following the successful completion of the transaction.</P>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-3">
+<A NAME="pgfId-1348445"></A><A NAME="_Toc489267395"></A><A NAME="_Toc489267749"></A><A NAME="_Toc489272723"></A><A NAME="_Toc202341908"></A><A NAME="_Toc258262527"></A>Block Process Call (SMBBlockProcessCall)<A NAME="marker-1348443"></A><A NAME="marker-1348444"></A></H5>
+<P CLASS="Body">
+<A NAME="pgfId-1348446"></A>The SMBus Block Write-Read Block Process Call protocol (SMBBlockProcessCall) transfers a block of data bi-directionally (performs a Write Block followed by a Read Block as an atomic transaction). The maximum aggregate amount of data that may be transferred is limited to 32 bytes. This protocol uses a command value to reference up to 256 block-sized virtual registers. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1348448"></A>The following ASL code illustrates how a device supporting the Process Call protocol should be accessed:<A NAME="marker-1348447"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1380799"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348450"></A>OperationRegion(SMBD, SMBus, 0x4200, 0x100)       // SMbus device at slave address 0x42</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348451"></A>Field(SMBD, BufferAcc, NoLock, Preserve)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348452"></A>{</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348453"></A>        AccessAs(BufferAcc, SMBBlockProcessCall)  // Use the Block Process Call protocol</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348454"></A>        FLD0, 8,    // Virtual register representing a command value of 0</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348455"></A>        FLD1, 8    // Virtual register representing a command value of 1</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348456"></A>}</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348457"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348458"></A>// Create the SMBus data buffer as BUFF</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348459"></A>Name(BUFF, Buffer(34)())                          // Create SMBus data buffer as BUFF</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348460"></A>CreateByteField(BUFF, 0x00, STAT)                 // STAT = Status (Byte)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348461"></A>CreateByteField(BUFF, 0x01, SIZE)                 // SIZE = Length (Byte)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348462"></A>CreateField(BUFF, 0x10, 256, DATA)                // Data (Block)</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348463"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348464"></A>// Process Call with input value &quot;ACPI&quot; to the device using command value 1</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348465"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348466"></A>Store(&quot;ACPI&quot;, DATA)                               // Fill in outgoing data</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348467"></A>Store(8, SIZE)                                    // Length of the valid data</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348468"></A>Store(Store(BUFF, FLD1), BUFF)                    // Execute the PC</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348469"></A>if (LEqual(STAT, 0x00))                           // Test the status</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348470"></A>{</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348471"></A>    // BUFF now contains information returned from PC</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348472"></A>    // SIZE now equals size of data returned</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1348473"></A>}</P>
+<P CLASS="Body">
+<A NAME="pgfId-1346798"></A>&nbsp;</P>
+</DIV>
+</DIV>
+</DIV>
+</BODY>
+</HTML>

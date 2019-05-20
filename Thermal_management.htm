@@ -1,0 +1,3475 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2016/HTML Export Filter">
+<LINK REL="STYLESHEET" HREF="Thermal_management.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE> 11 Thermal Management</TITLE></HEAD>
+<BODY>
+<DIV>
+<H1 CLASS="Heading-1">
+<A NAME="pgfId-1377843"></A><A NAME="54593"></A>Thermal Management<DIV>
+<IMG SRC="Thermal_management-1.gif" ALT="">
+</DIV>
+</H1>
+<P CLASS="Body">
+<A NAME="pgfId-1377853"></A>This section describes the ACPI thermal model and specifies the ACPI Namespace objects OSPM uses for thermal management of the platform.</P>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1377872"></A><A NAME="_Toc489267294"></A><A NAME="_Toc489267674"></A><A NAME="_Toc489272648"></A><A NAME="_Toc202341750"></A><A NAME="_Toc258262437"></A>Thermal Control </H2>
+<P CLASS="Body">
+<A NAME="pgfId-1377873"></A>ACPI defines interfaces that allow OSPM to be proactive in its system cooling policies. With OSPM in control of the operating environment, cooling decisions can be made based on the system&#8217;s application load, the user&#8217;s preference towards performance or energy conservation, and thermal heuristics. Graceful shutdown of devices or the entire system at critical heat levels becomes possible as well. The following sections describe the ACPI thermal model and the ACPI Namespace objects available to OSPM to apply platform thermal management policy. <A NAME="marker-1377874"></A><A NAME="marker-1377875"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1377876"></A>The ACPI thermal model is based around conceptual platform regions called thermal zones that physically contain devices, thermal sensors, and cooling controls. Generally speaking, the entire platform is one large thermal zone, but the platform can be partitioned into several ACPI thermal zones if necessary to enable optimal thermal management.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1377877"></A>ACPI Thermal zones are a logical collection of interfaces to temperature sensors, trip points, thermal property information, and thermal controls. Thermal zone interfaces apply either thermal zone wide or to specific devices, including processors, contained within the thermal zone. ACPI defines namespace objects that provide the thermal zone-wide interfaces in <A HREF="Thermal_management.htm#_Toc258262448" CLASS="XRef">See Fan Device.</A>, &#8220;Thermal Objects&#8221;. A subset of these objects may also be defined under devices. OS implementations compatible with the ACPI 3.0 thermal model, interface with these objects but also support OS native device driver interfaces that perform similar functions at the device level. This allows the integration of devices with embedded thermal sensors and controls, perhaps not accessible by AML, to participate in the ACPI thermal model through their inclusion in the ACPI thermal zone. OSPM is responsible for applying an appropriate thermal policy when a thermal zone contains both thermal objects and native OS device driver interfaces for thermal control.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1377878"></A>Some devices in a thermal zone may be comparatively large producers of thermal load in relation to other devices in the thermal zone. Devices may also have varying degrees of thermal sensitivity. For example, some devices may tolerate operation at a significantly higher temperature than other devices. As such, the platform can provide OSPM with information about the platform&#8217;s device topology and the resulting influence of one device&#8217;s thermal load generation on another device. This information must be comprehended by OSPM for it to achieve optimal thermal management through the application of cooling controls.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1377879"></A>ACPI expects all temperatures to be represented in tenths of degrees. This resolution is deemed sufficient to enable OSPM to perform robust platform thermal management.</P>
+<DIV>
+<H5 CLASS="Normal">
+<A NAME="pgfId-1475053"></A><IMG SRC="Thermal_management-2.gif" ALIGN="BASELINE" ALT="">
+&nbsp;</H5>
+<DIV>
+<H6 CLASS="FigureTitle">
+<A NAME="pgfId-1475054"></A>ACPI Thermal Zone</H6>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1475060"></A><A NAME="_Toc489267295"></A><A NAME="_Toc489267675"></A><A NAME="_Toc489272649"></A><A NAME="_Toc202341751"></A><A NAME="_Toc258262438"></A>Active, Passive, and Critical Policies</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1377904"></A>There are three cooling policies that OSPM uses to control the thermal state of the hardware. The policies are active, passive and critical. <A NAME="marker-1377905"></A></P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1381698"></A>Active Cooling. OSPM takes a direct action such as turning on one or more fans. Applying active cooling controls typically consume power and produce some amount of noise, but are able to cool a thermal zone without limiting system performance. Active cooling temperature trip points declare the temperature thresholds OSPM uses to decide when to start or stop different active cooling devices.<A NAME="marker-1377907"></A></LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1377910"></A>Passive Cooling. OSPM reduces the power consumption of devices to reduce the temperature of a thermal zone, such as slowing (throttling) the processor clock. Applying passive cooling controls typically produces no user-noticeable noise. Passive cooling temperature trip points specify the temperature thresholds where OSPM will start or stop passive cooling.<A NAME="marker-1377911"></A></LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1377914"></A>Critical Trip Points. These are threshold temperatures at which OSPM performs an orderly, but critical, shutdown of a device or the entire system. The _HOT object declares the critical temperature at which OSPM may choose to transition the system into the S4 sleeping state, if supported, The _CRT object declares the critical temperature at which OSPM must perform a critical shutdown.<A NAME="marker-1377915"></A></LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1377918"></A>When a thermal zone appears in the ACPI Namespace or when a new device becomes a member of a thermal zone, OSPM retrieves the temperature thresholds (trip points) at which it executes a cooling policy. When OSPM receives a temperature change notification, it evaluates the thermal zone&#8217;s temperature interfaces to retrieve current temperature values. OSPM compares the current temperature values against the temperature thresholds. If any temperature is greater than or equal to a corresponding active trip point then OSPM will perform active cooling . If any temperature is greater than or equal to a corresponding passive trip point then OSPM will perform passive cooling. If the _TMP object returns a value greater than or equal to the value returned by the _HOT object then OSPM may choose to transition the system into the S4 sleeping state, if supported. If the _TMP object returns a value greater than or equal to the value returned by the _CRT object then OSPM must shut the system down. Embedded Hot and Critical trip points may also be exposed by individual devices within a thermal zone. Upon passing of these trip points, OSPM must decide whether to shut down the device or the entire system based upon device criticality to system operation. OSPM must also evaluate the thermal zone&#8217;s temperature interfaces when any thermal zone appears in the namespace (for example, during system initialization) and must initiate a cooling policy as warranted independent of receipt of a temperature change notification. This allows OSPM to cool systems containing a thermal zone whose temperature has already exceeded temperature thresholds at initialization time.<A NAME="marker-1377919"></A><A NAME="marker-1377920"></A><A NAME="marker-1377921"></A><A NAME="marker-1377922"></A><A NAME="marker-1377923"></A><A NAME="marker-1377924"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1377925"></A>An optimally designed system that uses several thresholds can notify OSPM of thermal increase or decrease by raising an event every several degrees. This enables OSPM to anticipate thermal trends and incorporate heuristics to better manage the system&#8217;s temperature.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1377926"></A>To implement a preference towards performance or energy conservation, OSPM can request that the platform change the priority of active cooling (performance) versus passive cooling (energy conservation/silence) by evaluating the _SCP (Set Cooling Policy) object for the thermal zone or a corresponding OS-specific interface to individual devices within a thermal zone.</P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1377950"></A><A NAME="_Toc489267296"></A><A NAME="_Toc489267676"></A><A NAME="_Toc489272650"></A><A NAME="_Toc202341752"></A><A NAME="_Toc258262439"></A>Dynamically Changing Cooling Temperature Trip Points</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1377951"></A>The platform or its devices can change the active and passive cooling temperature trip points and notify OSPM to reevaluate the trip point interfaces to establish the new policy threshold settings. The following are the primary uses for this type of thermal notification:<A NAME="marker-1377952"></A></P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1377953"></A>When OSPM changes the platform&#8217;s cooling policy from one cooling mode to another.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1377954"></A>When a swappable bay device is inserted or removed. A swappable bay is a slot that can accommodate several different devices that have identical form factors, such as a CD-ROM drive, disk drive, and so on. Many mobile PCs have this concept already in place.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1377955"></A>After the crossing of an active or passive trip point is signaled to implement hysteresis.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1377956"></A>In each situation, OSPM must be notified to re-evaluate the thermal zone&#8217;s trip points via the AML code execution of a Notify(thermal_zone, 0x81) statement or via an OS specific interface invoked by device drivers for zone devices participating in the thermal model.</P>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1377971"></A>O<A NAME="_Toc489267297"></A>SPM Change of Cooling Policy<A NAME="marker-1377970"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1377972"></A>When OSPM changes the platform&#8217;s cooling policy from one cooling mode to the other, the following occurs:</P>
+<OL>
+<LI CLASS="StepNumList-1">
+<A NAME="pgfId-1377973"></A>OSPM notifies the platform of the new cooling mode by running the Set Cooling Policy (_SCP) control method in all thermal zones and invoking the OS-specific Set Cooling Policy interface to all participating devices in each thermal zone.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1377974"></A>Thresholds are updated in the hardware and OSPM is notified of the change. </LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1377975"></A>OSPM re-evaluates the active and passive cooling temperature trip points for the zone and all devices in the zone to obtain the new temperature thresholds.</LI>
+</OL>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1377988"></A>R<A NAME="_Toc489267298"></A>esetting Cooling Temperatures to Adjust to Bay Device Insertion or Removal<A NAME="marker-1377990"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1377991"></A>The platform can adjust the thermal zone temperature to accommodate the maximum operating temperature of a bay device as necessary. For example:</P>
+<OL>
+<LI CLASS="StepNumList-1">
+<A NAME="pgfId-1377992"></A>Hardware detects that a device was inserted into or removed from the bay, updates the temperature thresholds, and then notifies OSPM of the thermal policy change and device insertion events.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1377993"></A>OSPM re-enumerates the devices and re-evaluates the active and passive cooling temperature trip points.</LI>
+</OL>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1378008"></A>R<A NAME="_Toc489267299"></A>esetting Cooling Temperatures to Implement Hysteresis<A NAME="marker-1378007"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1378009"></A>An OEM can build hysteresis into platform thermal design by dynamically resetting cooling temperature thresholds. For example:</P>
+<OL>
+<LI CLASS="StepNumList-1">
+<A NAME="pgfId-1378010"></A>When the temperature increases to the designated threshold, OSPM will turn on the associated active cooling device or perform passive cooling. </LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1378011"></A>The platform resets the threshold value to a lower temperature (to implement hysteresis) and notifies OSPM of the change. Because of this new threshold value, the fan will be turned off at a lower temperature than when it was turned on (therefore implementing a negative hysteresis).</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1378012"></A>When the temperature hits the lower threshold value, OSPM will turn off the associated active cooling device or cease passive cooling. The hardware will reset _ACx to its original value and notify OSPM that the trip points have once again been altered.</LI>
+</OL>
+</DIV>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1378025"></A><A NAME="_Toc489267300"></A><A NAME="_Toc489267677"></A><A NAME="_Toc489272651"></A><A NAME="_Toc202341753"></A><A NAME="_Toc258262440"></A>Detecting Temperature Changes<A NAME="marker-1378023"></A><A NAME="marker-1378024"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1378026"></A>The ability of the platform and its devices to asynchronously notify an ACPI-compatible OS of meaningful changes in the thermal zone&#8217;s temperature is a highly desirable capability that relieves OSPM from implementing a poll-based policy and generally results in a much more responsive and optimal thermal policy implementation. Each notification instructs OSPM to evaluate whether a trip point has been crossed and allows OSPM to anticipate temperature trends for the thermal zone.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1381789"></A>It is recognized that much of the hardware used to implement thermal zone functionality today is not capable of generating ACPI-visible notifications (SCIs) or only can do so with wide granularity (for example, only when the temperature crosses the critical threshold). In these environments, OSPM must poll the thermal zone's temperature periodically to implement an effective policy.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378040"></A><A NAME="marker-1378036"></A>While ACPI specifies a mechanism that enables OSPM to poll thermal zone temperature, platform reliance on thermal zone polling is strongly discouraged by this specification. OEMs should design systems that asynchronously notify OSPM whenever a meaningful change in the zone&#8217;s temperature occurs - relieving OSPM of the overhead associated with polling. In some cases, embedded controller firmware can overcome limitations of existing thermal sensor capabilities to provide the desired asynchronous notification.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378041"></A>Notice that the _TZP (thermal zone polling) object is used to indicate whether a thermal zone must be polled by OSPM, and if so, a recommended polling frequency. See <A HREF="Thermal_management.htm#_Toc489267322" CLASS="XRef">See _TZP (Thermal Zone Polling).</A>, &#8220;_TZP,&#8221; for more information.</P>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1378047"></A>T<A NAME="_Toc489267301"></A>emperature Change Notifications<A NAME="marker-1378045"></A><A NAME="marker-1378046"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1378048"></A>Thermal zone-wide temperature sensor hardware that supports asynchronous temperature change notifications does so using an SCI. The AML code that responds to this SCI must execute a Notify(thermal_zone, 0x80) statement to inform OSPM that a meaningful change in temperature has occurred. Alternatively, devices with embedded temperature sensors may signal their associated device drivers and the drivers may use an OS-specific interface to signal OSPM&#8217;s thermal policy driver. A device driver may also invoke a device specific control method that executes a Notify(thermal_zone, 0x80) statement. When OSPM receives this thermal notification, it will evaluate the thermal zone&#8217;s temperature interfaces to evaluate the current temperature values. OSPM will then compare the values to the corresponding cooling policy trip point values (either zone-wide or device-specific). If the temperature has crossed over any of the policy thresholds, then OSPM will actively or passively cool (or stop cooling) the system, or shut the system down entirely.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378049"></A>Both the number and granularity of thermal zone trip points are OEM-specific. However, it is important to notice that since OSPM can use heuristic knowledge to help cool the system, the more events OSPM receives the better understanding it will have of the system&#8217;s thermal characteristic. <A NAME="marker-1378050"></A><A NAME="marker-1378051"></A></P>
+<DIV>
+<H6 CLASS="spacing">
+<A NAME="pgfId-1378052"></A>&nbsp;</H6>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H6 CLASS="Art">
+<A NAME="pgfId-1378056"></A><IMG SRC="Thermal_management-3.gif" ALIGN="BASELINE" ALT="">
+&nbsp;</H6>
+<DIV>
+<H6 CLASS="FigureTitle">
+<A NAME="pgfId-1378057"></A>Thermal Events </H6>
+<P CLASS="Body">
+<A NAME="pgfId-1378058"></A>For example, the simple thermal zone illustrated above includes hardware that will generate a temperature change notification using a 5&#176; Celsius granularity. All thresholds (_PSV, _AC1, _AC0, and _CRT) exist within the monitored range and fall on 5 boundaries. This granularity is appropriate for this system as it provides sufficient opportunity for OSPM to detect when a threshold is crossed as well as to understand the thermal zone&#8217;s basic characteristics (temperature trends).<A NAME="marker-1378060"></A><A NAME="marker-1378061"></A><A NAME="marker-1378062"></A></P>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1378063"></A>The ACPI specification defines Kelvin as the standard unit for absolute temperature values. All thermal zone objects must report temperatures in Kelvin when reporting absolute temperature values. All figures and examples in this section of the specification use Celsius for reasons of clarity. ACPI allows Kelvin to be declared in precision of 1/10th of a degree (for example, 310.5). Kelvin is expressed as &#952;/K = T/&#176;C + 273.2.</LI>
+</UL>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1378075"></A><A NAME="marker-1378064"></A> Polling</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1378078"></A>Temperature sensor hardware that is incapable of generating thermal change events, or that can do so for only a few thresholds should inform OSPM to implement a poll-based policy. OSPM does this to ensure that temperature changes across threshold boundaries are always detectable.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378079"></A>Polling can be done in conjunction with hardware notifications. For example, thermal zone hardware that only supports a single threshold might be configured to use this threshold as the critical temperature trip point. Assuming that hardware monitors the temperature at a finer granularity than OSPM would, this environment has the benefit of being more responsive when the system is overheating.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378080"></A>A thermal zone advertises the need to be polled by OSPM via the _TZP object. See <A HREF="Thermal_management.htm#_Toc489267322" CLASS="XRef">See _TZP (Thermal Zone Polling).</A>, &#8220;_TZP,&#8221; for more information.</P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1378101"></A><A NAME="_Toc489267303"></A><A NAME="_Toc489267678"></A><A NAME="_Toc489272652"></A><A NAME="_Toc202341754"></A><A NAME="_Toc258262441"></A>Active Cooling <A NAME="marker-1378099"></A><A NAME="marker-1378100"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1378102"></A>Active cooling devices typically consume power and produce some amount of noise when enabled. These devices attempt to cool a thermal zone through the removal of heat rather than limiting the performance of a device to address an adverse thermal condition.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378103"></A>The active cooling interfaces in conjunction with the active cooling lists or the active cooling relationship table (_ART) allow the platform to use an active device that offers varying degrees of cooling capability or multiple cooling devices. The active cooling temperature trip points designate the temperature where Active cooling is engaged or disengaged (depending upon the direction in which the temperature is changing). For thermal zone-wide active cooling controls, the _ALx object evaluates to a list of devices that actively cool the zone or the _ART object evaluates to describe the entire active cooling relationship of various devices. For example:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1378104"></A>If a standard single-speed fan is the Active cooling device, then _AC0 evaluates to the temperature where active cooling is engaged and the fan is listed in _AL0.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1378105"></A>If the zone uses two independently controlled single-speed fans to regulate the temperature, then _AC0 will evaluate to the maximum cooling temperature using two fans, and _AC1 will evaluate to the standard cooling temperature using one fan. </LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1378108"></A>If a zone has a single fan with a low speed and a high speed, the _AC0 will evaluate to the temperature associated with running the fan at high-speed, and _AC1 will evaluate to the temperature associated with running the fan at low speed. _AL0 and _AL1 will both point to different device objects associated with the same physical fan, but control the fan at different speeds.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1378109"></A>If the zone uses two independently controlled multiple-speed fans to regulate the temperature,  _AC0 of the target devices evaluates to the temperature at which OSPM will engage fan devices described by the _ART object as needed up to a maximum capability level.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1378110"></A>For ASL coding examples that illustrate these points, see <A HREF="Thermal_management.htm#_Toc489267323" CLASS="XRef">See Thermal Zone Interface Requirements.</A>, &#8220;Thermal Zone Interface Requirements,&#8221; and <A HREF="Thermal_management.htm#_Toc489267324" CLASS="XRef">See Thermal Zone Examples.</A>, &#8220;Thermal Zone Examples.&#8221; </P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1378129"></A>Passive Cooling</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1378130"></A>Passive cooling controls are able to cool a thermal zone without creating noise and without consuming additional power (actually saving power), but do so by decreasing the performance of the devices in the zone .</P>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1378136"></A>P<A NAME="_Toc489267305"></A>rocessor Clock Throttling <A NAME="marker-1378134"></A><A NAME="marker-1378135"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1378137"></A>The processor passive cooling threshold (_PSV) in conjunction with the processor list (_PSL) allows the platform to indicate the temperature at which a passive control, for example clock throttling, will be applied to the processor(s) residing in a given thermal zone. Unlike other cooling policies, during passive cooling of processors OSPM may take the initiative to actively monitor the temperature in order to cool the platform. <A NAME="marker-1378138"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1378139"></A>On an ACPI-compatible platform that properly implements CPU throttling, the temperature transitions will be similar to the following figure, in a coolable environment, running a coolable workload:</P>
+<DIV>
+<H6 CLASS="Pb">
+<A NAME="pgfId-1378148"></A><IMG SRC="Thermal_management-4.gif" ALIGN="BASELINE" ALT="">
+&nbsp;</H6>
+</DIV>
+<DIV>
+<H6 CLASS="FigureTitle">
+<A NAME="pgfId-1378149"></A>Temperature and CPU Performance Versus Time</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1378151"></A>The following equation should be used by OSPM to assess the optimum CPU performance change necessary to lower the thermal zone&#8217;s temperature:</P>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1378152"></A>Equation #1: </H3>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1381895"></A>&#916;P [%] = _TC1 * ( Tn  -  Tn-1 ) + _TC2 * (Tn - Tt)</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1378153"></A>Where:</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1378154"></A>Tn = current temperature </P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1378155"></A>Tt = target temperature (_PSV)</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378156"></A>The two coefficients _TC1 and _TC2 and the sampling period _TSP are hardware-dependent constants the OEM must supply to OSPM (for more information, see <A HREF="Thermal_management.htm#_Toc489267309" CLASS="XRef">See Thermal Objects.</A>, &#8220;Thermal Objects&#8221;). The _TSP object contains a time interval that OSPM uses to poll the hardware to sample the temperature. Whenever the time value returned by _TSP has elapsed, OSPM will evaluate _TMP to sample the current temperature (shown as Tn in the above equation). Then OSPM will use the sampled temperature and the passive cooling temperature trip point (_PSV) (which is the target temperature Tt) to evaluate the equation for &#916;P. The granularity of &#916;P is determined by the CPU duty width of the system. </P>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1378157"></A>Equation #1 has an implied formula.</LI>
+</UL>
+<P CLASS="Normal-Indent">
+<A NAME="pgfId-1378158"></A>Equation #2: </P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1381916"></A>Pn = Pn-1 + HW[- ?P ] where Minimum% &lt;= Pn &lt;= 100%</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378159"></A>For Equation #2, whenever Pn-1 + ?P lies outside the range Minimum0-100%, then Pn will be truncated to Minimum0-100%. Minimum% is the _MTL limit, or 0% if _MTL is not defined. For hardware that cannot assume all possible values of Pn between Minimum0 and 100%, a hardware specific mapping function HW is used. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1378160"></A>In addition, the hardware mapping function in Equation #2 should be interpreted as follows:</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378161"></A>For absolute temperatures:</P>
+<OL>
+<LI CLASS="StepNumList-1">
+<A NAME="pgfId-1378162"></A>If the right hand side of Equation #1 is negative, HW[ &#916;P] is rounded to the next available higher setting of frequency.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1378163"></A>If the right hand side of Equation #1 is positive, HW[&#916;P] is rounded to the next available lower setting of frequency.</LI>
+</OL>
+<P CLASS="Body">
+<A NAME="pgfId-1378165"></A>For relative temperatures:</P>
+<OL>
+<LI CLASS="StepNumList-1">
+<A NAME="pgfId-1378166"></A>If the right hand side of Equation #1 is positive, HW[ &#916;P] is rounded to the next available higher setting of frequency.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1378167"></A>If the right hand side of Equation #1 is negative, HW[&#916;P] is rounded to the next available lower setting of frequency.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1378168"></A>The calculated Pn becomes Pn-1 during the next sampling period.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1378169"></A>For more information about CPU throttling, see <A HREF="Processor_Configuration_and_Control.htm#76331" CLASS="XRef">See Processor Power State C0.</A>, Processor Power State C0.&#8221; A detailed explanation of this thermal feedback equation is beyond the scope of this specification.</LI>
+</OL>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1378192"></A><A NAME="_Toc489267306"></A><A NAME="_Toc489267680"></A><A NAME="_Toc489272654"></A><A NAME="_Toc202341756"></A><A NAME="_Toc258262443"></A>Critical Shutdown<A NAME="marker-1378188"></A><A NAME="marker-1378189"></A><A NAME="marker-1378190"></A><A NAME="marker-1378191"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1378193"></A>When the thermal zone-wide temperature sensor value reaches the threshold indicated by _CRT, OSPM must immediately shut the system down. The system must disable the power either after the temperature reaches some hardware-determined level above _CRT or after a predetermined time has passed. Before disabling power, platform designers should incorporate some time that allows OSPM to run its critical shutdown operation. There is no requirement for a minimum shutdown operation window that commences immediately after the temperature reaches _CRT. This is because:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1378194"></A>Temperature might rise rapidly in some systems and slowly on others, depending on casing design and environmental factors.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1378195"></A>Shutdown can take several minutes on a server and only a few seconds on a hand-held device.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1378196"></A>Because of this indistinct discrepancy and the fact that a critical heat situation is a remarkably rare occurrence, ACPI does not specify a target window for a safe shutdown. It is entirely up to the OEM to build in a safe buffer that it sees fit for the target platform.</P>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1378215"></A> <A NAME="_Toc489267307"></A><A NAME="_Toc489267681"></A><A NAME="_Toc489272655"></A><A NAME="_Toc202341757"></A><A NAME="_Toc258262444"></A>Cooling Preferences</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1378222"></A><A NAME="marker-1378216"></A><A NAME="marker-1378217"></A><A NAME="marker-1378218"></A><A NAME="marker-1378219"></A><A NAME="marker-1378220"></A><A NAME="marker-1378221"></A>A robust OSPM implementation provides the means for the end user to convey a preference (or a level of preference) for either performance or energy conservation to OSPM. Allowing the end user to choose this preference is most critical to mobile system users where maximizing system run-time on a battery charge often has higher priority over realizing maximum system performance. For example, if a user is taking notes on her PC in a quiet environment, such as a library or a corporate meeting, she may want the system to emphasize passive cooling so that the system operates quietly, even at the cost of system performance.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378223"></A>A user preference towards performance corresponds to the Active cooling mode while a user&#8217;s preference towards energy conservation or quiet corresponds to the Passive cooling mode. ACPI defines an interface to convey the cooling mode to the platform. Active cooling can be performed with minimal OSPM thermal policy intervention. For example, the platform indicates through thermal zone parameters that crossing a thermal trip point requires a fan to be turned on. Passive cooling requires OSPM thermal policy to manipulate device interfaces that reduce performance to reduce thermal zone temperature.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378224"></A>Either cooling mode will be activated only when the thermal condition requires it. When the thermal zone is at an optimal temperature level where it does not warrant any cooling, both modes result in a system operating at its maximum potential with all fans turned off.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378225"></A>Thermal zones supporting the Set Cooling Policy interface allow the user to switch the system&#8217;s cooling mode emphasis. See <A HREF="Thermal_management.htm#RSVD_SCP" CLASS="XRef">See _SCP (Set Cooling Policy).</A>, &#8220;_SCP,&#8221; for more information.</P>
+<DIV>
+<H6 CLASS="Art">
+<A NAME="pgfId-1378229"></A><IMG SRC="Thermal_management-5.gif" ALIGN="BASELINE" ALT="">
+&nbsp;</H6>
+<DIV>
+<H6 CLASS="FigureTitle">
+<A NAME="pgfId-1378231"></A><A NAME="20005"></A>Active and Passive Threshold Values</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1378241"></A><A NAME="marker-1378232"></A><A NAME="marker-1378233"></A>As illustrated in <A HREF="Thermal_management.htm#20005" CLASS="XRef">See Active and Passive Threshold Values.</A>, the platform must convey the value for each threshold to instruct OSPM to initiate the cooling policies at the desired target temperatures. The platform can emphasize active or passive cooling modes by assigning different threshold values. Generally, if _ACx is set lower than _PSV, then the system emphasizes active cooling. Conversely, if _PSV is set lower than _ACx, then the emphasis is placed on passive cooling. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1378242"></A>For example, a thermal zone that includes a processor and one single-speed fan may use _PSV to indicate the temperature value at which OSPM would enable passive cooling and _AC0 to indicate the temperature at which the fan would be turned on. If the value of _PSV is less than _AC0 then the system will favor passive cooling (for example, CPU clock throttling). On the other hand, if _AC0 is less than _PSV the system will favor active cooling (in other words, using the fan). See <A HREF="Thermal_management.htm#94395" CLASS="XRef">See Cooling Preferences.</A> below.</P>
+<DIV>
+<H6 CLASS="spacing">
+<A NAME="pgfId-1378243"></A>&nbsp;</H6>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H6 CLASS="Art">
+<A NAME="pgfId-1378247"></A><IMG SRC="Thermal_management-6.gif" ALIGN="BASELINE" ALT="">
+&nbsp;</H6>
+<DIV>
+<H6 CLASS="FigureTitle">
+<A NAME="pgfId-1378248"></A><A NAME="94395"></A>Cooling Preferences</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1378249"></A>The example on the left enables active cooling (for example, turn on a fan) when OSPM detects the temperature has risen above 50&#176;. If for some reason the fan does not reduce the system temperature, then at 75&#176; OSPM will initiate passive cooling (for example, CPU throttling) while still running the fan. If the temperature continues to climb, OSPM will quickly shut the system down when the temperature reaches 90&#176;C. The example on the right is similar but the _AC0 and _PSV threshold values have been swapped to emphasize passive cooling.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378250"></A>The ACPI thermal model allows flexibility in the thermal zone design. An OEM that needs a less elaborate thermal implementation may consider using only a single threshold (for example, _CRT). Complex thermal implementations can be modeled using multiple active cooling thresholds and devices, or through the use of additional thermal zones.</P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1378260"></A><A NAME="_Toc489267308"></A><A NAME="_Toc489267682"></A><A NAME="_Toc489272656"></A><A NAME="_Toc202341758"></A><A NAME="_Toc258262445"></A>Evaluating Thermal Device Lists</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1378261"></A>The Notify(thermal_zone, 0x82) statement is used to inform OSPM that a change has been made to the thermal zone device lists. This thermal event <A NAME="OLE_LINK31"></A><A NAME="OLE_LINK32"></A>instructs OSPM to re-evaluate the _ALx, _PSL, and _TZD objects. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1378264"></A>For example, a system that supports the dynamic insertions of processors might issue this notification to inform OSPM of changes to _PSL following the insertion or removal of a processor. OSPM would re-evaluate all thermal device lists and adjust its policy accordingly.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378265"></A>Notice that this notification can be used with the Notify(thermal_zone, 0x81) statement to inform OSPM to both re-evaluate all device lists and all thresholds.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378266"></A>Alternatively, devices may include the _TZM (Thermal Zone Member) object their device scope to convey their thermal zone association to OSPM. <A HREF="Thermal_management.htm#RSVD_TZM" CLASS="XRef">See _TZM (Thermal Zone Member).</A>, &#8220;_TZM (Thermal Zone Member)&#8221;, for more information.</P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1378270"></A><A NAME="_Toc202341759"></A><A NAME="_Toc258262446"></A>Evaluating Device Thermal Relationship Information</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1378271"></A>The Notify(thermal_zone, 0x83) statement is used to inform OSPM that a change has been made to the thermal relationship information. This thermal event instructs OSPM to re-evaluate the _TRT and _ART objects. The thermal influence between devices may change when active cooling moves air across device packages as compared to when only passive cooling controls are applied. Similarly, the active cooling relationship may change as various fans are engaged to actively cool a platform or if user preferences change.</P>
+<OL>
+<LI CLASS="ACPIHeading-3">
+<A NAME="pgfId-1378274"></A>F<A NAME="_Toc258262447"></A>an Device Notifications</LI>
+</OL>
+<P CLASS="Body">
+<A NAME="pgfId-1378275"></A>Notify events of type 0x80 will cause OSPM to evaluate the _FST object to evaluate the fan&#8217;s current speed.</P>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1378280"></A>F<A NAME="_Toc258262448"></A>an Device<A NAME="marker-1378279"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1378281"></A>ACPI 1.0 defined a simple fan device that is assumed to be in operation when it is in the D0 state. Thermal zones reference fan device(s) as being responsible primarily for cooling within that zone. Notice that multiple fan devices can be present for any one thermal zone. They might be actual different fans, or they might be used to implement one fan of multiple speeds (for example, by turning both &#8220;fans&#8221; on the one fan will run full speed).</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378282"></A>ACPI 4.0 defines additional fan device interface objects enabling OSPM to perform more robust active cooling thermal control. These objects are summarized in <A HREF="Thermal_management.htm#47104" CLASS="XRef">See Fan Specific Objects.</A>. OSPM requires that all of the objects listed in <A HREF="Thermal_management.htm#47104" CLASS="XRef">See Fan Specific Objects.</A> be defined under a fan device to enable advanced active cooling control. The absence of any of these objects causes OSPM to perform ACPI 1.0 style simple fan control .</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378283"></A>The Plug and Play ID of a fan device is PNP0C0B.</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1378286"></A><A NAME="47104"></A>Fan Specific Objects</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1378289"></A>Object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1378291"></A>Description</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378293"></A>_FIF</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378295"></A>Returns fan device information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378297"></A>_FPS</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378299"></A>Returns a list of supported fan performance states.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378301"></A>_FSL</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378303"></A>Control method that sets the fan device&#8217;s speed level (performance state).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378305"></A>_FST</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378307"></A>Returns current status information for a fan device.</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1378311"></A>While the Fan Device and its associated objects are optional, if the Fan Device is implemented by the platform, all objects listed in <A HREF="Thermal_management.htm#47104" CLASS="XRef">See Fan Specific Objects.</A> are required and must be provided.</P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1378314"></A>F<A NAME="_Toc258262449"></A>an Objects</H6>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1378318"></A><A NAME="91380"></A>_FIF (Fan Information)</H6>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1378319"></A>The optional _FIF object provides OSPM with fan device capability information.</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1378320"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1378321"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1474401"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1474402"></A>A Package containing the fan device parameters as described in <A HREF="Thermal_management.htm#50206" CLASS="XRef">See FIF Package Details.</A> below</P>
+<P CLASS="Body">
+<A NAME="pgfId-1474403"></A>_FIF evaluation returns a package of the following format:</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378326"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1473491"></A>Package (){ </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378327"></A>    Revision,                        // Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378328"></A>    FineGrainControl,                // Integer Boolean</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378329"></A>    StepSize                         // Integer DWORD</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378330"></A>    LowSpeedNotificationSupport      // Integer Boolean</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378331"></A>}</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1378333"></A><A NAME="50206"></A>FIF Package Details</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1378336"></A>Field</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1378338"></A>Format</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1378340"></A>Description</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378342"></A>Revision</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378344"></A>Integer</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378346"></A>Current revision is: 0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378348"></A>Fine Grain Control</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378350"></A>Integer (Boolean)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378352"></A>A non zero value in this field indicates OSPM may evaluate the fan device&#8217;s _FSL object with a Level argument value in the range of  0-100, which represents a percentage of maximum speed. A zero value in this field indicates that OSPM may evaluate the fan device&#8217;s _FSL object with a Level argument value that is a Control field value from a package in the _FPS object&#8217;s package list only.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378354"></A>Step Size</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378356"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378358"></A>The recommended minimum step size in percentage points to be used when OSPM performs fine-grained fan speed control. OSPM may utilize the value of this field if the FineGrainControl field is non-zero the value in this field is between 1 and 9.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378360"></A>Low Speed Notification Support</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378362"></A>Integer (Boolean)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378364"></A>A non zero value in this field indicates that the platform will issue a Notify (0x80) to the fan device if a low (errant) fan speed is detected.</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1378368"></A>If a fan device supports fine-grained control, OSPM may evaluate a fan device&#8217;s _FSL object with any Level argument value that is less than or equal to the Control field value specified in the package of the _FPS object&#8217;s package list that corresponds to the active cooling trip point that has been exceeded. This capability provides OSPM access to one hundred fan speed settings thus enabling fine-grained fan speed control. The platform uses the StepSize field to help OSPM optimize its fan level selection policy by fine-grained fan speed control. The platform uses the StepSize field to help OSPM optimize its fan level selection policy by indicating recommended increments in the fan speed level value that are appropriate for the fan when one percent increments are not optimal. In the event OSPM&#8217;s incremental selections of Level using  the StepSize field value do not sum to 100%, OSPM may select an appropriate ending Level increment to reach 100%. OSPM should use the same residual step value first when reducing Level.</P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1378371"></A><A NAME="70009"></A>_FPS (Fan Performance States)</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1378372"></A>The optional _FPS object evaluates to a variable-length package containing a list of  packages that describe the fan device&#8217;s performance states. A temperature reading above an active cooling trip point defined by an _ACx object in a thermal zone or above a native active cooling trip point of a device within the thermal zone causes OSPM thermal control to engage the appropriate corresponding fan performance state from the list of fan performance states described by the _FPS object if the fan device is present in the corresponding _ALx device list or if an entry exists for the fan and trip point in the active cooling relationship table (_ART).</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378373"></A>OSPM assumes a linear relationship for the acoustic impact and power consumption values between successive entries in the fan performance state list. Notice that the acoustic impact measurement unit (Decibels) is inherently non-linear. As such, the platform should  populate _FPS entries as necessary to enable OSPM to achieve optimal results.</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1378374"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1378375"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1378376"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1378377"></A>A variable-length Package containing a Revision ID and a list of Packages that describe the fan device&#8217;s performance states as described in <A HREF="Thermal_management.htm#84445" CLASS="XRef">See FPS FanPstate Package Details.</A> below.</P>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1378379"></A>Return Value Information</H3>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378381"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1473509"></A>Package { </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378382"></A>    Revision,                // Integer - Current revision is: 0</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378383"></A>    FanPState[0],            // Package</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378384"></A>     ....</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378385"></A>    FanPState[n]             // Package</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378386"></A>}</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1473516"></A>&nbsp;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378387"></A>Each FanPState sub-Package contains the elements described below:</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378389"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1473523"></A>Package ()                   // Fan P-State</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378390"></A>{</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378391"></A>    Control,                 // Integer DWORD</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378392"></A>    TripPoint,               // Integer DWORD</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378393"></A>    Speed,                   // Integer DWORD</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378394"></A>    NoiseLevel,              // Integer DWORD</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378395"></A>    Power                    // Integer DWORD</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378396"></A>}</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1473530"></A>&nbsp;</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1378398"></A><A NAME="84445"></A>FPS FanPstate Package Details</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1466065"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1466067"></A>Format</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1466069"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378407"></A>Control</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378409"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378411"></A>Indicates the value to be used to set the fan speed to a specific level using the _FSL object.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1378412"></A>If the fan device supports fine-grained control as indicated by the _FIF object, this value is a percentage (0-100) of maximum speed level.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1378413"></A>If the fan device does not support fine-grained control, this field is an opaque value that OSPM must simply use in its evaluation of the _FSL object to set the level to this performance state.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378415"></A>TripPoint</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378417"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378419"></A>0-9: The active cooling trip point number that corresponds to this performance state. If the _ART object is defined, OSPM may optionally use information provided by the _ART object and _FPS objects to select alternative fan performance states. Only one entry per unique trip point number is allowed in the _FPS.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1378420"></A>0x0A- 0xFFFFFFFE: Reserved</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1378421"></A>0x0FFFFFFFF: Indicates that this performance state does not correspond with a specific active cooling trip point.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378423"></A>Speed</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378425"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378427"></A>Indicates the speed of the fan in revolutions per minute in this performance state.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378429"></A>NoiseLevel</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378431"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378433"></A>This optional field indicates the audible noise emitted by the fan in this performance state. The value represents the noise in 10ths of decibels. For example, if the fan emits noise at 28.3dB in this performance state, the value of this field would be 283. A value of 0xFFFFFFFF indicates that this field is not populated.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378435"></A>Power</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378437"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378439"></A>This optional field indicates the power consumption (in milliwatts) of the fan in this performance state. For example, if the fan consumes .5W in this performance state, the value of this field would be 500. A value of 0xFFFFFFFF indicates that this field is not populated.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1378444"></A><A NAME="RSVD_FSL"></A>_FSL (Fan Set Level)</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1378445"></A>The optional _FSL object is a control method that OSPM evaluates to set a fan device&#8217;s speed (performance state) to a specific level</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1378446"></A>Arguments: (1)</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1378447"></A>Arg0 - Level (Integer): conveys to the platform the fan speed level to be set.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1378448"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1378449"></A>None</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1378450"></A>Argument Information</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1378451"></A>Arg0: Level. If the fan supports fine-grained control, Level is a percentage of maximum level (0-100) that the platform is to engage the fan. If the fan does not support fine-grained control, Level is a Control field value from a package in the _FPS object&#8217;s package list. A Level value of zero causes the platform to turn off the fan.</P>
+<DIV>
+<H6 CLASS="Heading-4">
+<A NAME="pgfId-1378454"></A><A NAME="13123"></A>_FST (Fan Status)</H6>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1378455"></A>The optional _FST object provides status information for the fan device.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1378456"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1378457"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1378458"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1378459"></A>A Package containing fan device status information as described in <A HREF="Thermal_management.htm#42463" CLASS="XRef">See FST Package Details.</A> below</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378460"></A>_FST evaluation returns a package of the following format:</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378462"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1473537"></A>Package (){ </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378463"></A>    Revision,                    // Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378464"></A>    Control,                     // Integer DWORD</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378465"></A>    Speed                        // Integer DWORD</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378466"></A>}</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1378468"></A><A NAME="42463"></A>FST Package Details</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1378471"></A>Field</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1378473"></A>Format</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1378475"></A>Description</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378477"></A>Revision</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378479"></A>Integer</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378481"></A>Current revision is: 0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378483"></A>Control</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378485"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378487"></A>The current control value used to operate the Fan. If the fan is not operating Control will be zero. If the fan is operating, Control is the Level argument passed in the evaluation of the _FSL object.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378489"></A>Speed</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378491"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378493"></A>The current fan speed in revolutions per minute at which the fan is rotating. A value of 0xFFFFFFFF indicates that the fan does not support speed reporting.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1378510"></A><A NAME="_Toc489267309"></A><A NAME="_Toc489267683"></A><A NAME="_Toc489272657"></A><A NAME="_Toc202341760"></A><A NAME="_Toc258262450"></A>Thermal Objects<A NAME="marker-1378506"></A><A NAME="marker-1378507"></A><A NAME="marker-1378508"></A><A NAME="marker-1378509"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1378511"></A>Objects related to thermal management are listed in the following table.</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1378513"></A>Thermal Objects</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1466083"></A>Object</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1466087"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378524"></A>_ACx</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378526"></A>Returns active cooling policy threshold values in tenths of degrees.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<H6 CLASS="Table-Head-th">
+<A NAME="pgfId-1378530"></A>&nbsp;</H6>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378532"></A>_ALx</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378534"></A>List of active cooling device objects.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<H6 CLASS="Table-Head-th">
+<A NAME="pgfId-1378538"></A>&nbsp;</H6>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378540"></A>_ART</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378542"></A>Table of values that convey the Active Cooling Relationship between devices</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<H6 CLASS="Table-Head-th">
+<A NAME="pgfId-1378546"></A>&nbsp;</H6>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378548"></A>_CRT</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378550"></A>Returns critical trip point in tenths of degrees where OSPM must perform a critical shutdown.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<H6 CLASS="Table-Head-th">
+<A NAME="pgfId-1378554"></A>&nbsp;</H6>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378556"></A>_HOT</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378558"></A>Returns critical trip point in tenths of degrees where OSPM may choose to transition the system into S4.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<H6 CLASS="Table-Head-th">
+<A NAME="pgfId-1378562"></A>&nbsp;</H6>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1475845"></A>_MTL</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1475847"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1475913"></A>Returns the minimum throttle limit of a zone, when defined under a thermal zone. T</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<H6 CLASS="Table-Head-th">
+<A NAME="pgfId-1475851"></A>&nbsp;</H6>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378564"></A>_NTT</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378566"></A>Returns the temperature change threshold for devices containing native temperature sensors to cause evaluation of the _TPT object</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<H6 CLASS="Table-Head-th">
+<A NAME="pgfId-1378570"></A>&nbsp;</H6>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378572"></A>_PSL</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378574"></A>List of processor device objects for clock throttling.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<H6 CLASS="Table-Head-th">
+<A NAME="pgfId-1378578"></A>&nbsp;</H6>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378580"></A>_PSV</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378582"></A>Returns the passive cooling policy threshold value in tenths of degrees.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<H6 CLASS="Table-Head-th">
+<A NAME="pgfId-1378586"></A>&nbsp;</H6>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378588"></A>_RTV</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378590"></A>Conveys whether temperatures are expressed in terms of absolute or relative values.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<H6 CLASS="Table-Head-th">
+<A NAME="pgfId-1378594"></A>&nbsp;</H6>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378596"></A>_SCP</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378598"></A>Sets platform cooling policy (active or passive).</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<H6 CLASS="Table-Head-th">
+<A NAME="pgfId-1378602"></A>&nbsp;</H6>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1476471"></A>_STR</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1476473"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<H6 CLASS="Table-Head-th">
+<A NAME="pgfId-1476475"></A>String name for this thermal zone. </H6>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<H6 CLASS="Table-Head-th">
+<A NAME="pgfId-1476477"></A>&nbsp;</H6>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378604"></A>_TC1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378606"></A>Thermal constant for passive cooling.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<H6 CLASS="Table-Head-th">
+<A NAME="pgfId-1378610"></A>&nbsp;</H6>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378612"></A>_TC2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378614"></A>Thermal constant for passive cooling.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<H6 CLASS="Table-Head-th">
+<A NAME="pgfId-1378618"></A>&nbsp;</H6>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1475165"></A>_TFP</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1475167"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1475169"></A>Thermal fast sampling period for Passive cooling in milliseconds.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<H6 CLASS="Table-Head-th">
+<A NAME="pgfId-1475171"></A>&nbsp;</H6>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378620"></A>_TMP</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378622"></A>Returns the thermal zone&#8217;s current temperature in tenths of degrees.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<H6 CLASS="Table-Head-th">
+<A NAME="pgfId-1378626"></A>&nbsp;</H6>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378628"></A>_TPT</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378630"></A>Conveys the temperature of a devices internal temperature sensor to the platform when a temperature trip point is crossed or a meaningful change in temperature occurs.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<H6 CLASS="Table-Head-th">
+<A NAME="pgfId-1378634"></A>&nbsp;</H6>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378636"></A>_TRT</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378638"></A>Table of values that convey the Thermal Relationship between devices</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<H6 CLASS="Table-Head-th">
+<A NAME="pgfId-1378642"></A>&nbsp;</H6>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1475833"></A>_TSN</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1475835"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1475837"></A>Returns a reference to the thermal sensor device used to monitor the temperature of the thermal zone (when defined under a thermal zone).</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<H6 CLASS="Table-Head-th">
+<A NAME="pgfId-1475839"></A>&nbsp;</H6>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378644"></A>_TSP</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378646"></A>Thermal sampling period for Passive cooling in tenths of seconds.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<H6 CLASS="Table-Head-th">
+<A NAME="pgfId-1378650"></A>&nbsp;</H6>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378652"></A>_TST</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378654"></A>Conveys the minimum separation for a devices&#8217; programmable temperature trip points.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<H6 CLASS="Table-Head-th">
+<A NAME="pgfId-1378658"></A>&nbsp;</H6>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378660"></A>_TZD</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378662"></A>List of devices whose temperature is measured by this thermal zone.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<H6 CLASS="Table-Head-th">
+<A NAME="pgfId-1378666"></A>&nbsp;</H6>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378668"></A>_TZM</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378670"></A>Returns the thermal zone for which a device is a member.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<H6 CLASS="Table-Head-th">
+<A NAME="pgfId-1378674"></A>&nbsp;</H6>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378676"></A>_TZP</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="2">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378678"></A>Thermal zone polling frequency in tenths of seconds.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<H6 CLASS="Table-Head-th">
+<A NAME="pgfId-1378682"></A>&nbsp;</H6>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1378696"></A><A NAME="_Toc369097140"></A><A NAME="_Toc369679895"></A><A NAME="_Toc369801512"></A><A NAME="_Toc369936285"></A><A NAME="_Toc370017375"></A><A NAME="_Toc374092210"></A><A NAME="_Toc375244464"></A><A NAME="_Toc375924860"></A><A NAME="_Toc423760085"></A><A NAME="_Toc475523726"></A><A NAME="_Toc486665540"></A>With the exception of _TPT, _TST, and the _TZM objects, the objects described in the following sections may exist under a thermal zone. Devices with embedded thermal sensors and controls may contain static cooling temperature trip points or dynamic cooling temperature trip points that must be programmed by the device&#8217;s driver. In this case, thermal objects defined under a device serve to convey the platform specific values for these settings to the devices driver. </P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1378706"></A><A NAME="_Toc489267310"></A><A NAME="_Toc489267684"></A><A NAME="_Toc489272658"></A><A NAME="RSVD_ACx"></A><A NAME="_Toc202341761"></A><A NAME="_Toc258262451"></A>_ACx (Active Cooling)<A NAME="marker-1378704"></A><A NAME="marker-1378705"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1378707"></A>This optional object, if present under a thermal zone, returns the temperature trip point at which OSPM must start or stop Active cooling, where x is a value between 0 and 9 that designates multiple active cooling levels of the thermal zone. If the Active cooling device has one cooling level (that is, &#8220;on&#8221;) then that cooling level must be defined as _AC0. If the cooling device has two levels of capability, such as a high fan speed and a low fan speed, then they must be defined as _AC0 and _AC1 respectively. The smaller the value of x, the greater the cooling strength _ACx represents. In the above example, _AC0 represents the greater level of cooling (the faster fan speed) and _AC1 represents the lesser level of cooling (the slower fan speed). For every _ACx method, there must be a matching _ALx object or a corresponding entry in an _ART object&#8217;s active cooling relationship list.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378708"></A>If this object it present under a device, the device&#8217;s driver evaluates this object to determine the device&#8217;s corresponding active cooling temperature trip point. This value may then be used by the device&#8217;s driver to program an internal device temperature sensor trip point. When this object is present under a device, the device must contain a native OS device driver interface supporting a corresponding active cooling control, a matching _ALx object under the thermal zone of which the device is a member must exist, or a corresponding entry in an _ART object&#8217;s active cooling relationship list must.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1378709"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1378710"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1378711"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1378712"></A>An Integer containing the active cooling temperature threshold in tenths of degrees Kelvin</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378713"></A>The return value is an integer  that represents tenths of degrees Kelvin. For example, 300.0K is represented by the integer 3000.</P>
+<DIV>
+<H6 CLASS="Pb">
+<A NAME="pgfId-1382338"></A><A NAME="marker-1382337"></A>&nbsp;</H6>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1382339"></A><A NAME="74674"></A>_ALx (Active List)</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1382340"></A>This object is defined under a thermal zone and evaluates to a list of Active cooling devices to be turned on when the corresponding _ACx temperature threshold is exceeded. For example, these devices could be fans.</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1378731"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1378732"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1378733"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1378734"></A>A variable-length Package containing a list of References to active cooling devices</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378735"></A>The return value is a package consisting of references to all active cooling devices that should be engaged when the associated active cooling threshold (_ACx) is exceeded.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378736"></A>When the returned package consists of references to an active cooling device that is a fan device and the fan device implements _FPS and _FSL objects, OSPM activates the identified fan at a capability level matching the level identified by this object. For example, if the system has a fan that implements _FPS object with 5 levels, and if _AL3 is evaluated by the OSPM causing it to return this fan&#8217;s reference, then the fan is activated by evaluating _FSL with the value from the Control field of an _FPS entry whose TripPoint field value equals 3.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378737"></A>If a thermal zone has the _ART object defined, then it is not necessary to have any _ALx objects implemented.</P>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1382323"></A>If a thermal zone has _ART object defined as well as _ALx defined, the OSPM ignores _ALx objects and uses _ART exclusively.</LI>
+</UL>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1382334"></A>_<A NAME="_Toc258262453"></A>ART (Active Cooling Relationship Table)</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1378744"></A>The optional _ART object evaluates to a variable-length package containing a list of packages each of which describes the active cooling relationship between a device within a thermal zone and an active cooling device. OSPM uses the combined information about the active cooling relationships of all devices in the thermal zone to make active cooling policy decisions.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378745"></A>If _ART is implemented within a thermal zone, OSPM ignores all _ALx objects as _ART conveys a mapping for each of the _ACx trip points to active cooling devices.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378746"></A>The platform can dynamically change the _ART object by notifying the thermal zone object with a Notify code of 0x83, which will cause OSPM to re-evaluate both the _TRT and _ART objects. This allows the platform to change the capability level mapping to various _ACx trip points dynamically at run time.</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1378747"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1378748"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1378749"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1378750"></A>A variable-length Package containing a Revision ID and a list of Active Relationship Packages as described below:</P>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1378751"></A>Return Value Information</H3>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378753"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1473551"></A>Package { </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378754"></A>    Revision,                    // Integer - Current revision is: 0</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378755"></A>    ActiveRelationship[0]        // Package</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378756"></A>    ....</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378757"></A>    ActiveRelationship[n]        // Package</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378758"></A>}</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1473558"></A>&nbsp;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378760"></A>Each ActiveRelationship sub-Package contains the elements described below:</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378762"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1473565"></A>Package {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378763"></A>    SourceDevice,                // Object Reference to a Fan Device Object</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378764"></A>    TargetDevice,                // Object Reference to a Device Object</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378765"></A>    Weight,                      // Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378766"></A>    AC0MaxLevel,                 // Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378767"></A>    AC1MaxLevel,                 // Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378768"></A>    AC2MaxLevel,                 // Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378769"></A>    AC3MaxLevel,                 // Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1466027"></A>    AC4MaxLevel,                 // Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1466028"></A>    AC5MaxLevel,                 // Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1466029"></A>    AC6MaxLevel,                 // Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1466030"></A>    AC7MaxLevel,                 // Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378774"></A>    AC8MaxLevel,                 // Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378775"></A>    AC9MaxLevel                  // Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1378776"></A>}</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1378778"></A>Thermal Relationship Package Values</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1466097"></A>Element</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1466099"></A>Object Type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1466101"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378787"></A>SourceDevice</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378789"></A>Reference (to a device)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378791"></A>The fan device that has an impact on the cooling of the device indicated by TargetDevice.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378793"></A>TargetDevice</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378795"></A>Reference (to a device)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378797"></A>The device that is impacted by the fan device indicated by SourceDevice.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378799"></A>Weight</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378801"></A>Integer</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378803"></A>Indicates the SourceDevice&#8217;s contribution to the platform&#8217;s  TargetDevice total cooling capability when the fans of all entries in the _ART with the same target device are engaged at their highest (maximum capability) performance state. This is represented as a percentage value (0-100).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378805"></A>AC0MaxLevel</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378807"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378809"></A>Indicates the maximum fans speed level in percent (0-100) that OSPM may engage on the SourceDevice  when a temperature exceeds the _AC0 trip point value. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1378810"></A>A value of 0xFFFFFFFF in this field indicates that the SourceDevice is not to be engaged for the trip point.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378812"></A>AC1MaxLevel</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378814"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378816"></A>Indicates the maximum fans speed level in percent (0-100) that OSPM may engage on the SourceDevice  when a temperature exceeds the _AC1 trip point value. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1378817"></A>A value of 0xFFFFFFFF in this field indicates that the SourceDevice is not to be engaged for the trip point.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378819"></A>AC2MaxLevel</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378821"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378823"></A>Indicates the maximum fans speed level in percent (0-100) that OSPM may engage on the SourceDevice  when a temperature exceeds the _AC2 trip point value. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1378824"></A>A value of 0xFFFFFFFF in this field indicates that the SourceDevice is not to be engaged for the trip point.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378826"></A>AC3MaxLevel</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378828"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378830"></A>Indicates the maximum fans speed level in percent (0-100) that OSPM may engage on the SourceDevice  when a temperature exceeds the _AC3 trip point value. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1378831"></A>A value of 0xFFFFFFFF in this field indicates that the SourceDevice is not to be engaged for the trip point.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378833"></A>AC4MaxLevel</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378835"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378837"></A>Indicates the maximum fans speed level in percent (0-100) that OSPM may engage on the SourceDevice  when a temperature exceeds the _AC4 trip point value. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1378838"></A>A value of 0xFFFFFFFF in this field indicates that the SourceDevice is not to be engaged for the trip point.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378840"></A>AC5MaxLevel</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378842"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378844"></A>Indicates the maximum fans speed level in percent (0-100) that OSPM may engage on the SourceDevice  when a temperature exceeds the _AC5 trip point value. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1378845"></A>A value of 0xFFFFFFFF in this field indicates that the SourceDevice is not to be engaged for the trip point.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378847"></A>AC6MaxLevel</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378849"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378851"></A>Indicates the maximum fans speed level in percent (0-100) that OSPM may engage on the SourceDevice  when a temperature exceeds the _AC6 trip point value. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1378852"></A>A value of 0xFFFFFFFF in this field indicates that the SourceDevice is not to be engaged for the trip point.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378854"></A>AC7MaxLevel</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378856"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378858"></A>Indicates the maximum fans speed level in percent (0-100) that OSPM may engage on the SourceDevice  when a temperature exceeds the _AC7 trip point value. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1378859"></A>A value of 0xFFFFFFFF in this field indicates that the SourceDevice is not to be engaged for the trip point.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378861"></A>AC8MaxLevel</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378863"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378865"></A>Indicates the maximum fans speed level in percent (0-100) that OSPM may engage on the SourceDevice  when a temperature exceeds the _AC8 trip point value. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1378866"></A>A value of 0xFFFFFFFF in this field indicates that the SourceDevice is not to be engaged for the trip point.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378868"></A>AC9MaxLevel</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378870"></A>Integer (DWORD)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1378872"></A>Indicates the maximum fans speed level in percent (0-100) that OSPM may engage on the SourceDevice  when a temperature exceeds the _AC9 trip point value. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1378873"></A>A value of 0xFFFFFFFF in this field indicates that the SourceDevice is not to be engaged for the trip point.</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1378877"></A>In the case multiple active cooling trip points have been exceeded and _ART entries indicate various maximum limits for the same SourceDevice, OSPM may operate the SourceDevice up to the highest ACxMaxLevel value indicated for all exceeded trip points.</P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1378899"></A><A NAME="_Toc489267312"></A><A NAME="_Toc489267686"></A><A NAME="_Toc489272660"></A><A NAME="RSVD_CRT"></A><A NAME="_Toc202341763"></A><A NAME="_Toc258262454"></A>_CRT (Critical Temperature)<A NAME="marker-1378897"></A><A NAME="marker-1378898"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1378900"></A>This object, when defined under a thermal zone, returns the critical temperature at which OSPM must shutdown the system. If this object it present under a device, the device&#8217;s driver evaluates this object to determine the device&#8217;s critical cooling temperature trip point. This value may then be used by the device&#8217;s driver to program an internal device temperature sensor trip point.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1378901"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1378902"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1378903"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1474761"></A>An Integer containing the critical temperature threshold in tenths of degrees Kelvin</P>
+<P CLASS="Body">
+<A NAME="pgfId-1474763"></A>The result is an integer value that represents the critical shutdown threshold in tenths of degrees. For example, 300.0K is represented by the integer 3000.</P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1475496"></A><A NAME="23925"></A>_CR3 (Warm/Standby Temperature)</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1475497"></A><EM CLASS="SC-16-266245">
+This object, when defined under a thermal zone, returns the critical temperature at which OSPM may choose to transition the system into a low power state with a faster exit latency than S4 sleeping state (e.g. S3, or an equivalent low power state if the LOW_POWER_S0_IDLE_CAPABLE FADT flag is set). The platform vendor should define _CR3 to be sufficiently below _CRT so as to allow enough time to transition the system into this low power state. It may be sufficient to define either _CR3 or _HOT depending on the type and thermal characteristics of the specific thermal zone under consideration. If this object it present under a device, the device&#8217;s driver evaluates this object to determine the device&#8217;s warm/standby cooling temperature trip point. This value may then be used by the device&#8217;s driver to program an internal device temperature sensor trip point. </EM>
+</P>
+<P CLASS="SP-16-90118">
+<A NAME="pgfId-1475499"></A>Arguments:</P>
+<P CLASS="Body">
+<A NAME="pgfId-1475547"></A>None </P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1475536"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1475501"></A>An <EM CLASS="Bold">
+Integer</EM>
+ containing the critical temperature threshold in tenths of degrees Kelvin</P>
+<P CLASS="Body">
+<A NAME="pgfId-1475491"></A>The result is an integer value that represents the critical shutdown threshold in tenths of degrees. For example, 300.0K is represented by the integer 3000.</P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1378909"></A><A NAME="RSVD_DTI"></A><A NAME="_Toc258262455"></A>_DTI (Device Temperature Indication)</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1378910"></A>This optional object may be present under a device and is evaluated by OSPM when the device&#8217;s native (driver managed) temperature sensor has crossed a cooling temperature trip point or when a meaningful change in temperature (as indicated by evaluation of the _NTT object) has occurred. OSPM evaluation of the _DTI object enables the platform to take action as a result of these events. For example, the platform may choose to implement fan control hysteresis based on the conveyed value or signal the revaluation of the _TDL or _PDL objects.</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1378911"></A>Arguments: (1)</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1378912"></A>Arg0 - An Integer containing the current value of the temperature sensor (in tenths Kelvin)</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1378913"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1378914"></A>None</P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1378926"></A><A NAME="_Toc489267313"></A><A NAME="_Toc489267687"></A><A NAME="_Toc489272661"></A><A NAME="RSVD_HOT"></A><A NAME="_Toc202341764"></A><A NAME="_Toc258262456"></A>_HOT (Hot Temperature)<A NAME="marker-1378924"></A><A NAME="marker-1378925"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1378927"></A>This optional object, when defined under a thermal zone, returns the critical temperature at which OSPM may choose to transition the system into the S4 sleeping state. The platform vendor should define _HOT to be far enough below _CRT so as to allow OSPM enough time to transition the system into the S4 sleeping state. While dependent on the amount of installed memory, on typical platforms OSPM implementations can transition the system into the S4 sleeping state in tens of seconds. If this object it present under a device, the device&#8217;s driver evaluates this object to determine the device&#8217;s hot cooling temperature trip point. This value may then be used by the device&#8217;s driver to program an internal device temperature sensor trip point.</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1378928"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1378929"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1378930"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1474756"></A>An Integer containing the critical temperature threshold in tenths of degrees Kelvin</P>
+<P CLASS="Body">
+<A NAME="pgfId-1474758"></A>The return value is an integer that represents the critical sleep threshold tenths of degrees Kelvin. For example, 300.0K is represented by the integer 3000.</P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1475351"></A><A NAME="77285"></A>_MTL (Minimum Throttle Limit)</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1475352"></A><EM CLASS="SC-16-266245">
+This object, when defined under a thermal zone, returns the minimum throttle limit of a zone. This will determine how much a thermal zone limits the performance of its controlled devices. This value can be used by OSPM to calculate the changes in performance limits it applies to the devices of the thermal zone. </EM>
+</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1475393"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1475354"></A><EM CLASS="SC-16-266245">
+None </EM>
+</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1475405"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1475347"></A><EM CLASS="SC-16-266245">
+An Integer value with the current minimum throttle limit, expressed as a percentage</EM>
+</P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1378940"></A>_<A NAME="_Toc258262457"></A>NTT (Notification Temperature Threshold)<A NAME="marker-1378938"></A><A NAME="marker-1378939"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1378941"></A>This optional object may be defined under devices containing native temperature sensors and evaluates to the temperature change threshold for the device where the platform requires notification of the change via evaluation of the _TPT object.</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1378942"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1378943"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1378944"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1378945"></A>An Integer containing the temperature threshold in tenths of degrees Kelvin.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378946"></A>The return value is an integer that represents the amount of change in device temperature that is meaningful to the platform and for which the platform requires notification via evaluation of the _TPT object.</P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1378968"></A><A NAME="_Toc489267314"></A><A NAME="_Toc489267688"></A><A NAME="_Toc489272662"></A><A NAME="RSVD_PSL"></A><A NAME="_Toc202341765"></A><A NAME="_Toc258262458"></A>_PSL (Passive List)<A NAME="marker-1378966"></A><A NAME="marker-1378967"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1378969"></A>This object is defined under a thermal zone and evaluates to a list of processor objects to be used for passive cooling.</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1378970"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1378971"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1378972"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1378973"></A>A variable-length Package containing a list of References to processor objects</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378974"></A>The return value is a package consisting of references to all processor objects that will be used for passive cooling when the zone&#8217;s passive cooling threshold (_PSV) is exceeded.</P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1378998"></A><A NAME="_Toc489267315"></A><A NAME="_Toc489267689"></A><A NAME="_Toc489272663"></A><A NAME="RSVD_PSV"></A><A NAME="_Toc202341768"></A><A NAME="_Toc258262459"></A>_PSV (Passive)<A NAME="marker-1378996"></A><A NAME="marker-1378997"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1378999"></A>This optional object, if present under a thermal zone, evaluates to the temperature at which OSPM must activate passive cooling policy.</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1379000"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1379001"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1379002"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1379003"></A>An Integer containing the passive cooling temperature threshold in tenths of degrees Kelvin</P>
+<P CLASS="Body">
+<A NAME="pgfId-1379004"></A>The return value is an integer that represents tenths of degrees Kelvin. For example, 300.0 Kelvin is represented by 3000.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1379017"></A><A NAME="_Toc369097147"></A><A NAME="_Toc369679901"></A><A NAME="_Toc369801518"></A><A NAME="_Toc369936291"></A><A NAME="_Toc370017381"></A><A NAME="_Toc374092216"></A><A NAME="_Toc375244469"></A><A NAME="_Toc375924865"></A><A NAME="_Toc423760090"></A><A NAME="_Ref465701741"></A><A NAME="_Toc475523731"></A><A NAME="_Toc486665546"></A>If this object it present under a device, the device&#8217;s driver evaluates this object to determine the device&#8217;s corresponding passive cooling temperature trip point. This value may then be used by the device&#8217;s driver to program an internal device temperature sensor trip point. When this object is present under a device, the device must contain a native OS device driver interface supporting a passive cooling control.</P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1379025"></A><A NAME="_Toc489267316"></A><A NAME="_Toc489267690"></A><A NAME="_Toc489272664"></A><A NAME="RSVD_RTV"></A><A NAME="_Toc202341769"></A><A NAME="_Toc258262460"></A>_RTV (Relative Temperature Values)</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1379026"></A>This optional object may be present under a device or a thermal zone and is evaluated by OSPM to determine whether the values returned by temperature trip point and current operating temperature interfaces under the corresponding device or thermal zone represent absolute or relative temperature values. </P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1379027"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1379028"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1379029"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1379030"></A>An Integer containing a relative versus absolute indicator</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1379031"></A>0		Temperatures are absolute</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1379032"></A>Other		Temperatures are relative</P>
+<P CLASS="Body">
+<A NAME="pgfId-1379033"></A>The return value is an integer that indicates whether values returned by temperature trip point and current operating temperature interfaces represent absolute or relative temperature values. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1379034"></A>If the _RTV object is not present or is present and evaluates to zero then OSPM assumes that all values returned by temperature trip point and current operating temperature interfaces under the device or thermal zone represent absolute temperature values expressed in tenths of degrees Kelvin. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1379035"></A>If the _RTV object is present and evaluates to a non zero value then all values returned by temperature trip point and current operating temperature interfaces under the corresponding device or thermal zone represent temperature values relative to a zero point that is defined as the maximum value of the device&#8217;s or thermal zone&#8217;s critical cooling temperature trip point. In this case, temperature trip point and current operating temperature interfaces return values in units that are tenths of degrees below the zero point.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1379036"></A>OSPM evaluates the _RTV object before evaluating any other temperature trip point or current operating temperature interfaces.</P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1379048"></A><A NAME="RSVD_SCP"></A><A NAME="_Toc202341775"></A><A NAME="_Toc258262461"></A>_SCP (Set Cooling Policy)<A NAME="marker-1379046"></A><A NAME="marker-1379047"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1379049"></A>This optional object is a control method that OSPM invokes to set the platform&#8217;s cooling mode policy setting. The platform may use the evaluation of _SCP to reassign _ACx and _PSV temperature trip points according to the mode or limits conveyed by OSPM. OSPM will automatically evaluate _ACx and _PSV objects after executing _SCP. This object may exist under a thermal zone or a device. </P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1474334"></A>Arguments: (3)</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1474335"></A>Arg0 - Mode			An Integer containing the cooling mode policy code</P>
+<P CLASS="Body">
+<A NAME="pgfId-1474336"></A>Arg1 - AcousticLimit			An Integer containing the acoustic limit</P>
+<P CLASS="Body">
+<A NAME="pgfId-1379053"></A>Arg2 - PowerLimit			An Integer containing the power limit</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1379054"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1379055"></A>None</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1379056"></A>Argument Information:</H3>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1379057"></A>Mode - 0 = Active, 1 = Passive</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1379058"></A>Acoustic Limit - Specifies the maximum acceptable acoustic level that active cooling devices may generate. Values are 1 to 5 where 1 means no acoustic tolerance and 5 means maximum acoustic tolerance.</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1379059"></A>Power Limit - Specifies the maximum acceptable power level that active cooling devices may consume. Values are from 1 to 5 where 1 means no power may be used to cool and 5 means maximum power may be used to cool.</P>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1379060"></A>Example:</H3>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1473579"></A>// Fan Control is defined as follows:</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379063"></A>//     Speed 1 (Fan is Off):    Acoustic Limit 1, Power Limit 1, &lt;= 64C</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379064"></A>//     Speed 2:        Acoustic Limit 2, Power Limit 2, 65C - 74C</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379065"></A>//     Speed 3:        Acoustic Limit 3, Power Limit 3, 75C - 84C</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379066"></A>//     Speed 4:        Acoustic Limit 4, Power Limit 4, 85C - 94C</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379067"></A>//     Speed 5:        Acoustic Limit 5, Power Limit 5, &gt;= 95C</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379068"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379069"></A>// _SCP Notifies the platform the current cooling mode.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379070"></A>//    Arg0 = Mode</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379071"></A>//        0 - Active cooling</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379072"></A>//        1 - Passive cooling</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379073"></A>//    Arg1 = Acoustic Limit</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379074"></A>//        1 = No acoustic tolerance</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379075"></A>//        ...</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379076"></A>//        5  = maximum acoustic tolerance</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379077"></A>//    Arg2 = Power Limit</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379078"></A>//        1 = No power may be used to cool</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379079"></A>//        ...</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379080"></A>//        5 = maximum power may be used to cool</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379081"></A>    </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379082"></A>Method(_SCP,3,Serialized)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379083"></A>{</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379084"></A>    // Store the Cooling Mode in NVS and use as needed in</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379085"></A>    // the rest of the ASL Code.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379086"></A>    Store(Arg0, CTYP)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379087"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379088"></A>    // Set PSVT to account for a Legacy OS that does not pass</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379089"></A>    // in either the acoustic limit or Power Limit.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379090"></A>    If(Arg0)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379091"></A>    {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379092"></A>        Store(60,PSVT)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379093"></A>    }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379094"></A>    Else</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379095"></A>    {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379096"></A>        Store(97,PSVT)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379097"></A>    }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379098"></A>    If (CondRefOf (_OSI,Local0))</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379099"></A>    {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379100"></A>      If (&#92;_OSI (&quot;3.0 _SCP Extensions&quot;))</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379101"></A>      {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379102"></A>        // Determine Power Limit.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379103"></A>        //</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379104"></A>        // NOTE1:  PSVT = Passive Cooling Trip Point stored</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379105"></A>        // in NVS in Celsius.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379106"></A>        //</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379107"></A>        // NOTE2:  4 Active Cooling Trips Points correspond to 5</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379108"></A>        // unique Power Limit regions and 5 unique acoustic limit</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379109"></A>        // regions.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1474804"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379110"></A>        //</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379111"></A>        // NOTE3:  This code will define Passive cooling so that</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379112"></A>        // CPU throttling will be initiated within the Power Limit</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379113"></A>        // Region passed in such that the next higher Power Limit</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379114"></A>        // Region will not be reached.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379115"></A>        Switch(Arg2)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379116"></A>        {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1474790"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379117"></A>            Case(1)            // Power Limit = 1.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379118"></A>            {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379119"></A>                // Stay in Acoustic Limit 1.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379120"></A>                Store(60,PSVT)    // Passive = 60C.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379121"></A>            }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379122"></A>            Case(2)            // Power Limit = 2.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379123"></A>            {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379124"></A>                // Store Highest supported Acoustic Level</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379125"></A>                // at this Power Limit (1 or 2).</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379126"></A>                Store(70,PSVT)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379127"></A>                If(Lequal(Arg1,1))</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379128"></A>                {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379129"></A>                    // Stay in Acoustic Level 1.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379130"></A>                    Store(60,PSVT)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379131"></A>                }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379132"></A>            }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379133"></A>            Case(3)            // Power Limit = 3.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379134"></A>            {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379135"></A>                // Store Highest supported Acoustic Level</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379136"></A>                // at this Power Limit (1, 2, or 3).</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379137"></A>                Store(80,PSVT)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379138"></A>                If(Lequal(Arg1,2))</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379139"></A>                {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379140"></A>                    // Stay in Acoustic Level 1 or 2.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379141"></A>                    Store(70,PSVT)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379142"></A>                }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379143"></A>                If(Lequal(Arg1,1))</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379144"></A>                {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379145"></A>                    // Stay in Acoustic Level 1.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379146"></A>                    Store(60,PSVT)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379147"></A>                }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379148"></A>            }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379149"></A>            Case(4)            // Power Limit = 4.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379150"></A>            {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379151"></A>                // Store Highest supported Acoustic Level</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379152"></A>                // at this Power Limit (1, 2, 3, or 4).</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379153"></A>                Store(90,PSVT)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379154"></A>                If(Lequal(Arg1,3))</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379155"></A>                {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379156"></A>                    // Stay in Acoustic Level 1 or 2.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379157"></A>                    Store(80,PSVT)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379158"></A>                }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379159"></A>                If(Lequal(Arg1,2))</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379160"></A>                {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379161"></A>                    // Stay in Acoustic Level 1 or 2.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379162"></A>                    Store(70,PSVT)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379163"></A>                }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379164"></A>                If(Lequal(Arg1,1))</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379165"></A>                {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379166"></A>                    // Stay in Acoustic Level 1.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379167"></A>                    Store(60,PSVT)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379168"></A>                }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379169"></A>            }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379170"></A>            Case(5)            // Power Limit = 5.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379171"></A>            {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379172"></A>                // Store Highest supported Acoustic Level</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379173"></A>                // at this Power Limit (1, 2, 3, 4, or 5).</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379174"></A>                Store(97,PSVT)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379175"></A>                If(Lequal(Arg1,4))</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379176"></A>                {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379177"></A>                    // Stay in Acoustic Level 1 or 2.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379178"></A>                    Store(90,PSVT)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379179"></A>                }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379180"></A>                If(Lequal(Arg1,3))</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379181"></A>                {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379182"></A>                    // Stay in Acoustic Level 1 or 2.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379183"></A>                    Store(80,PSVT)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379184"></A>                }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379185"></A>                If(Lequal(Arg1,2))</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379186"></A>                {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379187"></A>                    // Stay in Acoustic Level 1 or 2.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379188"></A>                    Store(70,PSVT)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379189"></A>                }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379190"></A>                If(Lequal(Arg1,1))</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379191"></A>                {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379192"></A>                    // Stay in Acoustic Level 1.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379193"></A>                    Store(60,PSVT)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379194"></A>                }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379195"></A>            }  // Case 5</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379196"></A>        } // Switch Arg 2</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379197"></A>    } // _OSI - Extended _SCP</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379198"></A>  } // CondRefOf _OSI</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379199"></A>}  // Method _SCP</P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1476632"></A><A NAME="74540"></A>_STR (String)<A NAME="marker-1476717"></A><A NAME="marker-1476718"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1476633"></A>This optional object, when defined under a thermal zone, returns a string name for this thermal zone.  See <A HREF="Device_Configuration.htm#72094" CLASS="XRef">See _STR (String).</A> for full definition of _STR.</P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1379222"></A><A NAME="_Toc489267317"></A><A NAME="_Toc489267691"></A><A NAME="_Toc489272665"></A><A NAME="RSVD_TC1"></A><A NAME="_Toc202341776"></A><A NAME="_Toc258262462"></A>_TC1 (Thermal Constant 1)<A NAME="marker-1379220"></A><A NAME="marker-1379221"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1379223"></A>This object evaluates to the constant _TC1 for use in the Passive cooling formula:</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1379224"></A>&#916;Performance [%]= _TC1 * ( Tn  -  Tn-1 ) + _TC2 * (Tn. - Tt)</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1379225"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1379226"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1379227"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1379228"></A>An Integer containing Thermal Constant #1</P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1379256"></A><A NAME="_Toc489267318"></A><A NAME="_Toc489267692"></A><A NAME="_Toc489272666"></A><A NAME="RSVD_TC2"></A><A NAME="_Toc202341781"></A><A NAME="_Toc258262463"></A>_TC2 (Thermal Constant 2)<A NAME="marker-1379254"></A><A NAME="marker-1379255"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1379257"></A>This object evaluates to the constant _TC2 for use in the Passive cooling formula:</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1379258"></A>&#916;Performance [%]= _TC1 * ( Tn  -  Tn-1 ) +  _TC2 *(Tn - Tt)</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1379259"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1379260"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1379261"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1379262"></A>An Integer containing Thermal Constant #2</P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1475221"></A><A NAME="80516"></A>_TFP (Thermal fast Sampling Period) </H6>
+<P CLASS="Body">
+<A NAME="pgfId-1475222"></A><EM CLASS="SC-16-266245">
+This object evaluates to a thermal sampling period (in milliseconds) used by OSPM to implement the Passive cooling equation. This value, along with _TC1 and _TC2, will enable OSPM to provide the proper hysteresis required by the system to accomplish an effective passive cooling policy.</EM>
+</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1475223"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1475224"></A>None </P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1475226"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1475227"></A><EM CLASS="SC-16-266245">
+An Integer containing the sampling period in milliseconds</EM>
+</P>
+<P CLASS="Body">
+<A NAME="pgfId-1475229"></A><EM CLASS="SC-16-266245">
+The granularity of the sampling period is 1 milliseconds. For example, if the sampling period is 30.0 seconds, then _TFP needs to report 30,000; if the sampling period is 0.5 seconds, then it will report 500. OSPM can normalize the sampling over a longer period if necessary.</EM>
+</P>
+<P CLASS="Body">
+<A NAME="pgfId-1475217"></A><EM CLASS="SC-16-266245">
+If both _TFP and _TSP are present in a Thermal Zone, _TFP overrides _TSP. Platforms which need to support legacy operating systems from before _TFP in ACPI 6.0, must specify a _TSP if a sampling period is required.</EM>
+ OS support for _TFP can be discovered via _OSC (see <A HREF="Device_Configuration.htm#21183" CLASS="XRef">See Platform-Wide _OSC Capabilities DWORD 2.</A>).</P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1379284"></A><A NAME="_Toc489267319"></A><A NAME="_Toc489267693"></A><A NAME="_Toc489272667"></A><A NAME="RSVD_TMP"></A><A NAME="_Toc202341782"></A><A NAME="_Toc258262464"></A>_TMP (Temperature)<A NAME="marker-1379282"></A><A NAME="marker-1379283"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1379285"></A>This control method returns the thermal zone&#8217;s current operating temperature.</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1379286"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1379287"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1379288"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1379289"></A>An Integer containing the current temperature of the thermal zone (in tenths of degrees Kelvin)</P>
+<P CLASS="Body">
+<A NAME="pgfId-1379290"></A>The return value is the current temperature of the thermal zone in tenths of degrees Kelvin. For example, 300.0K is represented by the integer 3000.</P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1379295"></A><A NAME="RSVD_TPT"></A><A NAME="_Toc202341783"></A><A NAME="_Toc258262465"></A>_TPT (Trip Point Temperature)</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1379296"></A>This optional object may be present under a device and is invoked by OSPM to indicate to the platform that the devices&#8217; embedded temperature sensor has crossed a cooling temperature trip point. After invocation, OSPM immediately evaluates the devices&#8217; Active and Passive cooling temperature trip point values. This enables the platform to implement hysteresis.</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1379297"></A>Arguments: (1)</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1379298"></A>Arg0 - An Integer containing the current value of the temperature sensor (in tenths Kelvin)</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1379299"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1379300"></A>None</P>
+<P CLASS="Body">
+<A NAME="pgfId-1379302"></A>The _TPT object is deprecated in ACPI 4.0. The _DTI object , <A HREF="Thermal_management.htm#RSVD_DTI" CLASS="XRef">See _DTI (Device Temperature Indication).</A> &#8220;_DTI (Device Temperature Indication)&#8221;, should be used instead.</P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1379310"></A><A NAME="RSVD_TRT"></A><A NAME="_Toc202341788"></A><A NAME="_Toc258262466"></A>_TRT (Thermal Relationship Table)</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1379311"></A>This object evaluates to a package of packages each of which describes the thermal relationship between devices within a thermal zone. OSPM uses the combined information about the thermal relationships of all devices in the thermal zone to make thermal policy decisions.</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1379312"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1379313"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1379314"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1379315"></A>A variable-length Package containing a list of Thermal Relationship Packages as described below</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="SubHeading">
+<A NAME="pgfId-1379316"></A>Return Value Information</H3>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379318"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1473593"></A>Package { </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379319"></A>    ThermalRelationship[0]        // Package</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379320"></A>    ....</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379321"></A>    ThermalRelationship[n]        // Package</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379322"></A>}</P>
+<P CLASS="Body">
+<A NAME="pgfId-1379323"></A>Each ThermalRelationship sub-Package contains the elements described below:</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1473607"></A>Package {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379326"></A>    SourceDevice,                 // Object Reference to a Device Object</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379327"></A>    TargetDevice,                 // Object Reference to a Device Object</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379328"></A>    Influence,                    // Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379329"></A>    SamplingPeriod,               // Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379330"></A>    Reserved1,                    // Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379331"></A>    Reserved2,                    // Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379332"></A>    Reserved3,                    // Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379333"></A>    Reserved4                     // Integer</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1474601"></A>},</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1474640"></A>Thermal Relationship Package Values</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1474605"></A>Element</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1474607"></A>Object Type</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1474609"></A>Description</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1474611"></A>Source Device</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1474613"></A>Reference (to a device)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1474615"></A>The device that is influencing the device indicated by TargetDevice.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1474617"></A>Target Device</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1474619"></A>Reference (to a device)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1474621"></A>The device that is influenced by the device indicated by SourceDevice.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1474623"></A>Influence</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1474625"></A>Integer</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1474627"></A>The thermal influence of SourceDevice on TargetDevice - represented as tenths of degrees Kelvin that the device indicated by SourceDevice raises the temperature of the device indicated by TargetDevice per watt of thermal load that SourceDevice generates.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1474629"></A>Sampling Period</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1474631"></A>Integer</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1474633"></A>The minimum period of time in tenths of seconds that OSPM should wait after applying a passive control to the device indicated by SourceDevice to detect its impact on the device indicated by TargetDevice.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1474635"></A>Reserved (1-4)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1474637"></A>Integer<BR>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1474639"></A>Reserved for future use.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1475421"></A><A NAME="18398"></A>_TSN (Thermal Sensor Device)</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1475422"></A><EM CLASS="SC-16-266245">
+This object, when defined under a thermal zone, returns a reference to the thermal sensor device used to monitor the temperature of the thermal zone. For Native OS Device Driver Thermal Interfaces, see <A HREF="Thermal_management.htm#_Toc202341854" CLASS="XRef">See Native OS Device Driver Thermal Interfaces.</A>.</EM>
+</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1475454"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1475424"></A><EM CLASS="SC-16-266245">
+None </EM>
+</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1475466"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1475416"></A><EM CLASS="SC-16-266245">
+A single Reference to the namespace device object that monitors the temperature of the thermal zone.</EM>
+</P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1379418"></A><A NAME="_Toc489267320"></A><A NAME="_Toc489267694"></A><A NAME="_Toc489272668"></A><A NAME="_Toc70350189"></A><A NAME="RSVD_TSP"></A><A NAME="_Toc202341829"></A><A NAME="_Toc258262467"></A>_TSP (Thermal Sampling Period)<A NAME="marker-1379416"></A><A NAME="marker-1379417"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1379419"></A>This object evaluates to a thermal sampling period (in tenths of seconds) used by OSPM to implement the Passive cooling equation. This value, along with _TC1 and _TC2, will enable OSPM to provide the proper hysteresis required by the system to accomplish an effective passive cooling policy. </P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1379420"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1379421"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1379422"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1379423"></A>An Integer containing the sampling period in tenths of seconds</P>
+<P CLASS="Body">
+<A NAME="pgfId-1408867"></A>The granularity of the sampling period is 0.1 seconds. For example, if the sampling period is 30.0 seconds, then _TSP needs to report 300; if the sampling period is 0.5 seconds, then it will report 5. OSPM can normalize the sampling over a longer period if necessary.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1476007"></A>If both _TFP and _TSP are present in a Thermal Zone, _TFP overrides _TSP. Platforms which need to support legacy operating systems from before _TFP in ACPI 6.0 must specify a _TSP if a sampling period is required. OS support for _TFP can be discovered via _OSC (see <A HREF="Device_Configuration.htm#21183" CLASS="XRef">See Platform-Wide _OSC Capabilities DWORD 2.</A>).</P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1408871"></A><A NAME="RSVD_TST"></A><A NAME="_Toc202341834"></A><A NAME="_Toc258262468"></A>_TST (Temperature Sensor Threshold)</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1408872"></A>This optional object may be present under a device and is evaluated by OSPM to determine the minimum separation for a devices&#8217; programmable temperature trip points. When a device contains multiple programmable temperature trip points, it may not be necessary for OSPM to poll the device&#8217;s temperature after crossing a temperature trip point when performing passive cooling control policy. </P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1379439"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1379440"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1379441"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1379442"></A>An Integer containing the sensor threshold (in tenths of degrees Kelvin)</P>
+<P CLASS="Body">
+<A NAME="pgfId-1379443"></A>To eliminate polling, the device can program intermediate trip points of interest (higher or lower than the current temperature) and signal the crossing of the intermediate trip points to OSPM. The distance between the current temperature and these intermediate trip points may be platform specific and must be set far enough away from the current temperature so as to not to miss the crossing of a meaningful temperature point. The _TST object conveys the recommended minimum separation between the current temperature and an intermediate temperature trip point to OSPM.</P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1379456"></A><A NAME="_Toc489267321"></A><A NAME="_Toc489267695"></A><A NAME="_Toc489272669"></A><A NAME="RSVD_TZD"></A><A NAME="_Toc202341839"></A><A NAME="_Toc258262469"></A>_TZD (Thermal Zone Devices)<A NAME="marker-1379454"></A><A NAME="marker-1379455"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1379457"></A>This optional object evaluates to a package of device names. Each name corresponds to a device in the ACPI namespace that is associated with the thermal zone. The temperature reported by the thermal zone is roughly correspondent to that of each of the devices.</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1379458"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1379459"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1379460"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1379461"></A>A variable-length Package containing a list of References to thermal zone devices</P>
+<P CLASS="Body">
+<A NAME="pgfId-1379462"></A>The list of devices returned by the control method need not be a complete and absolute list of devices affected by the thermal zone. However, the package should at least contain the devices that would uniquely identify where this thermal zone is located in the machine. For example, a thermal zone in a docking station should include a device in the docking station, a thermal zone for the CD-ROM bay, should include the CD-ROM.</P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1379470"></A><A NAME="RSVD_TZM"></A><A NAME="_Toc202341844"></A><A NAME="_Toc258262470"></A>_TZM (Thermal Zone Member)</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1379471"></A>This optional object may exist under any device definition and evaluates to a reference to the thermal zone of which the device is a member.</P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1379472"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1379473"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1379474"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1379475"></A>A Reference to the parent device</P>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1379491"></A><A NAME="_Toc489267322"></A><A NAME="_Toc489267696"></A><A NAME="_Toc489272670"></A><A NAME="RSVD_TZP"></A><A NAME="_Toc202341849"></A><A NAME="_Toc258262471"></A>_TZP (Thermal Zone Polling)<A NAME="marker-1379489"></A><A NAME="marker-1379490"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1379492"></A>This optional object evaluates to a recommended polling frequency (in tenths of seconds) for this thermal zone. A value of zero indicates that OSPM does not need to poll the temperature of this thermal zone in order to detect temperature changes (the hardware is capable of generating asynchronous notifications). </P>
+</DIV>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1379493"></A>Arguments:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1379494"></A>None</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1379495"></A>Return Value:</H4>
+<P CLASS="Body">
+<A NAME="pgfId-1379496"></A>An Integer containing the recommended polling frequency in tenths of seconds</P>
+<P CLASS="Body">
+<A NAME="pgfId-1379497"></A>The return value contains the recommended polling frequency, in tenths of seconds. A value of zero indicates that polling is not necessary.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1379498"></A>The use of polling is allowed but strongly discouraged by this specification. OEMs should design systems that asynchronously notify OSPM whenever a meaningful change in the zone&#8217;s temperature occurs--relieving the OS of the overhead associated with polling. See <A HREF="Thermal_management.htm#_Toc489267300" CLASS="XRef">See Detecting Temperature Changes.</A>, &#8220;Detecting Temperature Changes,&#8221; for more information.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1379505"></A>This value is specified as tenths of seconds with a 1 second granularity. A minimum value of 30 seconds (_TZP evaluates to 300) and a maximum value of 300 seconds (in other words, 5 minutes) (_TZP evaluates to 3000) may be specified. As this is a recommended value, OSPM will consider other factors when determining the actual polling frequency to use.</P>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1379509"></A><A NAME="_Toc202341854"></A><A NAME="_Toc258262472"></A>Native OS Device Driver Thermal Interfaces</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1379510"></A>OS implementations compatible with the ACPI 3.0 thermal model, interface with the thermal objects of a thermal zone but also comprehend the thermal zone devices&#8217; OS native device driver interfaces that perform similar functions to the thermal objects at the device level.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1379511"></A>The recommended native OS device driver thermal interfaces that enable OSPM to perform optimal performance / thermal management include:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1379512"></A>Reading a value from a device&#8217;s embedded thermal sensor</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1379513"></A>Reading a value that indicates whether temperature and trip point values are reported in absolute or relative temperatures</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1379514"></A>Setting the platform&#8217;s cooling mode policy setting</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1379515"></A>Reading the embedded thermal sensor&#8217;s threshold</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1379516"></A>Reading the device&#8217;s active and passive cooling temperature trip points</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1379517"></A>Reading the device&#8217;s association to a thermal zone</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1379518"></A>Signaling the crossing of a thermal trip point </LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1379519"></A>Reading the desired polling frequency at which to check the devices temperature if the device cannot signal OSPM or signal OSPM optimally (both before and after a temperature trip point is crossed)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1379520"></A>Setting / limiting a device&#8217;s performance / throttling states</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1379521"></A>Engaging / disengaging a device&#8217;s active cooling controls</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1379522"></A>These interfaces are OS specific and as such the OS vendor defines the exact interface definition for each target operating system.</P>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1379533"></A><A NAME="_Toc489267323"></A><A NAME="_Toc489267697"></A><A NAME="_Toc489272671"></A><A NAME="_Toc202341855"></A><A NAME="_Toc258262473"></A>Thermal Zone Interface Requirements<A NAME="marker-1379532"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1379534"></A>While not all thermal zone interfaces are required to be present in each thermal zone, OSPM levies conditional requirements for the presence of specific thermal zone interfaces based on the existence of other related thermal zone interfaces. These interfaces may be implemented by thermal zone-wide objects or by OS-specific device driver exposed thermal interfaces. The requirements are outlined below:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1379535"></A>A thermal zone must contain at least one temperature interface; either the _TMP object or a member device temperature interface.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1379536"></A>A thermal zone must contain at least one trip point (critical, near critical, active, or passive).</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1379537"></A>If _ACx is defined then an associated _ALx must be defined (e.g. defining _AC0 requires _AL0 also be defined).</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1379538"></A>If _PSV is defined then either the _PSL or _TZD objects must exist. The _PSL and _TZD objects may both exist.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1379539"></A>If _PSL is defined then:</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1379540"></A>If a linear performance control register is defined (via either P_BLK or the _PTC, _TSS, _TPC objects) for a processor defined in _PSL or for a processor device in the zone as indicated by _TZM then the _TC1, _TC2, and objects must exist. A_TFP or _TSP object must also be defined if the device requires polling.</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1379541"></A>If a linear performance control register is not defined (via either P_BLK or the _PTC, _TSS, _TPC objects) for a processor defined in _PSL or for a processor device in the zone as indicated by _TZM then the processor must support processor performance states (in other words, the processor&#8217;s processor object must include _PCT, _PSS, and _PPC).</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1379542"></A>If _PSV is defined and _PSL is not defined then at least one device in thermal zone, as indicated by either the _TZD device list or devices&#8217; _TZM objects, must support device performance states.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1379543"></A>_SCP is optional.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1379544"></A>_TZD is optional outside of the _PSV requirement outlined above. </LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1379545"></A>If _HOT is defined then the system must support the S4 sleeping state.</LI>
+</UL>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1379554"></A><A NAME="_Toc489267324"></A><A NAME="_Toc489267698"></A><A NAME="_Toc489272672"></A><A NAME="_Toc202341856"></A><A NAME="_Toc258262474"></A>Thermal Zone Examples</H2>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1379566"></A><A NAME="_Toc489267325"></A><A NAME="_Toc489267699"></A><A NAME="_Toc489272673"></A><A NAME="_Toc202341857"></A><A NAME="_Toc258262475"></A>Example: The Basic Thermal Zone<A NAME="marker-1379564"></A><A NAME="marker-1379565"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1379567"></A>The following ASL describes a basic configuration where the entire system is treated as a single thermal zone. Cooling devices for this thermal zone consist of a processor and one single-speed fan. This is an example only. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1379568"></A>Notice that this thermal zone object (TZ0) is defined in the &#92;_SB scope. Thermal zone objects should appear in the namespace under the portion of the system that comprises the thermal zone. For example, a thermal zone that is isolated to a docking station should be defined within the scope of the docking station device. Besides providing for a well-organized namespace, this configuration allows OSPM to dynamically adjust its thermal policy as devices are added or removed from the system.<A NAME="marker-1379569"></A></P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1475576"></A><A NAME="_Ref368051758"></A><A NAME="_Ref368052508"></A><A NAME="_Toc369097154"></A><A NAME="_Toc369679907"></A><A NAME="_Toc369801524"></A><A NAME="_Toc369936297"></A><A NAME="_Toc370017387"></A><A NAME="_Toc374092222"></A>Scope(&#92;_SB) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1475577"></A>    Device(CPU0) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1475578"></A>         Name(_HID, &#8220;ACPI0007&#8221;)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1475579"></A>         Name(_UID, 1)                         // unique number for this processor</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1475580"></A>    }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379584"></A>&lt;...&gt;                                   </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379586"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379587"></A>Scope(&#92;_SB.PCI0.ISA0) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379588"></A>    Device(EC0) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379589"></A>        Name(_HID, EISAID(&quot;PNP0C09&quot;))          // ID for this EC</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379590"></A>                                               // current resource description for this EC</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379591"></A>        Name(_CRS, ResourceTemplate() {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379592"></A>            IO(Decode16,0x62,0x62,0,1)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379593"></A>            IO(Decode16,0x66,0x66,0,1)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379594"></A>        })</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379595"></A>        Name(_GPE, 0)                          // GPE index for this EC</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379596"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379597"></A>        // create EC's region and field for thermal support</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379598"></A>        OperationRegion(EC0, EmbeddedControl, 0, 0xFF) </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379599"></A>        Field(EC0, ByteAcc, Lock, Preserve) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379600"></A>            MODE,    1,                        // thermal policy (quiet/perform)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379601"></A>            FAN,    1,                         // fan power (on/off)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379602"></A>            ,        6,                        // reserved</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379603"></A>            TMP,    16,                        // current temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379604"></A>            AC0,    16,                        // active cooling temp (fan high)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379605"></A>            ,        16,                       // reserved</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379606"></A>            PSV,    16,                        // passive cooling temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379607"></A>            HOT        16,                     // critical S4 temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379608"></A>            CRT,    16                         // critical temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379609"></A>        }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379610"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379611"></A>        // following is a method that OSPM will schedule after</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379612"></A>        // it receives an SCI and queries the EC to receive value 7</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379613"></A>        Method(_Q07) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379614"></A>            Notify (&#92;_SB.PCI0.ISA0.EC0.TZ0, 0x80)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379615"></A>        }    // end of Notify method</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379616"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379617"></A>    // fan cooling on/off - engaged at AC0 temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379618"></A>    PowerResource(PFAN, 0, 0) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379619"></A>        Method(_STA) { Return (&#92;_SB.PCI0.ISA0.EC0.FAN) }        // check power state </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379620"></A>        Method(_ON) { Store (One, &#92;_SB.PCI0.ISA0.EC0.FAN) }     // turn on fan</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379621"></A>        Method(_OFF) { Store ( Zero, &#92;_SB.PCI0.ISA0.EC0.FAN) }  // turn off fan</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379622"></A>    }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379623"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379624"></A>    // Create FAN device object</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379625"></A>    Device (FAN) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379626"></A>        // Device ID for the FAN </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379627"></A>        Name(_HID, EISAID(&quot;PNP0C0B&quot;))</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379628"></A>        // list power resource for the fan </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379629"></A>        Name(_PR0, Package(){PFAN})</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379630"></A>    }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379631"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379632"></A>    // create a thermal zone</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379633"></A>    ThermalZone (TZ0) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379634"></A>        Method(_TMP) { Return (&#92;_SB.PCI0.ISA0.EC0.TMP )}    // get current temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379635"></A>        Method(_AC0) { Return (&#92;_SB.PCI0.ISA0.EC0.AC0) }    // fan high temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379636"></A>        Name(_AL0, Package(){&#92;_SB.PCI0.ISA0.EC0.FAN})       // fan is act cool dev</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379637"></A>        Method(_PSV) { Return (&#92;_SB.PCI0.ISA0.EC0.PSV) }    // passive cooling temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379638"></A>        Name(_PSL, Package (){&#92;_SB.CPU0})                   // passive cooling devices</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379639"></A>        Method(_HOT) { Return (&#92;_SB.PCI0.ISA0.EC0.HOT) }    // get critical S4 temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379640"></A>        Method(_CRT) { Return (&#92;_SB.PCI0.ISA0.EC0.CRT) }          // get critical temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379641"></A>        Method(_SCP, 1) { Store (Arg1, &#92;_SB.PCI0.ISA0.EC0.MODE) } // set cooling mode</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379642"></A>        Name(_TC1, 4)                                             // bogus example constant</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379643"></A>        Name(_TC2, 3)                                             // bogus example constant </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379644"></A>        Name(_TSP, 150)                                           // passive sampling = 15 sec</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379645"></A>        Name(_TZP, 0)                                             // polling not required</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1476765"></A>        Name (_STR, Unicode (&#8220;System thermal zone&#8221;))</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379646"></A>        } // end of TZ0</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379647"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379648"></A>    }                                                             // end of ECO</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379649"></A>}                                                                 // end of &#92;_SB.PCI0.ISA0 scope-</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379650"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379651"></A>}                                                                 // end of &#92;_SB scope</P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1379664"></A><A NAME="_Toc489267326"></A><A NAME="_Toc489267700"></A><A NAME="_Toc489272674"></A><A NAME="_Ref42575234"></A><A NAME="_Toc202341858"></A><A NAME="_Toc258262476"></A>Example: Multiple-Speed Fans<A NAME="marker-1379662"></A><A NAME="marker-1379663"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1379665"></A>The following ASL describes a thermal zone consisting of a processor and one dual-speed fan. As with the previous example, this thermal zone object (TZ0) is defined in the &#92;_SB scope and represents the entire system. This is an example only.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379667"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1475664"></A>Scope(&#92;_SB) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1475665"></A>    Device(CPU0) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1475666"></A>        Name(_HID, &quot;ACPI0007&quot;)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1475667"></A>        Name(_UID, 1)                        // unique number for this processor</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1475668"></A>    }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1475669"></A>&lt;...&gt;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379674"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379675"></A>Scope(&#92;_SB.PCI0.ISA0) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379676"></A>    Device(EC0) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379677"></A>        Name(_HID, EISAID(&quot;PNP0C09&quot;))        // ID for this EC</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379678"></A>        // current resource description for this EC</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379679"></A>        Name(_CRS, ResourceTemplate() {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379680"></A>            IO(Decode16,0x62,0x62,0,1)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379681"></A>            IO(Decode16,0x66,0x66,0,1)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379682"></A>        })</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379683"></A>        Name(_GPE, 0)        // GPE index for this EC</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379684"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379685"></A>        // create EC's region and field for thermal support</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379686"></A>        OperationRegion(EC0, EmbeddedControl, 0, 0xFF)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379687"></A>        Field(EC0, ByteAcc, Lock, Preserve) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379688"></A>            MODE,    1,        // thermal policy (quiet/perform)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379689"></A>            FAN0,    1,        // fan strength high/off</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379690"></A>            FAN1,    1,        // fan strength low/off</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379691"></A>            ,        5,        // reserved</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379692"></A>            TMP,    16,        // current temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379693"></A>            AC0,    16,        // active cooling temp (high)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379694"></A>            AC1,    16,        // active cooling temp (low)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379695"></A>            PSV,    16,        // passive cooling temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379696"></A>            HOT        18,     // critical S4 temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379697"></A>            CRT,    16         // critical temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379698"></A>        }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379699"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379700"></A>        // following is a method that OSPM will schedule after it</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379701"></A>        // receives an SCI and queries the EC to receive value 7</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379702"></A>        Method(_Q07) { </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379703"></A>            Notify (&#92;_SB.PCI0.ISA0.EC0.TZ0, 0x80)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379704"></A>        } end of Notify method</P>
+<P CLASS="Body">
+<A NAME="pgfId-1379705"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379706"></A>        // fan cooling mode high/off - engaged at AC0 temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379707"></A>        PowerResource(FN10, 0, 0) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379708"></A>            Method(_STA) { Return (&#92;_SB.PCI0.ISA0.EC0.FAN0) }        // check power state </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379709"></A>            Method(_ON) { Store (One, &#92;_SB.PCI0.ISA0.EC0.FAN0) }     // turn on fan at high</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379710"></A>            Method(_OFF) { Store (Zero, &#92;_SB.PCI0.ISA0.EC0.FAN0) }   // turn off fan</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379711"></A>        }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379712"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379713"></A>        // fan cooling mode low/off    - engaged at AC1 temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379714"></A>        PowerResource(FN11, 0, 0) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379715"></A>            Method(_STA) { Return (&#92;_SB.PCI0.ISA0.EC0.FAN1) }        // check power state </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379716"></A>            Method(_ON) { Store (One, &#92;_SB.PCI0.ISA0.EC0.FAN1) }     // turn on fan at low</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379717"></A>            Method(_OFF) { Store (Zero, &#92;_SB.PCI0.ISA0.EC0.FAN1) }   // turn off fan</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379718"></A>}</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379724"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379725"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379726"></A>    // Following is a single fan with two speeds.  This is represented</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379727"></A>    // by creating two logical fan devices.  When FN2 is turned on then</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379728"></A>    // the fan is at a low speed.  When FN1 and FN2 are both on then</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379729"></A>    // the fan is at high speed.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379730"></A>    //</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379731"></A>    // Create FAN device object FN1</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379732"></A>    Device (FN1) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379733"></A>        // Device ID for the FAN </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379734"></A>        Name(_HID, EISAID(&quot;PNP0C0B&quot;))</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379735"></A>        Name(_UID, 0)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379736"></A>        Name(_PR0, Package(){FN10, FN11})</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379737"></A>    }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379738"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379739"></A>    // Create FAN device object FN2</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379740"></A>    Device (FN2) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379741"></A>        // Device ID for the FAN </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379742"></A>        Name(_HID, EISAID(&quot;PNP0C0B&quot;))</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379743"></A>        Name(_UID, 1)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379744"></A>        Name(_PR0, Package(){FN10})</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379745"></A>    }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379746"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379747"></A>    // create a thermal zone</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379748"></A>    ThermalZone (TZ0) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379749"></A>        Method(_TMP) { Return (&#92;_SB.PCI0.ISA0.EC0.TMP )}          // get current temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379750"></A>        Method(_AC0) { Return (&#92;_SB.PCI0.ISA0.EC0.AC0) }          // fan high temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379751"></A>        Method(_AC1) { Return (&#92;_SB.PCI0.ISA0.EC0.AC1) }          // fan low temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379752"></A>        Name(_AL0, Package() {&#92;_SB.PCI0.ISA0.EC0.FN1})            // active cooling (high)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379753"></A>        Name(_AL1, Package() {&#92;_SB.PCI0.ISA0.EC0.FN2})            // active cooling (low)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379754"></A>        Method(_PSV) { Return (&#92;_SB.PCI0.ISA0.EC0.PSV) }          // passive cooling temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379755"></A>        Name(_PSL, Package() {&#92;_SB.CPU0})                         // passive cooling devices</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379756"></A>        Method(_HOT) { Return (&#92;_SB.PCI0.ISA0.EC0.HOT) }          // get critical S4 temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379757"></A>        Method(_CRT) { Return (&#92;_SB.PCI0.ISA0.EC0.CRT) }          // get crit. temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379758"></A>        Method(_SCP, 1) { Store (Arg1, &#92;_SB.PCI0.ISA0.EC0.MODE) } // set cooling mode</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379759"></A>        Name(_TC1, 4)                                             // bogus example constant</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379760"></A>        Name(_TC2, 3)                                             // bogus example constant </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379761"></A>        Name(_TSP, 150)                                           // passive sampling = 15 sec</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379762"></A>        Name(_TZP, 0)                                             // polling not required</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379763"></A>        } // end of TZ0</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379764"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379765"></A>    } // end of ECO</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379766"></A>}    // end of &#92;_SB.PCI0.ISA0 scope</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379767"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379768"></A>} // end of &#92;_SB scope</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1473628"></A>&nbsp;</P>
+</DIV>
+<DIV>
+<H6 CLASS="Heading-3">
+<A NAME="pgfId-1379774"></A><A NAME="_Toc202341859"></A><A NAME="_Toc258262477"></A>Example: Thermal Zone with Multiple Devices<A NAME="marker-1379772"></A><A NAME="marker-1379773"></A></H6>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379776"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1473635"></A>Scope(&#92;_SB) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379777"></A>    Device(CPU0) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379778"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379779"></A>        Name(_HID, &quot;ACPI0007&quot;)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379780"></A>        Name(_UID, 0)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379781"></A>        </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379782"></A>        //</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379783"></A>        // Load additional objects if 3.0 Thermal model support is available</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379784"></A>        //</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379785"></A>        Method(_INI, 0) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379786"></A>            If (&#92;_OSI(&quot;3.0 Thermal Model&quot;)) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379787"></A>                LoadTable(&quot;OEM1&quot;, &quot;PmRef&quot;, &quot;Cpu0&quot;, &quot;&#92;&#92;_SB.CPU0&quot;) // 3.0 Thermal Model </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379788"></A>            }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379789"></A>        }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379790"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379791"></A>        // For brevity, most processor objects have been excluded </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379792"></A>        // from this example (such as _PSS, _CST, _PCT, _PPC, etc.)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379793"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379794"></A>        // Processor Throttle Control object</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379795"></A>        Name(_PTC, ResourceTemplate() {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379796"></A>            Register(SystemIO, 32, 0, 0x120)    // Processor Control</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379797"></A>            Register(SystemIO, 32, 0, 0x120)    // Processor Status</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379798"></A>        })</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379799"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379800"></A>        // Throttling Supported States</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379801"></A>        // The values shown are for exemplary purposes only</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379802"></A>        Name(_TSS, Package() {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379803"></A>        // Read: freq percentage, power, latency, control, status</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379804"></A>            Package() {0x64, 1000, 0x0, 0x7, 0x0},    // Throttle off (100%)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379805"></A>            Package() {0x58, 800, 0x0, 0xF, 0x0},     // 87.5%</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379806"></A>            Package() {0x4B, 600, 0x0, 0xE, 0x0},     // 75%</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379807"></A>            Package() {0x3F, 400, 0x0, 0xD, 0x0}      // 62.5%</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379808"></A>        })</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379809"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379810"></A>        // Throttling Present Capabilities</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379811"></A>        // The values shown are for exemplary purposes only</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379812"></A>        Method(_TPC) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379813"></A>            If(&#92;_SB.AC) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379814"></A>                Return(0)    // All throttle states available</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379815"></A>            } Else {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379816"></A>                Return(2)    // Throttle states &gt;= 2 are available</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379817"></A>            }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379818"></A>        }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379819"></A>    }  // end of CPU0 scope</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379820"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379821"></A>    Device(CPU1) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379822"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379823"></A>        Name(_HID, &quot;ACPI0007&quot;)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379824"></A>        Name(_UID, 1)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379825"></A>        </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379826"></A>        //</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379827"></A>        // Load additional objects if 3.0 Thermal model support is available</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379828"></A>        //</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379829"></A>        Method(_INI, 0) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379830"></A>            If (&#92;_OSI(&quot;3.0 Thermal Model&quot;)) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379831"></A>                LoadTable(&quot;OEM1&quot;, &quot;PmRef&quot;, &quot;Cpu1&quot;, &quot;&#92;&#92;_SB.CPU1&quot;) // 3.0 Thermal Model</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379832"></A>            }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379833"></A>        }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379834"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379835"></A>        // For brevity, most processor objects have been excluded </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379836"></A>        // from this example (such as _PSS, _CST, _PCT, _PPC, _PTC, etc.)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379837"></A>        </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379838"></A>        // Processor Throttle Control object</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379839"></A>        Name(_PTC, ResourceTemplate() {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379840"></A>            Register(SystemIO, 32, 0, 0x120)         // Processor Control</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379841"></A>            Register(SystemIO, 32, 0, 0x120)         // Processor Status</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379842"></A>        })</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379843"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1466049"></A>        // Throttling Supported States</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1466050"></A>        // The values shown are for exemplary purposes only</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1466051"></A>        Name(_TSS, Package() {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379847"></A>        // Read: freq percentage, power, latency, control, status</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379848"></A>            Package() {0x64, 1000, 0x0, 0x7, 0x0},    // Throttle off (100%)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379849"></A>            Package() {0x58, 800, 0x0, 0xF, 0x0},     // 87.5%</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379850"></A>            Package() {0x4B, 600, 0x0, 0xE, 0x0},     // 75%</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379851"></A>            Package() {0x3F, 400, 0x0, 0xD, 0x0}      // 62.5%</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379852"></A>        })</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379853"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379854"></A>        // Throttling Present Capabilities</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379855"></A>        // The values shown are for exemplary purposes only</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379856"></A>        Method(_TPC) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379857"></A>            If(&#92;_SB.AC) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379858"></A>                Return(0)                              // All throttle states available</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379859"></A>            } Else {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379860"></A>                Return(2)                              // Throttle states &gt;= 2 are available</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379861"></A>            }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379862"></A>        }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379863"></A>    }                                                  // end of CPU1 scope</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379864"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379865"></A>Scope(&#92;_SB.PCI0.ISA0) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379866"></A>    Device(EC0) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379867"></A>        Name(_HID, EISAID(&quot;PNP0C09&quot;))                  // ID for this EC</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379868"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379869"></A>        //</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379870"></A>        // Load additional objects if 3.0 Thermal model support is available</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379871"></A>        //</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379872"></A>        Method(_INI, 0) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379873"></A>            If (&#92;_OSI(&quot;3.0 Thermal Model&quot;)) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379874"></A>                LoadTable(&quot;OEM1&quot;, &quot;PmRef&quot;, &quot;Tz3&quot;, &quot;&#92;&#92;_SB.PCI0.ISA0.EC0&quot;) // 3.0 Tz</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379875"></A>            }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379876"></A>        }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379877"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379878"></A>        // Current resource description for this EC</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379879"></A>        Name(_CRS, </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379880"></A>                ResourceTemplate() {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379881"></A>                    IO(Decode16,0x62,0x62,0,1)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379882"></A>                    IO(Decode16,0x66,0x66,0,1)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379883"></A>            })</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379884"></A>        </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379885"></A>        Name(_GPE, 0)        // GPE index for this EC</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379886"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379887"></A>        // Create EC's region and field for thermal support</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379888"></A>        OperationRegion(EC0, EmbeddedControl, 0, 0xFF)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379889"></A>        Field(EC0, ByteAcc, Lock, Preserve) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379890"></A>            MODE,    1,        // thermal policy (quiet/perform)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379891"></A>            FAN0,    1,        // fan strength high/off</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379892"></A>            ,        6,        // reserved</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379893"></A>            TMP,    16,        // current temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379894"></A>            AC0,    16,        // active cooling temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379895"></A>            PSV,    16,        // passive cooling temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379896"></A>            HOT,    16,        // critical S4 temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379897"></A>            CRT,    16         // critical temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379898"></A>        }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379899"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379900"></A>        // Following is a method that OSPM will schedule after it</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379901"></A>    // fan cooling mode high/off - engaged at AC0 temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379902"></A>    PowerResource(FN10, 0, 0) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379903"></A>        Method(_STA) { Return (&#92;_SB.PCI0.ISA0.EC0.FAN0) }       // check power state </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379904"></A>        Method(_ON) { Store (One, &#92;_SB.PCI0.ISA0.EC0.FAN0) }    // turn on fan at high</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379905"></A>        Method(_OFF) { Store (Zero, &#92;_SB.PCI0.ISA0.EC0.FAN0) }  // turn off fan</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379906"></A>    }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379907"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379908"></A>    // Following is a single fan with one speed.  </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379909"></A>    // Create FAN device object FN1</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379910"></A>    Device (FN1) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379911"></A>        // Device ID for the FAN </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379912"></A>        Name(_HID, EISAID(&quot;PNP0C0B&quot;))</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379913"></A>        Name(_UID, 0)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379914"></A>        Name(_PR0, Package(){FN10})</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379915"></A>    }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379916"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379917"></A>        // Receives an SCI and queries the EC to receive value 7</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379918"></A>        Method(_Q07) { </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379919"></A>            Notify (&#92;_SB.PCI0.ISA0.EC0.TZ0, 0x80)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379920"></A>        } // end of Notify method</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379921"></A>    </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379922"></A>    // Create standard specific thermal zone</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379923"></A>    ThermalZone (TZ0) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379924"></A>        Method(_TMP) { Return (&#92;_SB.PCI0.ISA0.EC0.TMP )}          // get current temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379925"></A>        Name(_PSL, Package() {&#92;_SB.CPU0, &#92;_SB.CPU1})              // passive cooling devices</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379926"></A>        Name(_AL0, Package() {&#92;_SB.PCI0.ISA0.EC0.FN1})            // active cooling</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379927"></A>        Method(_AC0) { Return (&#92;_SB.PCI0.ISA0.EC0.AC0) }          // fan temp (high)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379928"></A>        Method(_AC1) { Return (&#92;_SB.PCI0.ISA0.EC0.AC1) }          // fan temp (low)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379929"></A>        Method(_PSV) { Return (&#92;_SB.PCI0.ISA0.EC0.PSV) }          // passive cooling temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379930"></A>        Method(_HOT) { Return (&#92;_SB.PCI0.ISA0.EC0.HOT) }          // get critical S4 temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379931"></A>        Method(_CRT) { Return (&#92;_SB.PCI0.ISA0.EC0.CRT) }          // get crit. temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379932"></A>        Name(_TC1, 4)                                             // bogus example constant</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379933"></A>        Name(_TC2, 3)                                             // bogus example constant </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379934"></A>        Method(_SCP, 1) { Store (Arg0, &#92;_SB.PCI0.ISA0.EC0.MODE) } // set cooling mode</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379935"></A>        Name(_TSP, 150)                                           // passive sampling = 15 sec</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379936"></A>        } // end of TZ0</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379937"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379938"></A>    } // end of ECO</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379939"></A>}    // end of &#92;_SB.PCI0.ISA0 scope</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379940"></A>} // end of &#92;_SB scope</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379941"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379942"></A>//</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379943"></A>// ACPI 3.0 Thermal Model SSDT</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379944"></A>//</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379945"></A>DefinitionBlock (</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379946"></A>    &quot;TZASSDT.aml&quot;,</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379947"></A>    &quot;OEM1&quot;,</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379948"></A>    0x01,</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379949"></A>    &quot;PmRef&quot;,</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379950"></A>    &quot;Tz3&quot;,</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379951"></A>    0x3000</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379952"></A>    )</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379953"></A>{</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379954"></A>    External(&#92;_SB.PCI0.ISA0.EC0, DeviceObj)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379955"></A>    External(&#92;_SB.CPU0, DeviceObj)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379956"></A>    External(&#92;_SB.CPU1, DeviceObj)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379957"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379958"></A>    Scope(&#92;_SB.PCI0.ISA0.EC0)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379959"></A>    {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379960"></A>    // Create an ACPI 3.0 specific thermal zone</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379961"></A>    ThermalZone (TZ0) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379962"></A>        // This TRT is for exemplary purposes only </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379963"></A>        Name(_TRT, Package() {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379964"></A>            // Thermal relationship package data.  A package is generated for</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379965"></A>            //  each permutation of device sets. 2 devices = 4 entries.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379966"></A>            // Read: source, target, thermal influence, sampling period, 4 reserved</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379967"></A>            Package () {&#92;_SB.CPU0,    &#92;_SB.CPU0,    20, 1, 0, 0, 0, 0},</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379968"></A>            Package () {&#92;_SB.CPU0,    &#92;_SB.CPU1,    10, 15, 0, 0, 0, 0},</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379969"></A>            Package () {&#92;_SB.CPU1,    &#92;_SB.CPU0,    10, 15, 0, 0, 0, 0},</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379970"></A>            Package () {&#92;_SB.CPU1,    &#92;_SB.CPU1,    20, 1, 0, 0, 0, 0}</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379971"></A>        }) // end of TRT</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379972"></A>    } // end of TZ0</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379973"></A>    } // end of EC0 Scope</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379974"></A>} // end of SSDT</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379975"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379976"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379977"></A>//</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379978"></A>// CPU0 3.0 Thermal Model SSDT</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379979"></A>//</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379980"></A>DefinitionBlock (</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379981"></A>    &quot;CPU0SSDT.aml&quot;,</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379982"></A>    &quot;OEM1&quot;,</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379983"></A>    0x01,</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379984"></A>    &quot;PmRef&quot;,</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379985"></A>    &quot;CPU0&quot;,</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379986"></A>    0x3000</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379987"></A>    )</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379988"></A>{</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379989"></A>    External(&#92;_SB.CPU0, DeviceObj)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379990"></A>    External(&#92;_SB.PCI0.ISA0.TZ0, ThermalZoneObj)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379991"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379992"></A>    Scope(&#92;_SB.CPU0)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379993"></A>    {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379994"></A>        //</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379995"></A>        // Add the objects required for 3.0 extended thermal support</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379996"></A>        //</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379997"></A>        // Create a region and fields for thermal support; the platform</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379998"></A>        // fills in the values and traps on writes to enable hysteresis. </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1379999"></A>        // The Operation Region location is invalid</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380000"></A>        OperationRegion(CP00, SystemMemory, 0x00000000, 0xA)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380001"></A>        Field(CP00, ByteAcc, Lock, Preserve) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380002"></A>            SCP,    1,         // thermal policy (passive/active)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380003"></A>            RTV,    1,         // absolute or relative temperature</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380004"></A>            ,        6,        // reserved</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380005"></A>            AC0,    16,        // active cooling temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380006"></A>            PSV,    16,        // passive cooling temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380007"></A>            CRT,    16,        // critical temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380008"></A>            TPT,    16,        // Temp trip point crossed</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380009"></A>            TST,    8          // Temp sensor threshold</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380010"></A>        }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380011"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380012"></A>        Method(_TZM, 0) { Return(&#92;_SB.PCI0.ISA0.TZ0) } // thermal zone member</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380013"></A>    </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380014"></A>        // Some thermal zone methods are now located under the</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380015"></A>        // thermal device participating in the 3.0 thermal model.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380016"></A>        // These methods provide device specific thermal information</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380017"></A>    Method(_SCP, 1) { Store (Arg0, &#92;_SB.CPU0.SCP) }    // set cooling mode</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380018"></A>    Method(_RTV) { Return (&#92;_SB.CPU0.RTV) }            // absolute or relative temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380019"></A>    Method(_AC0) { Return (&#92;_SB.CPU0.AC0) }            // active cooling (fan) temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380020"></A>    Method(_PSV) { Return (&#92;_SB.CPU0.PSV) }            // passive cooling temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380021"></A>    Method(_CRT) { Return (&#92;_SB.CPU0.CRT) }            // critical temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380022"></A>    Name(_TC1, 4)                                      // thermal constant 1 (INVALID)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380023"></A>    Name(_TC2, 3)                                      // thermal constant 2 (INVALID)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380024"></A>    Method(_TPT, 1) { Store (Arg0, &#92;_SB.CPU0.TPT)}     // trip point temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380025"></A>    Method(_TST) { Return (&#92;_SB.CPU0.TST) }            // temp sensor threshold</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380026"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380027"></A>    } // end of CPU0 scope</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380028"></A>} // end of SSDT</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380029"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380030"></A>//</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380031"></A>// CPU1 3.0 Thermal Model SSDT</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380032"></A>//</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380033"></A>DefinitionBlock (</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380034"></A>    &quot;CPU1SSDT.aml&quot;,</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380035"></A>    &quot;OEM1&quot;,</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380036"></A>    0x01,</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380037"></A>    &quot;PmRef&quot;,</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380038"></A>    &quot;CPU1&quot;,</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380039"></A>    0x3000</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380040"></A>    )</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380041"></A>{</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380042"></A>    External(&#92;_SB.CPU1, DeviceObj)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380043"></A>    External(&#92;_SB.PCI0.ISA0.TZ0, ThermalZoneObj)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380044"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380045"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380046"></A>    Scope(&#92;_SB.CPU1)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380047"></A>    {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380048"></A>        //</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380049"></A>        // Add the objects required for 3.0 extended thermal support</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380050"></A>        //</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380051"></A>        // Create a region and fields for thermal support; the platform</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380052"></A>        // fills in the values and traps on writes to enable hysteresis. </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380053"></A>        // The Operation Region location is invalid</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380054"></A>        OperationRegion(CP01, SystemIO, 0x00000008, 0xA)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380055"></A>        Field(CP01, ByteAcc, Lock, Preserve) {</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380056"></A>            SCP,    1,         // thermal policy (passive/active)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380057"></A>            RTV,    1,         // absolute or relative temperature</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380058"></A>            ,        6,        // reserved</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380059"></A>            AC0,    16,        // active cooling temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380060"></A>            PSV,    16,        // passive cooling temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380061"></A>            CRT,    16,        // critical temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380062"></A>            TPT,    16,        // Temp trip point crossed</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380063"></A>            TST,    8          // Temp sensor threshold</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380064"></A>        }</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380065"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380066"></A>        Method(_TZM, 0) { Return(&#92;_SB.PCI0.ISA0.TZ0) }   // thermal zone member</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380067"></A>    </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380068"></A>        // Some thermal zone methods are now located under the</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380069"></A>        // thermal device participating in the 3.0 thermal model.</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380070"></A>        // These methods provide device specific thermal information</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380071"></A>    Method(_SCP, 1) { Store (Arg0, &#92;_SB.CPU1.SCP) }      // set cooling mode</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380072"></A>    Method(_RTV) { Return (&#92;_SB.CPU1.RTV) }              // absolute or relative temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380073"></A>    Method(_AC0) { Return (&#92;_SB.CPU1.AC0) }              // active cooling (fan) temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380074"></A>    Method(_PSV) { Return (&#92;_SB.CPU1.PSV) }              // passive cooling temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380075"></A>    Method(_CRT) { Return (&#92;_SB.CPU1.CRT) }              // critical temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380076"></A>    Name(_TC1, 4)                                        // thermal constant 1 (INVALID)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380077"></A>    Name(_TC2, 3)                                        // thermal constant 2 (INVALID)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380078"></A>    Method(_TPT, 1) { Store (Arg0, &#92;_SB.CPU1.TPT)}       // trip point temp</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380079"></A>    Method(_TST) { Return (&#92;_SB.CPU1.TST) }              // temp sensor threshold</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380080"></A>&nbsp;</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1380081"></A>    }                                                    // end of CPU1 scope</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1354807"></A>}                                                        // end of SSDT </P>
+</DIV>
+</DIV>
+</DIV>
+</BODY>
+</HTML>

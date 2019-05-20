@@ -1,0 +1,975 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2016/HTML Export Filter">
+<LINK REL="STYLESHEET" HREF="Definition_of_Terms.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE> 2 Definition of Terms</TITLE></HEAD>
+<BODY>
+<DIV>
+<H1 CLASS="Heading-1">
+<A NAME="pgfId-1347752"></A>Definition of Terms<DIV>
+<IMG SRC="Definition_of_Terms-1.gif" ALT="">
+</DIV>
+</H1>
+<P CLASS="Body">
+<A NAME="pgfId-1347783"></A>This specification uses a particular set of terminology, defined in this section. This section has three parts:</P>
+<P CLASS="Body">
+<A NAME="pgfId-1347784"></A>General ACPI terms are defined and presented alphabetically.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1347785"></A>The ACPI global system states (working, sleeping, soft off, and mechanical off) are defined. Global system states apply to the entire system, and are visible to the user.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1347786"></A>The ACPI device power states are defined. Device power states are states of particular devices; as such, they are generally not visible to the user. For example, some devices may be in the off state even though the system as a whole is in the working state. Device states apply to any device on any bus.</P>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1347804"></A><A NAME="_Toc489255948"></A><A NAME="_Toc489267872"></A><A NAME="_Toc489272425"></A><A NAME="_Toc202340471"></A><A NAME="_Toc258262152"></A>General ACPI Terminology<A NAME="marker-1347802"></A><A NAME="marker-1347803"></A></H2>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347807"></A>Advanced Configuration and Power Interface (ACPI)<A NAME="marker-1347805"></A><A NAME="marker-1347806"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347808"></A>As defined in this document, ACPI is a method for describing hardware interfaces in terms abstract enough to allow flexible and innovative hardware implementations and concrete enough to allow shrink-wrap OS code to use such hardware interfaces.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347811"></A>ACPI Hardware<A NAME="marker-1347809"></A><A NAME="marker-1347810"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347812"></A>Computer hardware with the features necessary to support OSPM and with the interfaces to those features described using the Description Tables as specified by this document.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347815"></A>ACPI Namespace<A NAME="marker-1347813"></A><A NAME="marker-1347814"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347816"></A>A hierarchical tree structure in OS-controlled memory that contains named objects. These objects may be data objects, control method objects, bus/device package objects, and so on. The OS dynamically changes the contents of the namespace at run-time by loading definition blocks from the ACPI Tables that reside in the ACPI system firmware. All the information in the ACPI Namespace comes from the Differentiated System Description Table (DSDT), which contains the Differentiated Definition Block, and one or more other definition blocks.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347819"></A>ACPI Machine Language (AML)<A NAME="marker-1347817"></A><A NAME="marker-1347818"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347820"></A>Pseudo-code for a virtual machine supported by an ACPI-compatible OS and in which ACPI control methods and objects are written. The AML encoding definition is provided in section 19, &#8220;ACPI Machine Language (AML) Specification.&#8221;</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1365647"></A>Add-in Card</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1365643"></A>A generic term used to refer to any device which can be inserted or removed from a platform through a connection bus, such as PCI. Add-in cards are typically inserted within a platform&#8217;s physical enclosure, rather than residing physically external to a platform. An add-in card will have its own devices and associated firmware, and may have its own Expansion ROM Firmware.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347823"></A>Advanced Programmable Interrupt Controller (APIC)<A NAME="marker-1347821"></A><A NAME="marker-1347822"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347824"></A>An interrupt controller architecture commonly found on Intel Architecture-based 32-bit PC systems. The APIC architecture supports multiprocessor interrupt management (with symmetric interrupt distribution across all processors), multiple I/O subsystem support, 8259A compatibility, and inter-processor interrupt support. The architecture consists of local APICs commonly attached directly to processors and I/O APICs commonly in chip sets.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347827"></A>ACPI Source Language (ASL)<A NAME="marker-1347825"></A><A NAME="marker-1347826"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347828"></A>The programming language equivalent for AML. ASL is compiled into AML images. The ASL statements are defined in section 18, &#8220;ACPI Source Language (ASL) Reference.&#8221;</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1366898"></A>Address Range Scrub (ARS)</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1366894"></A>Process by which regions of memory can be scrubbed to look for memory locations that contain correctable or uncorrectable errors.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1365362"></A>BIOS</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1365363"></A>BIOS (Basic Input/Output System) is firmware that provides basic boot capabilities for a platform; it is used here to refer specifically to traditional x86 BIOS, and not as a general term for all firmware, or a replacement term for UEFI Core System BIOS.   The ambiguity of this the term is what we are trying to remove. See also: Legacy BIOS, System BIOS.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1365730"></A>Boot Firmware</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1365731"></A>Generic term to describe any firmware on a platform used during the boot process.  Use a more specific term, if possible.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1365732"></A>Component</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1365726"></A>Synonym for device.  Please use the term &#8220;device&#8221; if possible.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1365396"></A><A NAME="marker-1365707"></A>Control Method</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347841"></A>A control method is a definition of how the OS can perform a simple hardware task. For example, the OS invokes control methods to read the temperature of a thermal zone. Control methods are written in an encoded language called AML that can be interpreted and executed by the ACPI-compatible OS. An ACPI-compatible system must provide a minimal set of control methods in the ACPI tables. The OS provides a set of well-defined control methods that ACPI table developers can reference in their control methods. OEMs can support different revisions of chip sets with one version of platform firmware by either including control methods in the platform firmware that test configurations and respond as needed or including a different set of control methods for each chip set revision.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347844"></A>Central Processing Unit (CPU) or Processor<A NAME="marker-1347842"></A><A NAME="marker-1347843"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347845"></A>The part of a platform that executes the instructions that do the work. An ACPI-compatible OS can balance processor performance against power consumption and thermal states by manipulating the processor performance controls. The ACPI specification defines a working state, labeled G0 (S0), in which the processor executes instructions. Processor sleeping states, labeled C1 through C3, are also defined. In the sleeping states, the processor executes no instructions, thus reducing power consumption and, potentially, operating temperatures. The ACPI specification also defines processor performance states, where the processor (while in C0) executes instructions, but with lower performance and (potentially) lower power consumption and operating temperature. For more information, see section 8, &#8220;Processor Configuration and Control.&#8221; </P>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347849"></A>A definition block contains information about hardware implementation and configuration details in the form of data and control methods, encoded in AML. An OEM can provide one or more definition blocks in the ACPI Tables. One definition block must be provided: the Differentiated Definition Block, which describes the base system. Upon loading the Differentiated Definition Block, the OS inserts the contents of the Differentiated Definition Block into the ACPI Namespace. Other definition blocks, which the OS can dynamically insert and remove from the active ACPI Namespace, can contain references to the Differentiated Definition Block. For more information, see <A HREF="ACPI_Software_Programming_Model.htm#_Toc489256014" CLASS="XRef">See Definition Blocks.</A></P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347851"></A>Device<A NAME="marker-1347850"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347852"></A>A generic term used to refer to any computing, input/output or storage element, or any collection of computing, input/output or storage elements, on a platform.  An example of a device is a CPU,  APU, embedded controller (EC), BMC, Trusted Platform Module (TPM), graphics processing unit (GPU), network interface controller (NIC), hard disk drive (HDD), solid state drive (SSD), Read Only Memory (ROM), flash ROM, or any of the large number of other possible devices.  If at all possible, use a more specific term.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347855"></A>Device Context<A NAME="marker-1365769"></A><A NAME="marker-1365770"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347856"></A>The variable data held by the device; it is usually volatile. The device might forget this information when entering or leaving certain states (for more information, see section 2.3, &#8220;Device Power State Definitions.&#8221;), in which case the OS software is responsible for saving and restoring the information. Device Context refers to small amounts of information held in device peripherals. See System Context.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1365462"></A>Device Firmware</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1365463"></A>Firmware that is only used by a specific device and cannot be used with any other device. This firmware is typically provided by the device manufacturer. </P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347859"></A>Differentiated System Description Table (DSDT)<A NAME="marker-1347857"></A><A NAME="marker-1347858"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347860"></A>An OEM must supply a DSDT to an ACPI-compatible OS. The DSDT contains the Differentiated Definition Block, which supplies the implementation and configuration information about the base system. The OS always inserts the DSDT information into the ACPI Namespace at system boot time and never removes it.<A NAME="marker-1367140"></A></P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1367148"></A>DIMM Physical Address (DPA)</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1367149"></A>An NVDIMM relative memory address. </P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347877"></A>Embedded Controller</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347878"></A>The general class of micro-controllers used to support OEM-specific implementations, mainly in mobile environments. The ACPI specification supports embedded controllers in any platform design, as long as the micro-controller conforms to one of the models described in this section. The embedded controller performs complex low-level functions through a simple interface to the host microprocessor(s). </P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347882"></A>Embedded Controller Interface<A NAME="marker-1347879"></A><A NAME="marker-1347880"></A><A NAME="marker-1347881"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347883"></A>A standard hardware and software communications interface between an OS driver and an embedded controller. This allows any OS to provide a standard driver that can directly communicate with an embedded controller in the system, thus allowing other drivers within the system to communicate with and use the resources of system embedded controllers (for example, Smart Battery and AML code). This in turn enables the OEM to provide platform features that the OS and applications can use.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1365800"></A>Expansion ROM Firmware</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1365801"></A>Peripheral Component Interconnect (PCI) term for firmware executed on a host processor which is used by an add-in device during the boot process.  This includes Option ROM Firmware and UEFI drivers. Expansion ROM Firmware may be embedded as part of the Host Processor Boot Firmware, or may be separate (e.g., from an add-in card). See also: Option ROM Firmware</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1365501"></A>Firmware</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1365502"></A>Generic term to describe any BIOS or firmware on a platform; it refers to the general class of things, not a specific type. Use a more specific term, if possible.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347886"></A>Firmware ACPI Control Structure (FACS)<A NAME="marker-1365489"></A><A NAME="marker-1365490"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347887"></A>A structure in read/write memory that the platform runtime firmware uses for handshaking between the firmware and the OS. The FACS is passed to an ACPI-compatible OS via the Fixed ACPI Description Table (FADT). The FACS contains the system&#8217;s hardware signature at last boot, the firmware waking vector, and the Global Lock.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1365851"></A>Firmware Storage Device</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1365852"></A>A memory device used to store firmware.  This could include Read Only Memory (ROM), flash memory, eMMC, UFS drives, etc.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347890"></A>Fixed ACPI Description Table (FADT)<A NAME="marker-1347888"></A><A NAME="marker-1347889"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347891"></A>A table that contains the ACPI Hardware Register Block implementation and configuration details that the OS needs to directly manage the ACPI Hardware Register Blocks, as well as the physical address of the DSDT, which contains other platform implementation and configuration details. An OEM must provide an FADT to an ACPI-compatible OS in the RSDT/XSDT. The OS always inserts the namespace information defined in the Differentiated Definition Block in the DSDT into the ACPI Namespace at system boot time, and the OS never removes it. </P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347894"></A>Fixed Features<A NAME="marker-1347892"></A><A NAME="marker-1347893"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347895"></A>A set of features offered by an ACPI interface. The ACPI specification places restrictions on where and how the hardware programming model is generated. All fixed features, if used, are implemented as described in this specification so that OSPM can directly access the fixed feature registers.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347898"></A>Fixed Feature Events<A NAME="marker-1347896"></A><A NAME="marker-1347897"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347899"></A>A set of events that occur at the ACPI interface when a paired set of status and event bits in the fixed feature registers are set at the same time. When a fixed feature event occurs, a system control interrupt (SCI is raised. For ACPI fixed feature events, OSPM (or an ACPI-aware driver) acts as the event handler. </P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347903"></A>Fixed Feature Registers<A NAME="marker-1347900"></A><A NAME="marker-1347901"></A><A NAME="marker-1347902"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347904"></A>A set of hardware registers in fixed feature register space at specific address locations in system I/O address space. ACPI defines register blocks for fixed features (each register block gets a separate pointer from the FADT). For more information, see section 4.6, &#8220;ACPI Hardware Features.&#8221;</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347908"></A>General-Purpose Event Registers<A NAME="marker-1347905"></A><A NAME="marker-1347906"></A><A NAME="marker-1347907"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347909"></A>The general-purpose event registers contain the event programming model for generic features. All general-purpose events generate SCIs. </P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347912"></A>Generic Feature<A NAME="marker-1347910"></A><A NAME="marker-1347911"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347913"></A>A generic feature of a platform is value-added hardware implemented through control methods and general-purpose events.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1366331"></A>Generic Interrupt Controller (GIC)</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1366332"></A>An interrupt controller architecture for ARM processor-based systems.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347926"></A><A NAME="marker-1347923"></A>Global System Status</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347927"></A>Global system states apply to the entire system, and are visible to the user. The various global system states are labeled G0 through G3 in the ACPI specification. For more information, see <A HREF="Definition_of_Terms.htm#91173" CLASS="XRef">See Global System State Definitions.</A>, &#8220;Global System State Definitions.&#8221;</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1365873"></A>Host Processor</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1365874"></A>A host processor is the primary processing unit in a platform, traditionally called a Central Processing Unit (CPU), now also sometimes referred to as an Application Processing Unit (APU), or a System on Chip (SoC). This is the processing unit on which the primary operating system (and/or hypervisor), as well as user applications run.  This is the processor that is responsible for loading and executing the Host Processor Boot Firmware. This term and &quot;Boot Processor&quot; should be considered synonyms for this particular text clean-up effort (i.e., making them consistent should probably be part of a different ECR, if needed).</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1365875"></A>Host Processor Boot Firmware</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1365876"></A>Generic term used to describe firmware loaded and executed by the Host Processor which provides basic boot capabilities for a platform. This class of firmware is a reference to Legacy BIOS and UEFI, which were sometimes referred to as System BIOS. Where the distinction between Legacy BIOS and UEFI is not important, the term Host Processor Boot Firmware will be used. Where the distinction is important, it will be referenced appropriately. Expansion ROM firmware may also be considered as part of the Host Processor Boot Firmware. Expansion ROM Firmware may be embedded as part of the Host Processor Boot Firmware, or may be separate from the Host Processor Boot Firmware (e.g., loaded from an add-in card).</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1365877"></A>Host Processor Runtime Firmware</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1365878"></A>Host processor runtime firmware is any runtime firmware which executes on the host processor.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347930"></A>Ignored Bits<A NAME="marker-1347928"></A><A NAME="marker-1347929"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347931"></A>Some unused bits in ACPI hardware registers are designated as &#8220;ignored&#8221; in the ACPI specification. Ignored bits are undefined and can return zero or one (in contrast to reserved bits, which always return zero). Software ignores ignored bits in ACPI hardware registers on reads and preserves ignored bits on writes. </P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347934"></A>Intel Architecture-Personal Computer (IA-PC)<A NAME="marker-1347932"></A><A NAME="marker-1347933"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347935"></A>A general descriptive term for computers built with processors conforming to the architecture defined by the Intel processor family based on the Intel Architecture instruction set and having an industry-standard PC architecture.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347939"></A>I/O APIC<A NAME="marker-1347936"></A><A NAME="marker-1347937"></A><A NAME="marker-1347938"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347940"></A>An Input/Output Advanced Programmable Interrupt Controller routes interrupts from devices to the processor&#8217;s local APIC.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347943"></A>I/O SAPIC<A NAME="marker-1347941"></A><A NAME="marker-1347942"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347944"></A>An Input/Output Streamlined Advanced Programmable Interrupt Controller routes interrupts from devices to the processor&#8217;s local APIC.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1367387"></A>Label Storage Area</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1367388"></A>A persistent storage area reserved for Label storage. </P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347946"></A>Legacy<A NAME="marker-1347945"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347947"></A>A computer state where power management policy decisions are made by the platform hardware/firmware shipped with the system. The legacy power management features found in today&#8217;s systems are used to support power management in a system that uses a legacy OS that does not support the OS-directed power management architecture.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1365908"></A>Legacy BIOS</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1365909"></A>One form of Host Processor Boot Firmware used on x86 platforms which uses a legacy x86 BIOS structure.  This form of host processor boot firmware has been or is being replaced by UEFI.  This term will likely be most useful in distinguishing and comparing older forms of firmware to newer forms (e.g., &quot;it was done this way in legacy BIOS, but is now done another way in UEFI). 	See also: BIOS, System BIOS</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347949"></A>Legacy Hardware<A NAME="marker-1365929"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347950"></A>A computer system that has no ACPI or OSPM power management support.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347952"></A>Legacy OS<A NAME="marker-1347951"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347953"></A>An OS that is not aware of and does not direct the power management functions of the system. Included in this category are operating systems with APM 1.x support.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347956"></A>Local APIC<A NAME="marker-1347954"></A><A NAME="marker-1347955"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347957"></A>A local Advanced Programmable Interrupt Controller receives interrupts from the I/O APIC.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347959"></A>Local SAPIC<A NAME="marker-1347958"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347960"></A>A local Streamlined Advanced Programmable Interrupt Controller receives interrupts from the I/O SAPIC.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1365543"></A>Management Firmware</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1365539"></A>Firmware used only by a Baseboard Management Controller (BMC) or other Out-of-Band (OOB) management controller.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347964"></A>Multiple APIC Description Table (MADT)<A NAME="marker-1347961"></A><A NAME="marker-1347962"></A><A NAME="marker-1347963"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347965"></A>The Multiple APIC Description Table (MADT) is used on systems supporting the APIC and SAPIC to describe the APIC implementation. Following the MADT is a list of APIC/SAPIC structures that declare the APIC/SAPIC features of the machine.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1367400"></A>Namespace</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1367401"></A>A namespace defines a contiguously-addressed range of Non-Volatile Memory, conceptually similar to a SCSI Logical Unit (LUN) or an NVM Express namespace.     A namespace can be described by one or more Labels.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1365978"></A>Non-Host Processor</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1365979"></A>A non-host processor is a generic term used to describe any processing unit on a platform which is not a host processor (e.g. a microcontroller, co-processor, etc).  For the purposes of this particular ECR, this should also be considered a synonym for &quot;secondary processor&quot;, those CPUs that might be on an SoC, for example, that are not the host (or &quot;boot&quot;) processor.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1367374"></A>NVDIMM</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1367375"></A>Non Volatile Dual In-line Memory Module.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347967"></A>Object<A NAME="marker-1347966"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347968"></A>The nodes of the ACPI Namespace are objects inserted in the tree by the OS using the information in the system definition tables. These objects can be data objects, package objects, control method objects, and so on. Package objects refer to other objects. Objects also have type, size, and relative name. </P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347971"></A>Object name<A NAME="marker-1347969"></A><A NAME="marker-1347970"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347972"></A>Part of the ACPI Namespace. There is a set of rules for naming objects.<A NAME="marker-1347982"></A></P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347985"></A>Operating System-directed Power Management (OSPM)</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347986"></A>A model of power (and system) management in which the OS plays a central role and uses global information to optimize system behavior for the task at hand.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1366004"></A>Option ROM FirmwareDevice Firmware</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1366005"></A>Legacy term for boot firmware typically executed on a host processor which is used by a device during the boot process.  Option ROM firmware may be included with the host processor boot firmware or may be carried separately by a device (such as an add-in card). See also: Expansion ROM Firmware</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347988"></A>Package<A NAME="marker-1347987"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347989"></A>An array of objects.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1366035"></A>Peripheral</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1366036"></A>A peripheral (also known as an external device) is a device which resides physically external to a platform and is connected to a platform, either wired or wirelessly.  A peripheral is comprised of its own devices which may have their own firmware.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1367417"></A>Persistent Memory (pmem)</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1367418"></A>Byte-addressable memory that retains its contents across power loss. </P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1366037"></A>Platform</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1366038"></A>A platform consists of multiple devices assembled and working together to deliver a specific computing function, but does not include any other software other than the firmware as part of the devices in the platform.  Examples of platforms include a notebook, a desktop, a server, a network switch, a blade, etc. - all without and independent of any operating system, user applications, or user data.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1366039"></A>Platform Boot Firmware</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1366040"></A>The collection of all boot firmware on a platform.  This firmware is initially loaded by a platform (such as an SoC, a motherboard, or a complete system) at power-on to do basic initialization of the platform hardware and then hand control to a boot loader or OS.  In some cases this will be x86 BIOS, or it may be UEFI Core System BIOS, or it could be something else entirely.  Once control has been handed over to a boot loader or an OS, this firmware has no further role.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1366041"></A>Platform Runtime Firmware</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1366042"></A>The collection of all run-time firmware on a platform.  This is firmware that can provide functions that can be invoked by an OS, but those functions are still concerned only with the platform hardware (e.g., PSCI on ARM).  The assumption is that platform boot firmware has since been superceded by the OS since the OS is now up and running, but that there is still a need for an OS to access specific features of hardware that may only be possible via firmware.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1366043"></A>Platform Firmware</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1366044"></A>The collection of platform boot firmware and platform runtime firmware.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347992"></A>Power Button<A NAME="marker-1347990"></A><A NAME="marker-1347991"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347993"></A>A user push button or other switch contact device that switches the system from the sleeping/soft off state to the working state, and signals the OS to transition to a sleeping/soft off state from the working state.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347995"></A>Power Management<A NAME="marker-1347994"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1347996"></A>Mechanisms in software and hardware to minimize system power consumption, manage system thermal limits, and maximize system battery life. Power management involves trade-offs among system speed, noise, battery life, processing speed, and alternating current (AC) power consumption. Power management is required for some system functions, such as appliance (for example, answering machine, furnace control) operations.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347999"></A>Power Resources<A NAME="marker-1347997"></A><A NAME="marker-1347998"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348000"></A>Resources (for example, power planes and clock sources) that a device requires to operate in a given power state. </P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1348003"></A>Power Sources<A NAME="marker-1348001"></A><A NAME="marker-1348002"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348004"></A>The battery (including a UPS battery) and AC line powered adapters or power supplies that supply power to a platform. </P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1348007"></A>Register Grouping<A NAME="marker-1348005"></A><A NAME="marker-1348006"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348008"></A>Consists of two register blocks (it has two pointers to two different blocks of registers). The fixed-position bits within a register grouping can be split between the two register blocks. This allows the bits within a register grouping to be split between two chips.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1348011"></A>Reserved Bits<A NAME="marker-1348009"></A><A NAME="marker-1348010"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348012"></A>Some unused bits in ACPI hardware registers are designated as &#8220;Reserved&#8221; in the ACPI specification. For future extensibility, hardware-register reserved bits always return zero, and data writes to them have no side effects. OSPM implementations must write zeros to all reserved bits in enable and status registers and preserve bits in control registers.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1348015"></A>Root System Description Pointer (RSDP)<A NAME="marker-1348013"></A><A NAME="marker-1348014"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348016"></A>An ACPI-compatible system must provide an RSDP in the system&#8217;s low address space. This structure&#8217;s only purpose is to provide the physical address of the RSDT and XSDT.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1348019"></A>Root System Description Table (RSDT)<A NAME="marker-1348017"></A><A NAME="marker-1348018"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348020"></A>A table with the signature &#8216;RSDT,&#8217; followed by an array of physical pointers to other system description tables. The OS locates that RSDT by following the pointer in the RSDP structure.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1366075"></A>Runtime Firmware</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1366076"></A>Generic term to describe any firmware on a platform used during runtime (i.e., after the boot process has completed).  Use a more specific term, if possible.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1348023"></A>Secondary System Description Table (SSDT)<A NAME="marker-1348021"></A><A NAME="marker-1348022"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348024"></A>SSDTs are a continuation of the DSDT. Multiple SSDTs can be used as part of a platform description. After the DSDT is loaded into the ACPI Namespace, each secondary description table listed in the RSDT/XSDT with a unique OEM Table ID is loaded. This allows the OEM to provide the base support in one table, while adding smaller system options in other tables. </P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1367238"></A>System Physical Address (SPA)</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1367239"></A>The platform physical address assigned and programmed by the platform and utilized by the OS.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1348027"></A>Sleep Button<A NAME="marker-1348026"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348028"></A>A user push button that switches the system from the sleeping/soft off state to the working state, and signals the OS to transition to a sleeping state from the working state.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1348038"></A><A NAME="marker-1348035"></A>Smart Battery Subsystem</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348039"></A>A battery subsystem that conforms to the following specifications: Smart Battery and either Smart Battery System Manager or Smart Battery Charger and Selector--and the additional ACPI requirements.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1348041"></A>Smart Battery Table<A NAME="marker-1348040"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348042"></A>An ACPI table used on platforms that have a Smart Battery subsystem. This table indicates the energy-level trip points that the platform requires for placing the system into different sleeping states and suggested energy levels for warning the user to SMBus Interface<A NAME="marker-1348047"></A><A NAME="marker-1348048"></A></P>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348050"></A>A standard hardware and software communications interface between an OS bus driver and an SMBus controller. </P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1366077"></A>Software</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1366078"></A>Software is comprised of elements required to load the operating system and all user applications and user data subsequently handled by the operating system.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1348053"></A>Streamlined Advanced Programmable Interrupt Controller (SAPIC)<A NAME="marker-1348051"></A><A NAME="marker-1348052"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348054"></A>An advanced APIC commonly found on Intel ItaniumTM Processor Family-based 64-bit systems. </P>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1366181"></A>transition the platform into a sleeping state. </P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1366182"></A>System</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1366183"></A>A system is the entirety of a computing entity, including all elements in a platform (hardware, firmware) and software (operating system, user applications, user data).  A system can be thought of both as a logical construct (e.g. a software stack) or physical construct (e.g. a notebook, a desktop, a server, a network switch, etc).</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1366184"></A>System BIOS</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1366185"></A>A term sometimes used in industry to refer to either Legacy BIOS, or to UEFI Core System BIOS, or both. Please use this term only when referring to Legacy BIOS. See also: BIOS, Legacy BIOS.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1348057"></A>System Context<A NAME="marker-1348055"></A><A NAME="marker-1348056"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348058"></A>The volatile data in the system that is not saved by a device driver. </P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1348061"></A>System Control Interrupt (SCI)<A NAME="marker-1348059"></A><A NAME="marker-1348060"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348062"></A>A system interrupt used by hardware to notify the OS of ACPI events. The SCI is an active, low, shareable, level interrupt.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1366213"></A>System Management Bus (SMBus)<A NAME="marker-1366211"></A><A NAME="marker-1366212"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1366214"></A>A two-wire interface based upon the I&#178;C protocol. The SMBus is a low-speed bus that provides positive addressing for devices, as well as bus arbitration.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1348065"></A>System Management Interrupt (SMI)<A NAME="marker-1348063"></A><A NAME="marker-1348064"></A> </H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348066"></A>An OS-transparent interrupt generated by interrupt events on legacy systems. By contrast, on ACPI systems, interrupt events generate an OS-visible interrupt that is shareable (edge-style interrupts will not work). Hardware platforms that want to support both legacy operating systems and ACPI systems must support a way of re-mapping the interrupt events between SMIs and SCIs when switching between ACPI and legacy models.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1348068"></A>Thermal States<A NAME="marker-1348067"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348069"></A>Thermal states represent different operating environment temperatures within thermal zones of a system. A system can have one or more thermal zones; each thermal zone is the volume of space around a particular temperature-sensing device. The transitions from one thermal state to another are marked by trip points, which are implemented to generate an SCI when the temperature in a thermal zone moves above or below the trip point temperature.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1366084"></A>UEFI</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1366085"></A>One form of Host Processor Boot Firmware which uses a Unified Extensible Firmware Interface (UEFI) structure (as defined by the UEFI Forum).  This is the current host processor boot firmware structure being adopted as a standard in the industry. This term should be used when referring specifically to UEFI code on a platform.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1366086"></A>UEFI Drivers</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1366087"></A>Standalone binary executables in PECOFF format which are loaded by UEFI during the boot process to handle specific pieces of hardware.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1348072"></A>Extended Root System Description Table (XSDT)<A NAME="marker-1348070"></A><A NAME="marker-1348071"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348073"></A>The XSDT provides identical functionality to the RSDT but accommodates physical addresses of DESCRIPTION HEADERs that are larger than 32 bits. Notice that both the XSDT and the RSDT can be pointed to by the RSDP structure.<A NAME="marker-1348108"></A></P>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1348111"></A><A NAME="91173"></A>Global System State Definitions</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1348113"></A>Global system states (Gx states) apply to the entire system and are visible to the user. <A NAME="marker-1348112"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1348114"></A>Global system states are defined by six principal criteria:</P>
+<DIV>
+<H6 CLASS="StepNumList-1">
+<A NAME="pgfId-1348115"></A>Does application software run?</H6>
+<OL>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1348116"></A>What is the latency from external events to application response?</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1348117"></A>What is the power consumption?</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1348118"></A>Is an OS reboot required to return to a working state?</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1348119"></A>Is it safe to disassemble the computer?</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1348120"></A>Can the state be entered and exited electronically?</LI>
+</OL>
+<P CLASS="Body">
+<A NAME="pgfId-1348121"></A>Following is a list of the system states:</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1348124"></A>G3 Mechanical Off<A NAME="marker-1348122"></A><A NAME="marker-1348123"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348125"></A>A computer state that is entered and left by a mechanical means (for example, turning off the system&#8217;s power through the movement of a large red switch). It is implied by the entry of this off state through a mechanical means that no electrical current is running through the circuitry and that it can be worked on without damaging the hardware or endangering service personnel. The OS must be restarted to return to the Working state. No hardware context is retained. Except for the real-time clock, power consumption is zero.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1348129"></A>G2/S5 Soft Off<A NAME="marker-1348126"></A><A NAME="marker-1348127"></A><A NAME="marker-1348128"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348130"></A>A computer state where the computer consumes a minimal amount of power. No user mode or system mode code is run. This state requires a large latency in order to return to the Working state. The system&#8217;s context will not be preserved by the hardware. The system must be restarted to return to the Working state. It is not safe to disassemble the machine in this state.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1348133"></A>G1 Sleeping<A NAME="marker-1348131"></A><A NAME="marker-1348132"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348134"></A>A computer state where the computer consumes a small amount of power, user mode threads are not being executed, and the system &#8220;appears&#8221; to be off (from an end user&#8217;s perspective, the display is off, and so on). Latency for returning to the Working state varies on the wake environment selected prior to entry of this state (for example, whether the system should answer phone calls). Work can be resumed without rebooting the OS because large elements of system context are saved by the hardware and the rest by system software. It is not safe to disassemble the machine in this state. </P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1348137"></A>G0 Working<A NAME="marker-1348135"></A><A NAME="marker-1348136"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348138"></A>A computer state where the system dispatches user mode (application) threads and they execute. In this state, peripheral devices (peripherals) are having their power state changed dynamically. The user can select, through some UI, various performance/power characteristics of the system to have the software optimize for performance or battery life. The system responds to external events in real time. It is not safe to disassemble the machine in this state.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1348165"></A>S4 Non-Volatile Sleep</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348166"></A>A special global system state that allows system context to be saved and restored (relatively slowly) when power is lost to the motherboard. If the system has been commanded to enter S4, the OS will write all system context to a file on non-volatile storage media and leave appropriate context markers. The machine will then enter the S4 state. When the system leaves the Soft Off or Mechanical Off state, transitioning to Working (G0) and restarting the OS, a restore from a NVS file can occur. This will only happen if a valid non-volatile sleep data set is found, certain aspects of the configuration of the machine have not changed, and the user has not manually aborted the restore. If all these conditions are met, as part of the OS restarting, it will reload the system context and activate it. The net effect for the user is what looks like a resume from a Sleeping (G1) state (albeit slower). The aspects of the machine configuration that must not change include, but are not limited to, disk layout and memory size. It might be possible for the user to swap a PC Card or a Device Bay device, however.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348167"></A>Notice that for the machine to transition directly from the Soft Off or Sleeping states to S4, the system context must be written to non-volatile storage by the hardware; entering the Working state first so that the OS or platform runtime firmware can save the system context takes too long from the user's point of view. The transition from Mechanical Off to S4 is likely to be done when the user is not there to see it. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1348168"></A>Because the S4 state relies only on non-volatile storage, a machine can save its system context for an arbitrary period of time (on the order of many years).</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1348172"></A>Summary of Global Power States<A NAME="marker-1348169"></A><A NAME="marker-1348170"></A><A NAME="marker-1348171"></A></H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1362747"></A>Global system state</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1362749"></A>Software runs</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1362737"></A>Latency</P>
+<P CLASS="TableHeading">
+<A NAME="pgfId-1362725"></A>&nbsp;</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1362727"></A>Power consumption</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1362729"></A>OS restart required</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1362731"></A>Safe to disassemble computer</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1362733"></A>Exit state electronically</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1362622"></A>G0 Working<A NAME="marker-1362621"></A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1362624"></A><A NAME="marker-1362623"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1362626"></A>Yes</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1362628"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1362630"></A>Large</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1362632"></A>No</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1362634"></A>No</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1362636"></A>Yes</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1362640"></A>G1 Sleeping<A NAME="marker-1362638"></A><A NAME="marker-1362639"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1362642"></A>No</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1362644"></A>&gt;0, varies with sleep state</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1362646"></A>Smaller</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1362648"></A>No</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1362650"></A>No</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1362652"></A>Yes</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1362657"></A>G2/S5 Soft Off<A NAME="marker-1362654"></A><A NAME="marker-1362655"></A><A NAME="marker-1362656"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1362659"></A>No</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1362661"></A>Long</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1362663"></A>Very near 0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1362665"></A>Yes</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1362667"></A>No</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1362669"></A>Yes</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1362673"></A>G3 Mechanical Off<A NAME="marker-1362671"></A><A NAME="marker-1362672"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1362675"></A>No</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1362677"></A>Long</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1362679"></A>RTC battery</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1362681"></A>Yes</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1362683"></A>Yes</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1362685"></A>No</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1348271"></A>Notice that the entries for G2/S5 and G3 in the Latency column of the above table are &#8220;Long.&#8221; This implies that a platform designed to give the user the appearance of &#8220;instant-on,&#8221; similar to a home appliance device, will use the G0 and G1 states almost exclusively (the G3 state may be used for moving the machine or repairing it).<A NAME="_Ref360196432"></A><A NAME="_Toc369556080"></A><A NAME="_Toc369679659"></A><A NAME="_Toc369801269"></A><A NAME="_Toc369936039"></A><A NAME="_Toc370017129"></A><A NAME="_Toc374114571"></A><A NAME="_Toc375244203"></A><A NAME="_Toc375924599"></A><A NAME="_Toc423759810"></A><A NAME="_Toc475523518"></A><A NAME="_Toc486665309"></A></P>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1348295"></A><A NAME="_Toc489255950"></A><A NAME="_Toc489267874"></A><A NAME="_Toc489272427"></A><A NAME="_Toc202340473"></A><A NAME="_Toc258262154"></A>Device Power State Definitions<A NAME="marker-1348291"></A><A NAME="marker-1348292"></A><A NAME="marker-1348293"></A><A NAME="marker-1348294"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1348296"></A>Device power states are states of particular devices; as such, they are generally not visible to the user. For example, some devices may be in the Off state even though the system as a whole is in the Working state.<A NAME="marker-1348297"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1348298"></A>Device states apply to any device on any bus. They are generally defined in terms of four principal criteria:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348299"></A>Power consumption-How much power the device uses.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348300"></A>Device context--How much of the context of the device is retained by the hardware. The OS is responsible for restoring any lost device context (this may be done by resetting the device).</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348301"></A>Device driver--What the device driver must do to restore the device to full on.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348302"></A>Restore time--How long it takes to restore the device to full on.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1348303"></A>The device power states are defined below, although very generically. Many devices do not have all four power states defined. Devices may be capable of several different low-power modes, but if there is no user-perceptible difference between the modes, only the lowest power mode will be used. The Device Class Power Management Specifications, included in Appendix A of this specification, describe which of these power states are defined for a given type (class) of device and define the specific details of each power state for that device class. For a list of the available Device Class Power Management Specifications, see &#8220;<A HREF="Apx_A_Device_Class_Specifications.htm#92338" CLASS="XRef">See Device Class Specifications.</A>: Device Class Specifications.&#8221; </P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1348305"></A>D3 (Off)<A NAME="marker-1365019"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348306"></A>Power has been fully removed from the device. Also referred to as D3cold in this and other specs. All device context is lost when this state is entered, so the OS software will reinitialize the device when powering it back on. Since all device context and power are lost, devices in this state do not decode their address lines, and cannot be enumerated by software. Devices in this state have the longest restore times.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1348308"></A>D3hot<A NAME="marker-1365022"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348309"></A>The meaning of the D3hot State is defined by each device class. In general, D3hot is expected to save as much power as possible without affecting PNP Enumeration. Devices in D3hot must have enough power to remain enumerable by software. For example, PCI Configuration space access and contents must operate as in shallower power states. Similarly, ACPI identification and configuration objects must operate as in shallower power states. Otherwise, no device functionality is supported, and Driver software is required to restore any lost context, or reinitialize the device, during its transition back to D0. </P>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1365040"></A>Devices in this state can have long restore times. All classes of devices define this state.</P>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1348311"></A>For devices that support both D3hot and D3 exposed to OSPM via _PR3, device software/drivers must always assume OSPM will target D3and must assume all device context will be lost and the device will no longer be enumerable.    </LI>
+</UL>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1348313"></A>D2<A NAME="marker-1348312"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348314"></A>The meaning of the D2 Device State is defined by each device class. Many device classes may not define D2. In general, D2 is expected to save more power and preserve less device context than D1 or D0. Buses in D2 may cause the device to lose some context (for example, by reducing power on the bus, thus forcing the device to turn off some of its functions).</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1348316"></A>D1<A NAME="marker-1348315"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348317"></A>The meaning of the D1 Device State is defined by each device class. Many device classes may not define D1. In general, D1 is expected to save less power and preserve more device context than D2.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1348319"></A>D0 (Fully-On)<A NAME="marker-1348318"></A></H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348320"></A>This state is assumed to be the highest level of power consumption. The device is completely active and responsive, and is expected to remember all relevant context continuously.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1365055"></A>Transitions amongst these power states are restricted for simplicity. Power-down transitions (from higher-power, or shallower, to lower-power, or deeper) are allowed between any two states. However, power-up transitions (from deeper to shallower) are required to go through D0; i.e. Dy to Dx&lt;y is illegal for all x !=0.</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1349931"></A><A NAME="marker-1348331"></A>Summary of Device Power States</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1362581"></A>Device State</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1362583"></A>Power Consumption</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1362585"></A>Device Context Retained</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1362587"></A>Driver Restoration</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349892"></A>D0 - Fully-On</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349894"></A>As needed for operation</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349896"></A>All</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349898"></A>None</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349900"></A>D1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349902"></A>D0&gt;D1&gt;D2&gt; D3hot&gt;D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349904"></A>&gt;D2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349906"></A>&lt;D2</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349908"></A>D2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349910"></A>D0&gt;D1&gt;D2&gt; D3hot&gt;D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349912"></A>&lt;D1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349914"></A>&gt;D1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349916"></A>D3hot</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349918"></A>D0&gt;D1&gt;D2&gt;D3hot&gt;D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349920"></A>Optional</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349922"></A>None &lt;-&gt;Full initialization and load</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349924"></A>D3 - Off</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349926"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349928"></A>None</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349930"></A>Full initialization and load</P>
+</TD>
+</TR>
+</TABLE>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1348386"></A>Devices often have different power modes within a given state. Devices can use these modes as long as they can automatically transparently switch between these modes from the software, without violating the rules for the current Dx state the device is in. Low-power modes that adversely affect performance (in other words, low speed modes) or that are not transparent to software cannot be done automatically in hardware; the device driver must issue commands to use these modes. <A NAME="marker-1348387"></A></LI>
+</UL>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1365078"></A><A NAME="11116"></A>Device Performance States </H3>
+<P CLASS="Body">
+<A NAME="pgfId-1365079"></A>Device performance states (Px states) are power consumption and capability states within the active (D0) device power state. Performance states allow OSPM to make tradeoffs between performance and energy conservation. Device performance states have the greatest impact when the implementation is such that the states invoke different device efficiency levels as opposed to a linear scaling of performance and energy consumption. Since performance state transitions occur in the active device states, care must be taken to ensure that performance state transitions do not adversely impact the system.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1365074"></A>Device performance states, when necessary, are defined on a per device class basis (See <A HREF="Apx_A_Device_Class_Specifications.htm#92338" CLASS="XRef">See Device Class Specifications.</A> for more information).</P>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1348404"></A><A NAME="_Toc489255951"></A><A NAME="_Toc489267875"></A><A NAME="_Toc489272428"></A><A NAME="_Toc202340474"></A><A NAME="_Toc258262155"></A>Sleeping and Soft-off State Definitions<A NAME="marker-1348400"></A><A NAME="marker-1348401"></A><A NAME="marker-1348402"></A><A NAME="marker-1348403"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1348405"></A>S1-S4 are types of sleeping states within the global system state, G1, while S5 is a soft-off state associated with the G2 system state. The Sx states are briefly defined below. For a detailed definition of the system behavior within each Sx state, see <A HREF="Power_and_Performance_Mgmt.htm#46800" CLASS="XRef">See &#92;_S</A></P>
+</DIV>
+</DIV>
+</BODY>
+</HTML>

@@ -1,0 +1,2555 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2016/HTML Export Filter">
+<LINK REL="STYLESHEET" HREF="Platform_Comm_Channel.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE> 14 Platform Communications Channel (PCC)</TITLE></HEAD>
+<BODY>
+<DIV>
+<H1 CLASS="Heading-1">
+<A NAME="pgfId-1372480"></A><A NAME="68313"></A>Platform Communications Channel (PCC)<DIV>
+<IMG SRC="Platform_Comm_Channel-1.gif" ALT="">
+</DIV>
+</H1>
+<P CLASS="Body">
+<A NAME="pgfId-1372506"></A>The platform communication channel is a generic mechanism for OSPM to communicate with an entity in the platform (e.g. a platform controller, or a Baseboard Management Controller (BMC)). Neither the entity that OSPM communicates with, nor any aspects of the information passed back and forth is defined in this section. That information is defined by the actual interface that that employs PCC register address space as the communication channel. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1372507"></A>PCC defines a new address space type (PCC Space, 0xA), which is implemented as one or more independent communications channels, or subspaces. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1378199"></A>This chapter is arranged as follows:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1378200"></A><A HREF="Platform_Comm_Channel.htm#59683" CLASS="XRef">See Platform Communications Channel Table.</A> and <A HREF="Platform_Comm_Channel.htm#32877" CLASS="XRef">See Generic Communications Channel Shared Memory Region.</A> provide reference information covering the PCCT table, and expected data structures used with PCC.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1378201"></A><A HREF="Platform_Comm_Channel.htm#23089" CLASS="XRef">See Doorbell Protocol.</A>, <A HREF="Platform_Comm_Channel.htm#21024" CLASS="XRef">See Platform Notification.</A>, and <A HREF="Platform_Comm_Channel.htm#21327" CLASS="XRef">See Referencing the PCC address space.</A> describe how communications takes place between the OSPM and the platform over PCC.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1378195"></A>The interface is described in the following ACPI system description table.</P>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1372508"></A><A NAME="59683"></A>Platform Communications Channel Table</H2>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1372509"></A>Platform Communications Channel Table (PCCT)</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1372512"></A>Field</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1372514"></A>Byte Length</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1372516"></A>Byte Offset</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1372518"></A>Description</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372520"></A>Header</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372522"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372524"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372526"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372528"></A>    Signature</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372530"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372532"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372534"></A>&#8216;PCCT&#8217; Signature for the Platform Communications Channel Table.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372536"></A>    Length</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372538"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372540"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372542"></A>Length, in bytes, of the entire PCCT.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372544"></A>    Revision</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372546"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372548"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372550"></A>2</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372552"></A>    Checksum</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372554"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372556"></A>9</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372558"></A>Entire table must sum to zero.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372560"></A>    OEMID</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372562"></A>6</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372564"></A>10</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372566"></A>OEM ID</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372568"></A>    OEM Table ID</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372570"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372572"></A>16</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372574"></A>For the PCCT, the table ID is the manufacturer model ID.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372576"></A>    OEM Revision</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372578"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372580"></A>24</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372582"></A>OEM revision of PCCT for supplied OEM Table ID.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372584"></A>    Creator ID</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372586"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372588"></A>28</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372590"></A>Vendor ID of utility that created the table. For tables containing Definition Blocks, this is the ID for the ASL Compiler.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372592"></A>   Creator Revision</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372594"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372596"></A>32</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372598"></A>Revision of utility that created the table. For tables containing Definition Blocks, this is the revision for the ASL Compiler.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372600"></A>Flags</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372602"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372604"></A>36</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372606"></A>Platform Communications Channel Global flags, described in <A HREF="Platform_Comm_Channel.htm#48096" CLASS="XRef">See Platform Communications Channel Global Flags.</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372620"></A><EM CLASS="Italic">
+Reserved</EM>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372622"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372624"></A>40</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372626"></A>Reserved</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372628"></A>PCC Subspace Structure[n]</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1372629"></A>(n = subspace ID)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372631"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372633"></A>48</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372635"></A>A list of Platform Communications Channel Subspace structures for this platform. This structure is described in the following section. At most 256 subspaces are supported. </P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1372639"></A>Platform Communications Channel Global Flags</H3>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1372641"></A><A NAME="48096"></A>Platform Communications Channel Global Flags</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1372644"></A>PCC Global Flags</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1372646"></A>Bit Length</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1372648"></A>Bit Offset</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1372650"></A>Description</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372652"></A>Platform Interrupt</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372654"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372656"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372658"></A>If set, the platform is capable of generating an interrupt to indicate completion of a command.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372660"></A><EM CLASS="Italic">
+Reserved</EM>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372662"></A>31</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372664"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372666"></A>Must be zero.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1372670"></A><A NAME="89803"></A>Platform Communications Channel Subspace Structures</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1372671"></A>PCC Subspaces are described by the PCC Subspace structure in the PCCT table. The subspace ID of a PCC subspace is its index in the array of subspace structures, starting with subspace 0. All subspaces have a common header, followed by a set of type-specific fields:</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1372672"></A>Generic PCC Subspace Structure</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1372675"></A>Field</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1372677"></A>Byte Length</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1372679"></A>Byte Offset</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1372681"></A>Description</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372683"></A>Type</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372685"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372687"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372689"></A>The type of subspace.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372691"></A>Length</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372693"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372695"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372697"></A>Length of the subspace structure, in bytes. The next subspace structure begins length bytes after the start of this one.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372699"></A>Type specific fields</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372701"></A>variable</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372703"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372705"></A>See specific subspace types for more details</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1378294"></A>This specification defines the following subspaces:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1378295"></A>Type 0, the Generic Communications Subspace, </LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1378296"></A>Types 1 to 2, HW-Reduced Communications Subspaces, </LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1378297"></A>Types 3 and 4 are extended PCC subspaces.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1378298"></A>All other subspace types are reserved.</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1372710"></A>Generic Communications Subspace Structure (type 0)</H3>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1372711"></A><A NAME="55497"></A>PCC Subspace Structure type 0 (Generic Communications Subspace)</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1373054"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1373056"></A>Byte Length</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1373058"></A>Byte Offset</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1373060"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372722"></A>Type</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372724"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372726"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372728"></A>0 	(Generic Communications Subspace) </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372730"></A>Length</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372732"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372734"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372736"></A>62</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372738"></A><EM CLASS="Italic">
+Reserved</EM>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372740"></A>6</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372742"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372744"></A>Reserved</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372746"></A>Base Address</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372748"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372750"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372754"></A>Base Address of the shared memory range, described in <A HREF="Platform_Comm_Channel.htm#_Ref272262201" CLASS="XRef">See Generic Communications Channel Shared Memory Region.</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372758"></A>Length</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372760"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372762"></A>16</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372764"></A>Length of the memory range. Must be &gt; 8.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372766"></A>Doorbell Register</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372768"></A>12</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372770"></A>24</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372772"></A>Contains the processor relative address, represented in Generic Address Structure format, of the PCC doorbell.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1374404"></A>Note: Only System I/O space and System Memory space are valid for values for Address_Space_ID. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372774"></A>Doorbell Preserve</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372776"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372778"></A>36</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372780"></A>Contains a mask of bits to preserve when writing the doorbell register.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372782"></A>Doorbell Write</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372784"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372786"></A>44</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372788"></A>Contains a mask of bits to set when writing the doorbell register.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374375"></A>Nominal Latency</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374377"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374379"></A>52</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374381"></A>Expected latency to process a command, in microseconds.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374418"></A>Maximum Periodic Access Rate</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374420"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374422"></A>56</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374424"></A>The maximum number of periodic requests that the subspace channel can support, reported in commands  per minute. 0 indicates no limitation.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374410"></A>Minimum Request Turnaround Time</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374412"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374414"></A>60</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374416"></A>The minimum amount of time that OSPM must wait after the completion of a command before issuing the next command, in microseconds.</P>
+</TD>
+</TR>
+</TABLE>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1374491"></A>Inaccurate values for the Maximum Periodic Access Rate and Minimum Request Turnaround Time fields can result in punitive side effects for features that rely on the PCC interface. The Platform should report accurate values that allow for maximum channel efficiency while maintaining maximum channel stability.</LI>
+<LI CLASS="Note">
+<A NAME="pgfId-1374492"></A>The Maximum Periodic Access Rate is used by OSPM to determine the maximum rate for periodic evaluation of commands. Infrequent, event driven commands are not restricted by the maximum periodic access rate.</LI>
+</UL>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1375054"></A><A NAME="89355"></A>HW-Reduced Communications Subspace Structure (type 1)</H3>
+<P CLASS="Normal">
+<A NAME="pgfId-1375055"></A>The HW-Reduced Communications Subspace is defined in <A HREF="Platform_Comm_Channel.htm#56025" CLASS="XRef">See PCC Subspace Structure type 1 (HW-Reduced Communications Subspace).</A>. It is intended for use on HW-Reduced ACPI Platforms, which do not support the SCI. Aside from the interrupt change, and the allowed use of the Functional Fixed HW address space for the Doorbell Register, this subspace is identical to the Generic Communications Subspace described in <A HREF="Platform_Comm_Channel.htm#32877" CLASS="XRef">See Generic Communications Channel Shared Memory Region.</A> and <A HREF="Platform_Comm_Channel.htm#23089" CLASS="XRef">See Doorbell Protocol.</A>.</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1375056"></A><A NAME="56025"></A>PCC Subspace Structure type 1 (HW-Reduced Communications Subspace)</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="Body">
+<A NAME="pgfId-1385094"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="Body">
+<A NAME="pgfId-1385096"></A>Byte Length</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="Body">
+<A NAME="pgfId-1385098"></A>Byte Offset</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="Body">
+<A NAME="pgfId-1385100"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375067"></A>Type</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375069"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375071"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375073"></A>1 	(HW-Reduced Communications Subspace) </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375075"></A>Length</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375077"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375079"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375081"></A>62</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375083"></A>Platform Interrupt</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375085"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375087"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375089"></A>GSIV of the interrupt used for the PCC platform interrupt for this Subspace.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375091"></A>Platform Interrupt Flags</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375093"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375095"></A>6</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375097"></A>Bit [2-7]     Reserved</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1375098"></A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1375099"></A>Bit [1]       Platform interrupt mode</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1375100"></A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1375101"></A>1: Interrupt is Edge triggered</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1375102"></A>0: Interrupt is Level triggered</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1375103"></A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1375104"></A>Bit [0]     Platform interrupt polarity</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1375105"></A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1375106"></A>1: Interrupt is Active low</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1375107"></A>0: Interrupt is Active high</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375109"></A>Reserved</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375111"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375113"></A>7</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375115"></A>Reserved</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375117"></A>Base Address</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375119"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375121"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375123"></A>Base Address of the shared memory range, described in <A HREF="Platform_Comm_Channel.htm#_Ref272262201" CLASS="XRef">See Generic Communications Channel Shared Memory Region.</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375125"></A>Length</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375127"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375129"></A>16</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375131"></A>Length of the memory range. Must be &gt; 8.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375133"></A>Doorbell Register</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375135"></A>12</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375137"></A>24</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375139"></A>Contains the processor relative address, represented in Generic Address Structure format, of the PCC doorbell.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1375140"></A>Note: Only the System I/O, System Memory, and Functional Fixed Hardware spaces are valid for values for Address_Space_ID. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375142"></A>Doorbell Preserve</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375144"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375146"></A>36</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375148"></A>Contains a mask of bits to preserve when writing the doorbell register.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375150"></A>Doorbell Write</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375152"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375154"></A>44</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375156"></A>Contains a mask of bits to set when writing the doorbell register.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375158"></A>Nominal Latency</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375160"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375162"></A>52</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375164"></A>Expected latency to process a command, in microseconds.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375166"></A>Maximum Periodic Access Rate</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375168"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375170"></A>56</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375172"></A>The maximum number of periodic requests that the subspace channel can support, reported in commands per minute. 0 indicates no limitation.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375174"></A>Minimum Request Turnaround Time</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375176"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375178"></A>60</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1375180"></A>The minimum amount of time that OSPM must wait after the completion of a command before issuing the next command, in microseconds.</P>
+</TD>
+</TR>
+</TABLE>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1375323"></A>Inaccurate values for the Maximum Periodic Access Rate and Minimum Request Turnaround Time fields can result in punitive side effects for features that rely on the PCC interface. The Platform should report accurate values that allow for maximum channel efficiency while maintaining maximum channel stability.</LI>
+<LI CLASS="Note">
+<A NAME="pgfId-1375324"></A>The Maximum Periodic Access Rate is used by OSPM to determine the maximum rate for periodic evaluation of commands. Infrequent, event driven commands are not restricted by the maximum periodic access rate.</LI>
+<LI CLASS="Note">
+<A NAME="pgfId-1383536"></A>Type 1 subspaces do not support a level triggered platform interrupt as no method is provided to clear the interrupt. Where level interrupts are required, type 2 or type 3 subspaces should be used.</LI>
+</UL>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1375817"></A><A NAME="12859"></A>HW-Reduced Communications Subspace Structure (type 2)</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1376445"></A>The HW-Reduced Communications Subspace is defined in <A HREF="Platform_Comm_Channel.htm#66530" CLASS="XRef">See PCC Subspace Structure type 2 (HW-Reduced Communications Subspace).</A>. It is intended for use on HW-Reduced ACPI Platforms, which require read-modify-write sequence to acknowledge Platform Interrupt. Aside from three Platform Ack fields at the bottom of the table, this subspace is identical to the HW-Reduced Communications Subspace Structure (type 1) described above.</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1376942"></A><A NAME="66530"></A>PCC Subspace Structure type 2 (HW-Reduced Communications Subspace)</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="Body">
+<A NAME="pgfId-1385195"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="Body">
+<A NAME="pgfId-1385197"></A>Byte Length</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="Body">
+<A NAME="pgfId-1385199"></A>Byte Offset</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="Body">
+<A NAME="pgfId-1385201"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376953"></A>Type</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376955"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376957"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376959"></A>2 	(HW-Reduced Communications Subspace) </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376961"></A>Length</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376963"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376965"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376967"></A>90</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376969"></A>Platform Interrupt</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376971"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376973"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376975"></A>GSIV of the interrupt used for the PCC platform interrupt for this Subspace.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376977"></A>Platform Interrupt Flags</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376979"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376981"></A>6</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376983"></A>Bit [2-7]     Reserved</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1376984"></A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1376985"></A>Bit [1]       Platform interrupt mode</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1376986"></A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1376987"></A>1: Interrupt is Edge triggered</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1376988"></A>0: Interrupt is Level triggered</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1376989"></A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1376990"></A>Bit [0]     Platform interrupt polarity</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1376991"></A></P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1376992"></A>1: Interrupt is Active low</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1376993"></A>0: Interrupt is Active high</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376995"></A>Reserved</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376997"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1376999"></A>7</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377001"></A>Reserved</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377003"></A>Base Address</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377005"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377007"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377009"></A>Base Address of the shared memory range, described in <A HREF="Platform_Comm_Channel.htm#_Ref272262201" CLASS="XRef">See Generic Communications Channel Shared Memory Region.</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377011"></A>Length</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377013"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377015"></A>16</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377017"></A>Length of the memory range. Must be &gt; 8.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377019"></A>Doorbell Register</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377021"></A>12</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377023"></A>24</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377025"></A>Contains the processor relative address, represented in Generic Address Structure format, of the PCC doorbell.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1377026"></A>Note: Only the System I/O, System Memory, and Functional Fixed Hardware spaces are valid for values for Address_Space_ID. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377028"></A>Doorbell Preserve</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377030"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377032"></A>36</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377034"></A>Contains a mask of bits to preserve when writing the doorbell register.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377036"></A>Doorbell Write</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377038"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377040"></A>44</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377042"></A>Contains a mask of bits to set when writing the doorbell register.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377044"></A>Nominal Latency</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377046"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377048"></A>52</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377050"></A>Expected latency to process a command, in microseconds.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377052"></A>Maximum Periodic Access Rate</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377054"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377056"></A>56</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377058"></A>The maximum number of periodic requests that the subspace channel can support, reported in commands per minute. 0 indicates no limitation.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377060"></A>Minimum Request Turnaround Time</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377062"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377064"></A>60</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377066"></A>The minimum amount of time that OSPM must wait after the completion of a command before issuing the next command, in microseconds.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377068"></A>Platform Interrupt Ack Register</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377070"></A>12</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377072"></A>62</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377074"></A>Contains the processor relative address, represented in Generic Address Structure format, of the platform interrupt ack register.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1377075"></A>Note: Only the System I/O, System Memory, and Functional Fixed Hardware spaces are valid for values for Address_Space_ID. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377077"></A>Platform Interrupt Ack Preserve</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377079"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377081"></A>74</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377083"></A>Contains a mask of bits to preserve when writing the platform interrupt ack register.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377085"></A>Platform Interrupt Ack Write</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377087"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377089"></A>82</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377091"></A>Contains a mask of bits to set when writing the platform interrupt ack register.</P>
+</TD>
+</TR>
+</TABLE>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1376097"></A>Inaccurate values for the Maximum Periodic Access Rate and Minimum Request Turnaround Time fields can result in punitive side effects for features that rely on the PCC interface. The Platform should report accurate values that allow for maximum channel efficiency while maintaining maximum channel stability.</LI>
+<LI CLASS="Note">
+<A NAME="pgfId-1376069"></A>The Maximum Periodic Access Rate is used by OSPM to determine the maximum rate for periodic evaluation of commands. Infrequent, event driven commands are not restricted by the maximum periodic access rate</LI>
+</UL>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1378939"></A><A NAME="56438"></A>Extended PCC subspaces (types 3 and 4)</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1378941"></A>Extended PCC communication subspaces are of two types:</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378942"></A>Type 3 Master subspace: used by the OSPM to communicate with the platform.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378943"></A>Type 4 Slave subspace: Used by the platform to send asynchronous notifications to the OSPM. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1378944"></A>Master subspaces are not substantially different to type 0,1, or 2 subspaces, the most notable difference is that a type 3 master subspace does not support asynchronous notifications. Slave subspaces, type 4, provide those notifications, and cannot be used by the OSPM to send messages to the platform. Together a master and slave pair create a bidirectional interface between the OSPM and the platform.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1378945"></A>The format for PCCT entries describing master (type 3), and slave (type 4) subspaces is shown in the following table. </P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1378947"></A><A NAME="52200"></A>PCC Subspace Structure type 3 and type 4, master and slave respectively</H6>
+<TABLE>
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="Body">
+<A NAME="pgfId-1379344"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="Body">
+<A NAME="pgfId-1379346"></A>Byte Length</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="Body">
+<A NAME="pgfId-1379348"></A>Byte Offset</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="Body">
+<A NAME="pgfId-1379350"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998425"></A>Type</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998427"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998429"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998431"></A>3 - Master subspace</P>
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998475"></A>4 - Slave subspace</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998485"></A>Length</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998487"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998489"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998491"></A>170</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998537"></A>Platform Interrupt</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998539"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998541"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998543"></A>GSIV of an interrupt triggered by the platform:</P>
+<UL>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1380514"></A>For master subspaces (type 3) this is raised when a command is completed on this subspace.</LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1380579"></A>For slave subspaces (type 4) this is raised when platform sends a notification.</LI>
+</UL>
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1380603"></A>For a master subspace this field is ignored if the platform interrupt flag (table 14-137) of the PCCT is set to zero. If a slave subspace is present in the PCCT, then the global Platform Interrupt flag (<A HREF="Platform_Comm_Channel.htm#48096" CLASS="XRef">See Platform Communications Channel Global Flags.</A>) must be set to 1.</P>
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998641"></A>Note that if interrupts are edge triggered, then each subspace must have its own unique interrupt. If interrupt are level, a GSIV may be shared by multiple subspaces, but each one must have unique Platform interrupt Ack preserve and Ack Set masks (see below)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998654"></A>Platform Interrupt Flags</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998656"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998658"></A>6</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998660"></A>Bit 7:2	Reserved</P>
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998709"></A>Bit 1:	Platform interrupt mode </P>
+<UL>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-998721"></A>Set to 1 if interrupt is Edge triggered</LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-998733"></A>Set to 0 if interrupt Level triggered </LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-998745"></A>Bit 0: Platform interrupt polarity</LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-998757"></A>Set to 1 if interrupt is Active low</LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-998769"></A>Set to 0 if interrupt is Active high </LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998782"></A>Reserved</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998784"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998786"></A>7</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998788"></A>Reserved must be zero</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998831"></A>Base Address</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998833"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998835"></A>16</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998837"></A>Base Address of the shared memory range, described in <A HREF="Platform_Comm_Channel.htm#78184" CLASS="XRef">See Master Slave Communications Channel Shared Memory Region.</A>. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998902"></A>Length</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998904"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998906"></A>24</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998908"></A>Length of the memory range. Must be &gt;= 16.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998963"></A>Doorbell Register</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998965"></A>12</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998967"></A>28</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-998969"></A>Contains the processor relative address, represented in Generic Address Structure (GAS) format, of the PCC doorbell.</P>
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999040"></A>Note: Only the System I/O, System Memory, and Functional Fixed Hardware spaces are valid values for Address_Space_ID</P>
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999088"></A>For slave subspaces this field is optional, if not present the field should just contain zeros.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999098"></A>Doorbell Preserve</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999100"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999102"></A>40</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999104"></A>Contains a mask of bits to preserve when writing the doorbell register. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999170"></A>Doorbell Write</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999172"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999174"></A>48</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999176"></A>Contains a mask of bits to set when writing the doorbell register. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999238"></A> Nominal Latency</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999240"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999242"></A>56</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999244"></A>Expected latency to process a command, in microseconds. This field is only relevant for master subspaces.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999304"></A>Maximum Periodic Access Rate</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999306"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999308"></A>60</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999310"></A>The maximum number of periodic requests that the subspace subspace can support, reported in commands per minute. 0 indicates no limitation. This field is only relevant for master subspaces.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999389"></A>Minimum Request Turnaround Time</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999391"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999393"></A>64</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999395"></A>The minimum amount of time that OSPM must wait after the completion of a command before issuing the next command, in microseconds. This field is only relevant for master subspaces.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999466"></A>Platform interrupt Ack Register</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999468"></A>12</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999470"></A>68</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999472"></A>Contains the processor relative address, represented in Generic Address Structure (GAS) format, of the platform interrupt acknowledge register. </P>
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999546"></A>Note: Only the System I/O, System Memory, and Functional Fixed Hardware spaces are valid for values for Address_Space_ID.</P>
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999584"></A>If the subspace does not support interrupts or the interrupt is edge driven the register may be omitted. A value of 0x0 on all 12 bytes of the GAS structure indicates the register is not present. </P>
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999596"></A>If the subspace does support interrupts, and these are level, this register must be supplied. And is used to clear the interrupt by using a read, modify, write sequence.  </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999606"></A>Platform interrupt Ack Preserve</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999608"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999610"></A>80</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999612"></A>Contains a mask of bits to preserve when writing the platform interrupt ack register.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999670"></A>Platform interrupt Ack Set</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999672"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999674"></A>88</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999676"></A>Contains a mask of bits to set when writing the platform interrupt ack register.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999740"></A>Reserved</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999742"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999744"></A>96</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999746"></A> Reserved must be zero</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999789"></A>Command complete check register address</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999791"></A>12</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999793"></A>104</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999795"></A>Contains the processor relative address, represented in Generic Address Structure (GAS) format, of the Command complete check register.</P>
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999864"></A>Note: Only the System I/O, System Memory, and Functional Fixed Hardware spaces are valid for values for Address_Space_ID</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999903"></A>Command complete check mask</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999905"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999907"></A>116</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999909"></A>Mask to determine whether a command is complete, using the command complete check register. A command is complete if the value of the register when combined through a logical AND with this mask, yields a non-zero value</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999955"></A>Command complete  update register address</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999957"></A>12</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999959"></A>128</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-999961"></A>Contains the processor relative address, represented in Generic Address Structure (GAS) format, of the command complete update register.</P>
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1000030"></A>Note: Only the System I/O, System Memory, and Functional Fixed Hardware spaces are valid for values for Address_Space_ID</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1000069"></A>Command complete  update preserve mask</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1000071"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1000073"></A>136</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1000075"></A>Mask of bits to preserve in the command complete update register, when updating command complete in this subspace.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1000121"></A>Command complete  update set mask</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1000123"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1000125"></A>142</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1000127"></A>Mask of bits to set in the command complete update register, when updating command complete in this subspace.</P>
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1000172"></A>For master subspaces the mask must indicate how to clear the command complete bit.</P>
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1000184"></A>For slave subspaces the mask must indicate how set the command complete bit</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1000197"></A>Error status register</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1000199"></A>12</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1000201"></A>150</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1000203"></A>Contains the processor relative address, represented in Generic Address Structure (GAS) format, of the Error status register.</P>
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1000272"></A>This field is ignored by the OSPM on slave channels</P>
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1000284"></A>Note: Only the System I/O, System Memory, and Functional Fixed Hardware spaces are valid for values for Address_Space_ID</P>
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1000322"></A>Note: this register can be the same as the command complete check register.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1000336"></A>Error status mask </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1000338"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1000340"></A>162</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1000342"></A>The mask contained here can be combined through a logical AND with content of the Error status register to ascertain whether an error occurred in the transmission of the command through the subspace.</P>
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1000387"></A>The logical NOT of this mask is be used to clear the error. The inverted mask is combined through a logical AND with the content of the Error status register, and the result is written back into said register. </P>
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1000399"></A>This field is ignored for slave channels.</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1379008"></A>Note: Inaccurate values for the Maximum Periodic Access Rate and Minimum Request Turnaround Time fields can result in punitive side effects for features that rely on the PCC interface. The Platform should report accurate values that allow for maximum channel efficiency while maintaining maximum channel stability.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1379010"></A>Slave subspaces may be used by the platform to send asynchronous notifications to the OSPM. Slave subspace entries in the PCCT share the same format as master subspaces, with the following modifications:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1379011"></A>Type is set to 4 - slave subspace</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1379012"></A>The doorbell may be zero and if so must be ignored by the OSM. If present, the platform can request that the OSPM writes to the doorbell after it has processed a notification. </LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1379013"></A>A slave subspace is associated with a master, that is both a master/slave pair will connect the OSPM to the same processing entity in the platform. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1379014"></A>If a slave subspace is included in the PCCT then the global Plaform Interrupt flag (<A HREF="Platform_Comm_Channel.htm#48096" CLASS="XRef">See Platform Communications Channel Global Flags.</A>) must be set to 1.</P>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1372792"></A><A NAME="32877"></A>Generic Communications Channel Shared Memory Region</H2>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1372794"></A><A NAME="_Ref272262201"></A>Generic Communications Channel Shared Memory Region</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1381045"></A>Field</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1381047"></A>Byte Length</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1381049"></A>Byte Offset</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1381051"></A>Description</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372805"></A>Signature</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372807"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372809"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372811"></A>The PCC signature. The signature of a subspace is computed by a bitwise-or of the value 0x50434300 with the subspace ID. For example, subspace 3 has the signature 0x50434303.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372813"></A>Command</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372815"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372817"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372821"></A>PCC command field, described in <A HREF="Platform_Comm_Channel.htm#71957" CLASS="XRef">See Generic Communications Channel Command Field.</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372825"></A>Status</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372827"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372829"></A>6</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372833"></A>PCC status field, described in <A HREF="Platform_Comm_Channel.htm#_Ref272262297" CLASS="XRef">See Generic Communications Channel Status Field.</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372837"></A>Communication Space</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372839"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372841"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372843"></A>Memory region for reading/writing PCC data. The size of this region is 8 bytes smaller than the size of the shared memory region (specified in the General Communications Subspace structure). The first byte of this field represents PCC address 0.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1372847"></A>Generic Communications Channel Command Field</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1372848"></A>For channels of type 0 to 2, this 16-bit field is used to select one of the defined commands for the platform to perform. OSPM is responsible for populating this field before each command invocation.</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1372850"></A><A NAME="71957"></A>Generic Communications Channel Command Field</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1381102"></A>Field</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1381104"></A>Bit Length</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1381106"></A>Bit Offset</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1381108"></A>Description</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372861"></A>Command</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372863"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372865"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372867"></A>Command code to execute. Command codes are application specific and defined by the consumer of this interface.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372869"></A><EM CLASS="Italic">
+Reserved</EM>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372871"></A>7</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372873"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372875"></A>Reserved.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372877"></A>Notify on completion</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372879"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372881"></A>15</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1377905"></A>If set, the platform should generate a Doorbell interrupt at the completion of this command. The interrupt is an SCI for a Type 0 subspace structure, or as described by the Doorbell Interrupt field for Type 1 and Type 2 subspace structures.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1377906"></A>&nbsp;</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1372885"></A>If the Doorbell bit is not set in the PCC global flags, this bit must be cleared.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1372889"></A><A NAME="35261"></A>Generic Communications Channel Status Field</H3>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1372891"></A><A NAME="_Ref272262297"></A>Generic Communications Channel Status Field</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1381166"></A>Field</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1381168"></A>Bit Length</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1381170"></A>Bit Offset</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1381172"></A>Description</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372902"></A>Command Complete</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372904"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372906"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372908"></A>If set, the platform has completed processing the last command.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372910"></A>Platform interrupt</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372912"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372914"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372916"></A>If set, the platform has issued a Platform Interrupt to this subspace. OSPM must check the Command Complete and Platform Notification fields to determine the cause of the Interrupt.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374566"></A>Error</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374568"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374570"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1374572"></A>If set, an error occurred executing the last command.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372918"></A>Platform Notification</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372920"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372922"></A>3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372924"></A>If set, indicates the platform is issuing an asynchronous notification to OSPM.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372926"></A><EM CLASS="Italic">
+Reserved</EM>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372928"></A>12</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372930"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1372932"></A>Reserved.</P>
+</TD>
+</TR>
+</TABLE>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1372937"></A>OSPM (either in an Interrupt handler or via polling) is required to detect that the Command Complete bit has been set and to clear it before issuing another command. While waiting for this bit to be set, OSPM must not modify any portion of the shared memory region.</LI>
+<LI CLASS="Note">
+<A NAME="pgfId-1372938"></A>The Platform Interrupt bit is required to be cleared in OSPM&#8217;s Interrupt handler so that a new event can be detected.     </LI>
+</UL>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1380745"></A>Extended PCC Subspace Shared Memory Region</H2>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1380790"></A><A NAME="78184"></A> Master Slave Communications Channel Shared Memory Region</H6>
+<TABLE>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1381270"></A>Field</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1381272"></A>Byte Length</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1381274"></A>Byte Offset</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1381276"></A>Description</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1380824"></A>Signature</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1380826"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1380828"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1380830"></A>The PCC signature. The signature of a subspace is computed by a bitwise-or of the value 0x50434300 with the subspace ID. For example, subspace 3 has the signature 0x50434303.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1380832"></A>Flags</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1380834"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1380836"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1380838"></A>See <A HREF="Platform_Comm_Channel.htm#58047" CLASS="XRef">See Master Slave Communications Channel Flags.</A> below.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1380840"></A>Length	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1380842"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1380844"></A>8</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1380846"></A>Length of payload being transmitted including command field.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1380848"></A>Command</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1380850"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1380852"></A>12</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1380854"></A>Command being sent over the subspace. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1380856"></A>Communication subspace</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1380858"></A>--</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1380860"></A>16</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1380862"></A>Memory region for reading/writing PCC data. The maximum size of this region is 16 bytes smaller than the size of the shared memory region (specified in the Master slave Communications Subspace structure). When a command is sent to or received from the platform, the size of the data in this space will be Length (expressed above) minus the 4 bytes taken up by the command. </P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1381334"></A>The 32-bit command field is used to select one of the defined commands for the platform to perform. On master subspaces the OSPM is responsible for populating this field, alongside the command&#8217;s payload, length and flags. For slave subspaces, the OSPM is responsible for interpreting the command and payload fields to ascertain the nature of the notification that was sent. The format for the flags field is shown in <A HREF="Platform_Comm_Channel.htm#58047" CLASS="XRef">See Master Slave Communications Channel Flags.</A></P>
+</DIV>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1381279"></A><A NAME="58047"></A> Master Slave Communications Channel Flags</H6>
+<TABLE>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1381388"></A>Field</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1381390"></A>Bit Length</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1381392"></A>Bit Offset</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1381394"></A>Description</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1381353"></A>Notify on completion</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1381355"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1381357"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1381359"></A>For master subspaces this field indicates to the platform that it must generate an interrupt when the command has completed.</P>
+<UL>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1381360"></A>Setting this bit to 1 when sending a command, requests that completion of the command is signaled via the platform interrupt. </LI>
+<LI CLASS="TableBullet">
+<A NAME="pgfId-1381361"></A>Setting it to 0 when sending a command, requests that no interrupt is asserted when the command is completed.</LI>
+</UL>
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1381363"></A>For slave subspaces, if the doorbell field of the slave subspace is non zero, and this flag is set, the OSPM must access the doorbell once it has processed the notification. </P>
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1381365"></A>This bit is ignored by the platform if the Platform Interrupt field of the PCC flags (<A HREF="Platform_Comm_Channel.htm#48096" CLASS="XRef">See Platform Communications Channel Global Flags.</A>) is set to zero.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1381367"></A>Reserved</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1381369"></A>31</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1381371"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="Table-Paragraph">
+<A NAME="pgfId-1381373"></A>&nbsp;</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1374812"></A><A NAME="23089"></A>Doorbell Protocol</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1374821"></A>Other than on slave subspaces, the doorbell is used by OSPM to notify the platform that the shared memory region contains a valid command that is ready to be processed. A doorbell consists of a hardware register that is accessed via I/O or memory mapped I/O, abstracted in the doorbell field of the PCC subspace structure. OSPM rings the doorbell by performing a read/modify/write cycle on the specified register, preserving and setting the bits specified in the preserve and write mask of the PCC subspace structure.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1381566"></A>&nbsp;</P>
+<DIV>
+<IMG SRC="Platform_Comm_Channel-2.gif" ALT="">
+</DIV>
+<DIV>
+<H6 CLASS="FigureTitle">
+<A NAME="pgfId-1381640"></A><A NAME="13091"></A>Communication flow of the doorbell protocol</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1381642"></A><A HREF="Platform_Comm_Channel.htm#13091" CLASS="XRef">See Communication flow of the doorbell protocol.</A> illustrates the steps that the OPSM takes to send message to the platform over a PCC subspace. </P>
+<OL>
+<LI CLASS="StepNumList-1">
+<A NAME="pgfId-1381643"></A>Firstly the OSPM checks that there is no command pending completion on the subspace, indicating that the subspace is free for use. This is done by checking that the command complete bit is set in the status field of the subspace. If the bit is set the subspace is free for use, and the shared memory associated with the subspace is exclusively owned by the OSPM.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1381644"></A>The OSPM places a command into the shared memory of the subspace to update the flags, length, command and payload fields (see <A HREF="Platform_Comm_Channel.htm#_Ref272262201" CLASS="XRef">See Generic Communications Channel Shared Memory Region.</A>). If the platform indicates support for platform interrupts in the PCCT (see <A HREF="Platform_Comm_Channel.htm#48096" CLASS="XRef">See Platform Communications Channel Global Flags.</A>), then the OSPM can request that the platform generate an interrupt once it has completed processing the command. This is requested by setting the Notify on completion bit in the flags (see <A HREF="Platform_Comm_Channel.htm#48096" CLASS="XRef">See Platform Communications Channel Global Flags.</A> and <A HREF="Platform_Comm_Channel.htm#58047" CLASS="XRef">See Master Slave Communications Channel Flags.</A>).</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1381645"></A>The OSPM then clears the command complete bit. This step transfers ownership of the shared memory to the platform.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1381646"></A>OSPM rings the doorbell by performing a read/modify/write cycle on the specified register, preserving and setting the bits specified in the preserve and write mask of the PCC subspace structure. </LI>
+</OL>
+<P CLASS="Body">
+<A NAME="pgfId-1381647"></A>The management of the command complete bit differs slightly between subspaces of types 0-2 and those of type 3. For the former, the command complete bit is in a status register which follows a specific format described in <A HREF="Platform_Comm_Channel.htm#35261" CLASS="XRef">See Generic Communications Channel Status Field.</A>. Type 3 subspaces still use a single command complete bit, however allow the platform to dictate the location and format of the register holding it. Therefore, PCCT structures describing type 3 subspaces use masks and an address to describe how to set the bit. Equally, masks are used for describing how to clear the bit. For these subspaces to check if the command complete bit is set, the OSPM combines the content of command complete check register, through a bitwise AND, with the command complete check mask. A non-zero value indicates the command complete bit is set. Clearing the command complete bit is done through the command complete update register, which can differ in address from the command complete check register. In this case the content of the update register is combined through a bitwise AND with the preserve mask, the result is then combined through a bitwise inclusive OR with the set mask, and that result is written back to the update register.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1381648"></A>For subspaces of type 1-3, the command complete bit must be initialized to one, command complete set, prior to OSPM sending a command. On type 0 channels, whether the platform sets command complete when the subspace is initialized is implementation defined. On these subspaces, the OSPM does not have to check for command complete to be set before sending the first command. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1381649"></A><A HREF="Platform_Comm_Channel.htm#13091" CLASS="XRef">See Communication flow of the doorbell protocol.</A> illustrates the steps the platform takes when it receives the command:</P>
+<OL>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1381650"></A>	For robustness the platform might optionally check that command complete bit is clear</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1381651"></A>Processes the command</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1381652"></A>Sets the command complete bit</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1381653"></A>Triggers the platform interrupt indicated by the GSIV of the subspace&#8217;s PCCT entry (<A HREF="Platform_Comm_Channel.htm#52200" CLASS="XRef">See PCC Subspace Structure type 3 and type 4, master and slave respectively.</A>). This will only occur if an interrupt has been requested in step 2, and interrupts are supported by the platform. A platform can indicate support for interrupts through the Platform interrupt flag (<A HREF="Platform_Comm_Channel.htm#48096" CLASS="XRef">See Platform Communications Channel Global Flags.</A>).</LI>
+</OL>
+<P CLASS="Body">
+<A NAME="pgfId-1381654"></A>OSPM can detect command completion either by polling on the command complete bit or via a platform interrupts. When the OSPM detects that the command has completed it proceeds with the following steps:</P>
+<OL>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1381655"></A>If necessary clears platform interrupt. This step applies if:</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1381656"></A>Platform interrupts are supported by the platform on command completion (<A HREF="Platform_Comm_Channel.htm#48096" CLASS="XRef">See Platform Communications Channel Global Flags.</A>)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1381657"></A>The interrupt was requested by the OSPM through the Notify on completion flag (see <A HREF="Platform_Comm_Channel.htm#_Ref272262201" CLASS="XRef">See Generic Communications Channel Shared Memory Region.</A> and <A HREF="Platform_Comm_Channel.htm#58047" CLASS="XRef">See Master Slave Communications Channel Flags.</A>).</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1381658"></A>The interrupt is described as being a level triggered through the Platform Interrupt flags, and Platform Interrupt Ack register address, and associated masks are provided by the subspace PCCT entry (see table entries for types 2 and 3). </LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1381659"></A>If detecting command completion via interrupt, optionally checks command is complete</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1381660"></A>Processes the command response</LI>
+</OL>
+<P CLASS="Body">
+<A NAME="pgfId-1381661"></A>To ensure correct operation, it is necessary to ensure that all memory updates performed by the OSPM in step 2 are observable by the platform before step 3 completes. Equally all memory updates performed by the platform in step 6 must be observable by the OSPM before step 7 completes. </P>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1375502"></A>For subspace types 0 to 2, all accesses to the Status Field must be made using interlocked operations, by both entities sharing the subspace. Types 3-4 avoid this requirement. This requirement will be removed for subspace types 0 to 2 as part of deprecation of platform async notifications in a future spec revision - see <A HREF="Platform_Comm_Channel.htm#21024" CLASS="XRef">See Platform Notification.</A>.</LI>
+</UL>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1375503"></A><A NAME="21024"></A>Platform Notification</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1381942"></A>The following sections describe platform notifications on subspace types 0-2 and types 3-4.</P>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1381984"></A><A NAME="79897"></A>Platform Notification for Subspace Types 0, 1 and 2</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1374840"></A>The doorbell protocol is a synchronous notification from OSPM to the platform to process a command. If the platform wants to notify OSPM of an event asynchronously, it may set the Platform Interrupt and Platform Notification status bits and issue a Platform Interrupt. OSPM will service the Interrupt, clear the Platform Interrupt and Platform Notification bits, and service the platform notification. The meaning of the platform notification and the steps required to service it are defined by the individual components utilizing the PCC interface.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1374841"></A>The platform must wait until OSPM has issued a consumer defined command that serves to notify the platform that OSPM is ready to service Platform Notifications. The command is subspace specific and may not be supported by all subspaces. Platform Notifications must be used in conjunction with an interrupt. Polling for Platform Notifications is not supported. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1375584"></A>The platform may not modify any portion of the shared memory region other than the status field when issuing a platform notification.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1382810"></A>Platform notifications for subspace types 0, 1, and 2 will be deprecated in a future revision of the specification. Implementers requiring the platform be able to send asynchronous notifications to OSPM should use master/slave subspaces.</P>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1375585"></A>All accesses to the Status Field must be made using interlocked operations, by both entities sharing the subspace. This requirement will be removed for subspace types 0 to 2 as part of deprecation of platform async notifications in a future spec revision. </LI>
+</UL>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1382113"></A>Platform Notification for slave PCC subspaces (type 4)</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1382114"></A>Master and subspaces only allow synchronous communication from the OSPM to the platform, and do not use the platform notification mechanism provided for subspaces of types 0 to 2. Instead a master subspace can be paired with a slave subspace, type 4, which is specifically provided for platform to OSPM communications.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1382410"></A>&nbsp;</P>
+<DIV>
+<IMG SRC="Platform_Comm_Channel-3.gif" ALT="">
+</DIV>
+<DIV>
+<H6 CLASS="FigureTitle">
+<A NAME="pgfId-1382116"></A><A NAME="47467"></A>Communication flow for notifications on slave subspaces</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1382117"></A>Like type 3 master subspaces, type 4 slave subspaces include a command complete bit. Slave subspaces are owned by the OSPM by default, and therefore it must set the set the command complete bit when it is ready to receive notifications from the platform.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1382118"></A>The flow of communications for a notification is illustrated in <A HREF="Platform_Comm_Channel.htm#47467" CLASS="XRef">See Communication flow for notifications on slave subspaces.</A>. As can be seen the communication flow is very similar to that of a master subspace, shown in <A HREF="Platform_Comm_Channel.htm#13091" CLASS="XRef">See Communication flow of the doorbell protocol.</A>, except that the roles of the platform and the OSPM are reversed. The steps are as follows:</P>
+<OL>
+<LI CLASS="StepNumList-1">
+<A NAME="pgfId-1382119"></A>Firstly, the platform checks that there no command pending completion on the subspace, indicating that the subspace is free for use. This is done by checking that the command complete bit is set in the status field of the subspace. If the bit is set the subspace is free for use, and the shared memory associated with the subspace is exclusively owned by the platform.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1382120"></A>The platform places a notification command into the shared memory in the subspace, updating the flags, length, command and payload fields (see <A HREF="Platform_Comm_Channel.htm#78184" CLASS="XRef">See Master Slave Communications Channel Shared Memory Region.</A>). The platform can request the OSPM rings the doorbell once it has completed processing the notification command by setting the Generate Signal bit in the flags (see <A HREF="Platform_Comm_Channel.htm#58047" CLASS="XRef">See Master Slave Communications Channel Flags.</A>).</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1382121"></A>The platform then clears the command complete bit. This transfers ownership of the shared memory to the OSPM.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1382122"></A>The platform raises the platform interrupt indicated by the GSIV of the slave subspace.</LI>
+</OL>
+<P CLASS="Body">
+<A NAME="pgfId-1382582"></A>When the OSPM receives the interrupt it executes the following steps:</P>
+<OL>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1382124"></A>Clears the platform interrupt. This is required if the interrupt is described as being a level triggered through the Platform Interrupt flags, and Platform Interrupt Ack register address, and associated masks are provided by the subspace PCCT entry (see <A HREF="Platform_Comm_Channel.htm#52200" CLASS="XRef">See PCC Subspace Structure type 3 and type 4, master and slave respectively.</A>). </LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1382125"></A>Optionally checks the command complete bit is clear.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1382126"></A>Processes the notification command.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1382127"></A>Sets the command complete bit using the command complete update register and masks.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1382128"></A>Rings the doorbell. This is required if the doorbell ring was requested by the platform in step 2 above. This also requires that the PCCT entry for the subspace has a non-zero doorbell register address.</LI>
+</OL>
+<P CLASS="Body">
+<A NAME="pgfId-1382129"></A>The platform can check whether a notification has been processed by the OSPM either by polling the command complete bit, or where supported through receiving a doorbell interrupt from the OSPM. When the platform detects that the notification has been processed by the OSPM, the platform takes the following steps:</P>
+<OL>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1382130"></A>If polling check command complete is set. If using a doorbell this step is optional.</LI>
+<LI CLASS="StepNumList-N">
+<A NAME="pgfId-1382131"></A>Processes the command response</LI>
+</OL>
+<P CLASS="Body">
+<A NAME="pgfId-1382132"></A>The platform must ensure that any writes in step 2, are observable by the OSPM application processors before writes in step 3. Similarly, the OSPM must ensure that any writes in step 7 are observable by the platform before step 8 completes. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1382044"></A>Individual protocols that use PCC define the meaning of notifications.</P>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1374784"></A><A NAME="21327"></A>Referencing the PCC address space</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1372962"></A>An individual PCC register may be referenced by the Generic Address Structure or in a Generic Register Descriptor by using the Address Space ID PCC (0xA). When using the PCC address space, the Access Size field is redefined to Subspace ID, and identifies which PCC subspace the descriptor refers to. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1372963"></A>As an example, the following resource template refers to the field occupying bits 8 through 15 at address 0x30 in PCC subspace 9:</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1372964"></A>ResourceTemplate() </P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1372965"></A>{</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1372966"></A>Register (</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1372967"></A>PCC,     //AddressSpaceKeyword</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1372968"></A>8,       //RegisterBitWidth</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1372969"></A>8,       //RegisterBitOffset</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1372970"></A>0x30,    //RegisterAddress</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1372971"></A>9        //AccessSize (subspace ID)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1372972"></A>)</P>
+<P CLASS="CodeExample">
+<A NAME="pgfId-1372973"></A>}</P>
+<P CLASS="Body">
+<A NAME="pgfId-1372975"></A>Note that the PCC address space may not be used in any resource template or register unless the register/resource field explicitly allows the use of the PCC address space.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1373185"></A>&nbsp;</P>
+</DIV>
+</DIV>
+</BODY>
+</HTML>

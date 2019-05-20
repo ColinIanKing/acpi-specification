@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2016/HTML Export Filter">
+<LINK REL="STYLESHEET" HREF="NUMA_Architecture_Platforms.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE> 17 Non-Uniform Memory Access (NUMA) Architecture Platforms</TITLE></HEAD>
+<BODY>
+<DIV>
+<H1 CLASS="Heading-1">
+<A NAME="pgfId-1348554"></A><A NAME="99045"></A>Non-Uniform Memory Access (NUMA) Architecture Platforms<DIV>
+<IMG SRC="NUMA_Architecture_Platforms-1.gif" ALT="">
+</DIV>
+</H1>
+<P CLASS="Body">
+<A NAME="pgfId-1350325"></A>Systems employing a Non Uniform Memory Access (NUMA) architecture contain collections of hardware resources including processors, memory, and I/O buses, that comprise what is commonly known as a &#8220;NUMA node&#8221;. Two or more NUMA nodes are linked to each other via a high-speed interconnect. Processor accesses to memory or I/O resources within the local NUMA node are generally faster than processor accesses to memory or I/O resources outside of the local NUMA node, accessed via the node interconnect. ACPI defines interfaces that allow the platform to convey NUMA node topology information to OSPM both statically at boot time and dynamically at run time as resources are added or removed from the system.</P>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1350329"></A><A NAME="_Toc202341932"></A><A NAME="_Toc258262551"></A>NUMA Node</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1350330"></A>A conceptual model for a node in a NUMA configuration may contain one or more of the following components:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350331"></A>Processor</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350332"></A>Memory</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350333"></A>I/O Resources</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350334"></A>Networking, Storage</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1350335"></A>Chipset</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1350336"></A>The components defined as part of the model are intended to represent all possible components of a NUMA node. A specific node in an implementation of a NUMA platform may not provide all of these components. At a minimum, each node must have a chipset with an interface to the interconnect between nodes. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1350337"></A>The defining characteristic of a NUMA system is a coherent global memory and / or I/O address space that can be accessed by all of the processors. Hence, at least one node must have memory, at least one node must have I/O resources and at least one node must have processors. Other than the chipset, which must have components present on every node, each is implementation dependent. In the ACPI namespace, NUMA nodes are described as module devices. See <A HREF="ACPIdefined_Devices_and_DeviceSpecificObjects.htm#_Toc489256154" CLASS="XRef">See Module Device.</A>,&#8221;Module Device&#8221;. </P>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1350341"></A><A NAME="_Toc202341933"></A><A NAME="_Toc258262552"></A>System Locality</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1350342"></A>A collection of components that are presented to OSPM as a Symmetrical Multi-Processing (SMP) unit belong to the same System Locality, also known as a Proximity Domain. The granularity of a System Locality is typically at the NUMA Node level although the granularity can also be at the sub-NUMA node level or the processor, memory and host bridge level. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1361604"></A>A System Locality is reported to the OSPM using Proximity Domain entries in the System Resource Affinity Table (SRAT), or using _PXM methods in the ACPI namespace. If OSPM only needs to know a near/far distinction among the System Localities, comparing Proximity Domain values is sufficient. See <A HREF="ACPI_Software_Programming_Model.htm#_Toc202340544" CLASS="XRef">See System Resource Affinity Table (SRAT).</A>, &#8220;System Resource Affinity Table (SRAT)&#8221;, and <A HREF="Device_Configuration.htm#81577" CLASS="XRef">See _PXM (Proximity).</A>, &#8220;_PXM (Proximity)&#8221; for more information.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350343"></A>OSPM makes no assumptions about the proximity or nearness of different proximity domains. The difference between two integers representing separate proximity domains does not imply distance between the proximity domains (in other words, proximity domain 1 is not assumed to be closer to proximity domain 0 than proximity domain 6).</P>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1350347"></A><A NAME="_Toc202341934"></A><A NAME="_Toc258262553"></A>System Resource Affinity Table Definition</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1350348"></A>This optional System Resource Affinity Table (SRAT) provides the boot time description of the processor and memory ranges belonging to a system locality. OSPM will consume the SRAT only at boot time. For any devices not in the SRAT, OSPM should use _PXM for them or their ancestors that are hot-added into the system after boot up.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350349"></A>The SRAT describes the system locality that all processors and memory present in a system belong to at system boot. This includes memory that can be hot-added (that is memory that can be added to the system while it is running, without requiring a reboot). OSPM can use this information to optimize the performance of NUMA architecture systems. For example, OSPM could utilize this information to optimize allocation of memory resources and the scheduling of software threads. </P>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1358000"></A>System Resource Affinity Update</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1358001"></A>Dynamic migration of the devices may cause the relative system resource affinity information (if the optional SRAT is present) to change. If this occurs, The System Resource Affinity Update notification (Notify event of type 0x0D) may be generated by the platform to a device at a point on the device tree that represents a System Resource Affinity. This indicates to OSPM to invoke the _PXM object of the notified device to update the resource affinity.</P>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1350353"></A><A NAME="_Toc202341935"></A><A NAME="_Toc258262554"></A>System Locality Distance Information</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1350354"></A>Optionally, OSPM may further optimize a NUMA architecture system using information about the relative memory latency distances among the System Localities. This may be useful if the distance between multiple system localities is significantly different. In this case, a simple near/far distinction may be insufficient. This information is contained in the optional System Locality Information Table (SLIT) and is returned from the evaluation of the _SLI object.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350355"></A>The SLIT is a matrix that describes the relative distances between all System Localities. To include devices that are not in the System Resource Affinity Table (SRAT), support for the _PXM object is required. The Proximity Domain values from SRAT, or the values returned by the _PXM objects are used as the row and column indices of the matrix. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1350356"></A>Implementation Note: The size of the SLIT is determined by the largest Proximity Domain value used in the system. Hence, to minimize the size of the SLIT, the Proximity Domain values assigned by the system firmware should be in the range 0, ..., N-1, where N is the number of System Localities. If Proximity Domain values are not packed into this range, the SLIT will still work, but more memory will have to be allocated to store the &#8220;Entries&#8221; portion of the SLIT for the matrix.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350357"></A>The static SLIT table provides the boot time description of the relative distances among all System Localities. For hot-added devices and dynamic reconfiguration of the system localities, the _SLI object must be used for runtime update.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1357880"></A>The _SLI method is an optional object that provides the runtime update of the relative distances from the System Locality i to all other System Localities in the system. Since _SLI method is providing additional relative distance information among System Localities, if implemented, it is provided alongside with the _PXM method.</P>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1357881"></A><A NAME="37518"></A>Online Hot Plug</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1357882"></A>In the case of online devide addition, the Bus Check notification (0x0) is performed on a device object to indicate to OSPM that it needs to perform the Plug and Play re-enumeration operation on the device tree starting from the point where it has been notified. OSPM needs to evaluate all _PXM objects associated with the added devices, or _SLI objects if the SLIT is present.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1350361"></A>In the case of online device removal, OSPM needs to perform the Plug and Play ejection operation when it receives the Eject Request notification (0x03). OSPM needs to remove the relative distance information from its internal dta structure for the removed devices.</P>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1350362"></A><A NAME="13557"></A>Impact to Existing Localities</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1346798"></A>Dynamic reconfiguration of the system may cause the relative distance information (if the optional SLIT is present) to become stale. If this occurs, the System Locality Information Update notification (Notify event of type 0xB) may be generated by the platform to a device at a point on the device tree that represents a System Locality. This indicates to OSPM that it needs to invoke the _SLI objects associated with the System Localities on the device tree starting from the point where it has been notified.</P>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1358963"></A><A NAME="80818"></A>Heterogeneous Memory Attributes Information</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1359013"></A>Optionally, OSPM may further optimize a NUMA architecture system using the Heterogeneous Memory Attributes. This may be useful if the memory latency and bandwidth attributes between system localities is significantly different. In this case, the information is contained in the optional Heterogeneous Memory Attributes (HMAT) and is returned from the evaluation of the _HMA object.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1359014"></A>The HMAT structure describes the latency and bandwidth information between memory access Initiator and memory Target System Localities. System Locality proximity domain identifiers, as defined by Proximity Domain entries in the System Resource Affinity Table (SRAT), or as returned by _PXM object, are used in the HMAT structure.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1359015"></A>Implementation Note: The size of the HMAT table is determined by number of memory initiator System Localities and the memory target System Localities. The static HMAT table provides the boot time description of the memory latency and bandwidth among all memory access Initiator and memory Target System Localities. For hot-added devices and dynamic reconfiguration of the system localities, the _HMA object must be used for runtime update.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1359016"></A>The _HMA method is an optional object that provides the runtime update of the latency and bandwidth from the memory access Initiator System Locality &#8220;i&quot; to all other memory Target System Localities &#8220;j&#8221; in the system. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1359017"></A>Since _HMA method is providing additional memory latency and bandwidth information among System Localities, if implemented, it is provided alongside with the _PXM method.</P>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1359032"></A><A NAME="56800"></A>Online Hot Plug</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1359058"></A>In the case of online device addition, the Bus Check notification (0x0) is performed on a device object to indicate to OSPM that it needs to perform the Plug and Play re-enumeration operation on the device tree starting from the point where it has been notified. OSPM needs to evaluate all _PXM objects associated with the added devices, or _HMA objects if the HMAT is present. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1359059"></A>In the case of online device removal, OSPM needs to perform the Plug and Play ejection operation when it receives the Eject Request notification (0x03). OSPM needs to remove the ejected System Localities related information from its internal data structure for the removed devices.</P>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1359034"></A>Impact to Existing Localities</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1359036"></A>Dynamic reconfiguration of the system may cause the memory latency and bandwidth information (if the optional HMAT is present) to become stale. If this occurs, the Heterogeneous Memory Attributes Update notification (Notify event of type 0xE) may be generated by the platform to a device at a point on the device tree that represents a System Locality. This indicates to OSPM that it needs to invoke the _HMA objects associated with the System Localities on the device tree starting from the point where it has been notified.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1358977"></A>&nbsp;</P>
+</DIV>
+</DIV>
+</DIV>
+</BODY>
+</HTML>

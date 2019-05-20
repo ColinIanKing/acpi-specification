@@ -1,0 +1,2694 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2016/HTML Export Filter">
+<LINK REL="STYLESHEET" HREF="Apx_A_Device_Class_Specifications.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE> Appendix A: Device Class Specifications</TITLE></HEAD>
+<BODY>
+<DIV>
+<H1 CLASS="zHeading-1-Appendix">
+<A NAME="pgfId-1347747"></A><A NAME="92338"></A>Device Class Specifications<DIV>
+<IMG SRC="Apx_A_Device_Class_Specifications-1.gif" ALT="">
+</DIV>
+</H1>
+<P CLASS="Body">
+<A NAME="pgfId-1347782"></A>This section defines the behavior of devices as that behavior relates to power management and, specifically, to the four device power states defined by ACPI. The goal is enabling device vendors to design power-manageable products that meet the basic needs of OSPM and can be utilized by any ACPI-compatible operating system.</P>
+<DIV>
+<H6 CLASS="zHeading-2-Appendix">
+<A NAME="pgfId-1347792"></A><A NAME="_Toc475523776"></A><A NAME="_Toc486665635"></A><A NAME="_Toc489272752"></A><A NAME="_Toc202342108"></A> <A NAME="_Toc489267560"></A><A NAME="_Toc489267778"></A>Overview<A NAME="marker-1347790"></A><A NAME="marker-1347791"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1347793"></A>The power management of individual devices is the responsibility of a policy owner in the operating system. This software element will implement a power management policy that is appropriate for the type (or class) of device being managed. Device power management policy typically operates in conjunction with a global system power policy implemented in the operating system. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1347794"></A>In general, the device-class power management policy strives to reduce power consumption while the system is working by transitioning among various available power states according to device usage. The challenge facing policy owners is to minimize power consumption without adversely impacting the system&#8217;s usability. This balanced approach provides the user with both power savings and good performance.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1347795"></A>Because the policy owner has very specific knowledge about when a device is in use or potentially in use, there is no need for hardware timers or such to determine when to make these transitions. Similarly, this level of understanding of device usage makes it possible to use fewer device power states. Generally, intermediate states attempt to draw a compromise between latency and consumption because of the uncertainty of actual device usage. With the increased knowledge in the OS, good decisions can be made about whether the device is needed at all. With this ability to turn devices off more frequently, the benefit of having intermediate states diminishes.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1347796"></A>The policy owner also determines what class-specific events can cause the system to transition from sleeping to working states, and enables this functionality based on application or user requests. Notice that the definition of the wake events that each class supports will influence the system&#8217;s global power policy in terms of the level of power management a system sleeping state can attain while still meeting wake latency requirements set by applications or the user.</P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-2-Appendix">
+<A NAME="pgfId-1347804"></A><A NAME="_Toc489267561"></A><A NAME="_Toc489267779"></A>Device Power States</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1347805"></A>The following definitions apply to devices of all classes: </P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347806"></A>D0. State in which device is on and running. It is receiving full power from the system and is delivering full functionality to the user. </LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347807"></A>D1. Class-specific low-power state (defined in the following section) in which device context may or may not be lost. Buses in D1 cannot do anything to the bus that would force devices on that bus to lose context. </LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347808"></A>D2. Class-specific low-power state (defined in the following section) in which device context may or may not be lost. Attains greater power savings than D1. Buses in D2 can cause devices on that bus to lose some context (for example, the bus reduces power supplied to the bus). Devices in D2 must be prepared for the bus to be in D2 or higher. </LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347809"></A>D3. State in which device is off and not running. Device context is lost. Power can be removed from the device.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1347810"></A>Device power-state transitions are typically invoked through bus-specific mechanisms (for example, ATA Standby, USB Suspend, and so on). In some cases, bus-specific mechanisms are not available and device-specific mechanisms must be used. Notice that the explicit command for entering the D3 state might be the removal of power.<A NAME="marker-1347811"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1347812"></A>It is the responsibility of the policy owner (or other software) to restore any lost device context when returning to the D0 state.</P>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1347825"></A> <A NAME="_Toc489267562"></A><A NAME="_Toc489267780"></A>Bus Power Management<A NAME="marker-1347820"></A><A NAME="marker-1347821"></A><A NAME="marker-1347822"></A><A NAME="marker-1347823"></A><A NAME="marker-1347824"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1347826"></A>Policy owners for bus devices (for example, PCI, USB, Small Computer System Interface [SCSI]) have the additional responsibility of tracking the power states of all devices on the bus and for transitioning the bus itself to only those power states that are consistent with those of its devices. This means that the bus state can be no lower than the highest state of one of its devices. However, enabled wake events can affect this as well. For example, if a particular device is in the D2 state and set to wake the system and the bus can only forward wake requests while in the D1 state, then the bus must remain in the D1 state even if all devices are in a lower state.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1347827"></A>Below are summaries of relevant bus power management specifications with references to the sources.</P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1347839"></A> <A NAME="_Toc489267563"></A><A NAME="_Toc489267781"></A>Display Power Management<A NAME="marker-1347835"></A><A NAME="marker-1347836"></A><A NAME="marker-1347837"></A><A NAME="marker-1347838"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1347840"></A>Refer to the Display Power Management Signaling Specification (DPMS), available from:</P>
+<P CLASS="ArgDefinitionBullet">
+<A NAME="pgfId-1347841"></A>Video Electronics Standards Association (VESA)<BR>
+2150 North First Street<BR>
+Suite 440<BR>
+San Jose, CA 95131-2029</P>
+<P CLASS="Body">
+<A NAME="pgfId-1347842"></A>A DPMS-compliant video controller and DPMS-compliant monitor use the horizontal and vertical sync signals to control the power mode of the monitor. There are 4 modes of operation: normal, standby, suspend and off. DPMS-compliant video controllers toggle the sync lines on or off to select the power mode.</P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1347854"></A><A NAME="_Toc475523780"></A><A NAME="_Toc486665639"></A><A NAME="_Toc489272756"></A><A NAME="_Toc202342112"></A><A NAME="_Toc258262742"></A><A NAME="_Toc489267564"></A><A NAME="_Toc489267782"></A>PCMCIA/PCCARD/CardBus Power Management<A NAME="marker-1347850"></A><A NAME="marker-1347851"></A><A NAME="marker-1347852"></A><A NAME="marker-1347853"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1347856"></A>PCMCIA and PCCARD devices do not have device power states defined. The only power states available are on and off, controlled by the host bus controller. The CardBus specification is a superset of the PCCARD specification, incorporating the power management specification for PCI bus. Power management capabilities query, state transition commands and wake event reporting are identical.</P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1347868"></A> <A NAME="_Toc489267565"></A><A NAME="_Toc489267783"></A>PCI Power Management <A NAME="marker-1347864"></A><A NAME="marker-1347865"></A><A NAME="marker-1347866"></A><A NAME="marker-1347867"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1347869"></A>Refer to the PCI Special Interest Group (PCISIG) Web site, at &#8220;Links to ACPI-Related Documents&#8221; (<EM CLASS="Hyperlink">
+http://uefi.org/acpi</EM>
+) under the heading &quot;PCI Sig&quot;.</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347870"></A>PCI Bus Power Management Capabilities Query. PCI Bus device capabilities are reported via the optional Capabilities List registers, which are accessed via the Cap_Ptr.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347871"></A>PCI Bus Power Management State Transition Commands. PCI Bus device power states are controlled and queried via the standard Power Management Status/Control Register (PMCSR).</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347872"></A>PCI Bus Wakeup Event Reporting. PCI wake events are reported on the optional PME# signal, with setting of the Wake_Int bit in the PMCSR. Wake event reporting is controlled by the Wake_En bit in the PMCSR register.</LI>
+</UL>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1347882"></A><A NAME="_Toc489267566"></A><A NAME="_Toc489267784"></A>USB Power Management<A NAME="marker-1347880"></A><A NAME="marker-1347881"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1347883"></A>Refer to the Universal Serial Bus Implementers Forum (USB-IF ) Web site, at &#8220;Links to ACPI-Related Documents&#8221; (<EM CLASS="Hyperlink">
+http://uefi.org/acpi</EM>
+) under the heading &quot;Universal Serial Bus Power Management&quot;.</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347884"></A>USB Power Management Capabilities Query. USB device capabilities are reported to the USB Host via the standard Power Descriptors. These address power consumption, latency time, wake support, and battery support and status notification.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347885"></A>USB Power Management State Transition Commands. USB device power states are controlled by the USB Host via the standard SET_FEATURE command. USB device power states are queried via the standard USB GET_STATUS command.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347886"></A>USB Wakeup Event Reporting. USB wake event reporting is controlled using the SET_FEATURE command, with value DEVICE_REMOTE_WAKEUP. USB wake events are reported by sending remote wake resume signaling.</LI>
+</UL>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1347894"></A> <A NAME="_Toc489267567"></A><A NAME="_Toc489267785"></A>Device Classes</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1347895"></A>Below is a list of the class-specific device power management definitions available in this specification. Notice that there exists a default device class definition that applies to all devices, even if there is a separate, class-specific section that adds additional requirements.</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347897"></A>Audio Device Class. Applies to audio devices.<A NAME="marker-1347896"></A></LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347901"></A>COM Port Device Class. Applies to COM ports devices.<A NAME="marker-1347900"></A></LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347904"></A>Display Device Class. Applies to CRT monitors, LCD panels, and video controllers for those devices.<A NAME="marker-1347905"></A></LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347908"></A>Input Device Class. Applies to standard types of input devices such as keyboards, keypads, mice, pointing devices, joysticks, and game pads, plus new types of input devices such as virtual reality devices.<A NAME="marker-1347909"></A></LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347912"></A>Modem Device Class. Applies to modem and modem-like (for example, ISDN terminal adapters) devices.<A NAME="marker-1347913"></A></LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347916"></A>Network Device Class. Applies specifically to Ethernet and token ring adapters. ATM and ISDN adapters are not supported by this specification.<A NAME="marker-1347917"></A></LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347921"></A>PC Card Controller Device Class. Applies to PC Card controllers and slots. <A NAME="marker-1347920"></A></LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347924"></A>Storage Device Class. Applies specifically to ATA hard disks, floppy disks, ATAPI and SCSI CD-ROMs, and the IDE channel.<A NAME="marker-1347925"></A></LI>
+</UL>
+</DIV>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-2-Appendix">
+<A NAME="pgfId-1347937"></A><A NAME="_Toc489267568"></A><A NAME="_Toc489267786"></A>Default Device Class<A NAME="marker-1347935"></A><A NAME="marker-1347936"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1347938"></A>The requirements expressed in this section apply to all devices, even if there is a separate, class-specific power management definition that identifies additional requirements.</P>
+</DIV>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1347946"></A>Default Power State Definitions</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1350502"></A>State</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1350504"></A>Definition</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350506"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350508"></A>Device is on and running. It is receiving full power from the system, and is delivering full functionality to the user.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350510"></A>D1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350512"></A>This state is not defined and not used by the default device class.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350514"></A>D2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350516"></A>This state is not defined and not used by the default device class.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350518"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1350520"></A>Device is off and not running. Device context is assumed lost, and there is no need for any of it to be preserved in hardware. This state should consume the minimum power possible. Its only requirement is to recognize a bus-specific command to re-enter D0. Power can be removed from the device while in D3. If power is removed, the device will receive a bus-specific hardware reset upon reapplication of power, and should initialize itself as in a normal power on.</P>
+</TD>
+</TR>
+</TABLE>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1350529"></A><A NAME="_Toc475523786"></A><A NAME="_Toc486665645"></A><A NAME="_Toc489272762"></A><A NAME="_Toc202342118"></A><A NAME="_Toc258262748"></A> <A NAME="_Toc489267570"></A><A NAME="_Toc489267788"></A>Default Power Management Policy</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1347982"></A>Present State</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1347984"></A>Next State</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1347986"></A>Cause</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347988"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347990"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347992"></A>Device determined by the OS to not be needed by any applications or the user. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1347993"></A>System enters a sleeping state.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347995"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347997"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1347999"></A>Device determined by the OS to be needed by some application or the user.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1402445"></A> <A NAME="_Toc489267571"></A><A NAME="_Toc489267789"></A>Default Wake Events<A NAME="marker-1348009"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348011"></A>There are no default wake events, because knowledge of the device is implicit in servicing such events. Devices can expose wake capabilities to OSPM, and device-specific software can enable these, but there is no generic application-level or OS-wide support for undefined wake events.</P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1348019"></A>Minimum Power Capabilities</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348020"></A>All devices must support the D0 and D3 states. Functionality available in D0 must be available after returning to D0 from D3 without requiring a system reboot or any user intervention. This requirement applies whether or not power is removed from the device during D3.</P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-2-Appendix">
+<A NAME="pgfId-1348031"></A><A NAME="_Toc489267573"></A><A NAME="_Toc489267791"></A>Audio Device Class<A NAME="marker-1348028"></A><A NAME="marker-1348029"></A><A NAME="marker-1348030"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348032"></A>The requirements expressed in this section apply to audio devices</P>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1348040"></A> <A NAME="_Toc489267574"></A><A NAME="_Toc489267792"></A>Power State Definitions</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348044"></A>State</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348046"></A>Status</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348048"></A>Definition</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348050"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348052"></A>Required</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348054"></A>Power is on. Device is operating.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348056"></A>D1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348058"></A>Optional</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348060"></A>Power consumption is less than D0 state. Device must be able to transition between D0 and D1 states within 100 ms. No audio samples may be lost by entering and leaving this state.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348062"></A>D2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348064"></A>Required</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348066"></A>Power consumption is less than D0 state. Device must be able to transition between D0 and D2 states within 100 ms. Audio samples may be lost by entering and leaving this state.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348068"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348070"></A>Required</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348072"></A>The device is completely off or drawing minimal power. For example, a stereo will be off, but a light-emitting diode (LED) may be on and the stereo may be listening to IR commands.</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1348075"></A>If a device is in the D1 or D2 state it must resume within 100 ms. A device in the D3 state may take as long as it needs to power up. It is the responsibility of the policy owner to advertise to the system how long a device requires to power up.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348076"></A>All audio devices must be capable of D0, D2 and D3 states. It is desirable that an audio device be capable of D1 state. The difference between D1 and D2 is that a device capable of D1 can maintain complete state information in reduced power mode. The policy owner or other software must save all states for D2-capable devices. Some audio samples may be lost in transitioning into and out of the D2 state.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348077"></A>Notice that the D1 state was added to allow digital signal processor (DSP)-equipped audio hardware to exploit low-power modes in the DSP. For example, a DSP may be used to implement Dolby AC-3 Decode. When paused it stops playing audio, but the DSP may contain thousands of bytes worth of state information. If the DSP supports a low-power state, it can shut down and later resume from exactly the audio sample where it paused without losing state information.</P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1348091"></A> <A NAME="_Toc489267575"></A><A NAME="_Toc489267793"></A> Power Management Policy</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348092"></A>For the purpose of the following state transition policy, the following device-specific operational states are defined:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348093"></A>Playing. Audio is playing.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348094"></A>Recording: </LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348095"></A>Foreground. Normal application is recording. Recording is considered foreground unless specifically designated low priority.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348096"></A>Background. Speech recognition or speech activity detection is running. Recording may be preempted by foreground recording or playing. Any audio recording may be designated as background.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348097"></A>Full Duplex. Device is simultaneously playing and recording.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348098"></A>Paused. File handle is open. Only devices that are playing, foreground recording or in full duplex operation may be paused. Background recording may not be paused. State is static and never lost. The paused state assumes that a device must transition to the resumed state rapidly. Playing or recording must be resumed within 100 ms. No audio samples may be lost between the device is paused and later resumed.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348099"></A>Closed. No file handle is open.</LI>
+</UL>
+</DIV>
+</DIV>
+<DIV>
+<H6 CLASS="spacing">
+<A NAME="pgfId-1348100"></A>&nbsp;</H6>
+</DIV>
+<DIV>
+<H6 CLASS="spacing">
+<A NAME="pgfId-1348144"></A>&nbsp;</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348103"></A>Present State</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348105"></A>Next State</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348107"></A>Cause</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348109"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348111"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348113"></A>Audio device moves from closed to open state or paused when the device receives the resume command.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348115"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348117"></A>D1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348119"></A>Audio device receives pause command. If device is D1 capable, this state is preferred. If not, the device driver will preserve context, and the device will be set to D2.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348121"></A>D2/D1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348123"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348125"></A>Audio device receives a resume command.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348127"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348129"></A>D2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348131"></A>Audio device is closed. Audio inactivity timer started.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348133"></A>D2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348135"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348137"></A>Audio inactivity timer expires.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348139"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348141"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348143"></A>Audio device is in background record mode and receives power-down command.</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1348146"></A>When an audio device is in the D0 state it will refuse system requests to transition to D3 state unless it is in background record mode. When an audio device is paused (D1 or D2) and it receives a request to transition to the D3 state, it will save the state of the audio device and transition to the D3 state.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348147"></A>Since multimedia applications often open and close audio files in rapid succession, it is recommended that an inactivity timer be employed by the policy owner to prevent needless shutdowns (D3 transitions) of the audio hardware. For example, frequent power cycling may damage audio devices powered by vacuum tubes.</P>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1348156"></A> <A NAME="_Toc489267576"></A><A NAME="_Toc489267794"></A>Wake Events<A NAME="marker-1348155"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348157"></A>An audio device may be a wake device. For example, a USB microphone designed for security applications might use the USB wake mechanism to signal an alarm condition.</P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1348165"></A><A NAME="_Toc489267577"></A><A NAME="_Toc489267795"></A>Minimum Power Capabilities</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348166"></A>All audio devices must be capable of D0, D2 and D3 power states. If the device is capable of maintaining context while in a low-power state it should advertise support for D1. Transitional latency for the D2 or D3 states must be less than 100 ms. There are no latency restrictions for D3 transitions, but the policy owner should advertise the amount of time required.</P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-2-Appendix">
+<A NAME="pgfId-1348178"></A><A NAME="_Toc475523794"></A><A NAME="_Toc486665653"></A><A NAME="_Toc489272770"></A><A NAME="_Toc202342126"></A><A NAME="_Toc258262756"></A><A NAME="_Toc489267578"></A><A NAME="_Toc489267796"></A>COM Port Device Class<A NAME="marker-1348174"></A><A NAME="marker-1348175"></A><A NAME="marker-1348176"></A><A NAME="marker-1348177"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348179"></A>The requirements expressed in this section apply to Universal Asynchronous Receiver/Transmitters (UARTs) such as the common NS16550 buffered serial port and equivalents. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1348180"></A>The two required states for any power-managed COM Port are full on (D0) and full off (D3). This in turn requires that the COM port hardware be power-manageable by ACPI control methods for COM ports that are on system boards, or by standard bus power management controls for COM ports that are on add-in cards (for example, PCI). Because of this, ISA-based COM port add-in cards will not be able to meet this requirement, and therefore cannot be compliant with this specification.</P>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1348188"></A> <A NAME="_Toc489267579"></A><A NAME="_Toc489267797"></A>Power State Definitions</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348192"></A>State</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348194"></A>Status</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348196"></A>Definition</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348198"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348200"></A>Required</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348202"></A>Line drivers are on. UART context is preserved.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348204"></A>D1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348206"></A>N/A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348208"></A>This state is not defined for COM Ports. Use the D3 state instead.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348210"></A>D2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348212"></A>N/A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348214"></A>This state is not defined for COM Ports. Use the D3 state instead.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348216"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348218"></A>Required</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348220"></A>Line drivers are off (unpowered; outputs isolated from devices attached to the port). UART context is lost. Latency to return to D0 is less than 1 second.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1348230"></A><A NAME="_Toc475523796"></A><A NAME="_Toc486665655"></A><A NAME="_Toc489272772"></A><A NAME="_Toc202342128"></A><A NAME="_Toc258262758"></A> <A NAME="_Toc489267580"></A><A NAME="_Toc489267798"></A>Power Management Policy</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348234"></A>Present State</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348236"></A>Next State</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348238"></A>Cause</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348240"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348242"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348244"></A>Power-on reset</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348245"></A>COM port opened by an application</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348247"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348249"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348251"></A>COM port closed </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348252"></A>System enters sleeping state while wake is disabled on this device.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348253"></A>System enters sleeping state while wake is enabled on this device and the device is capable of generating wake to the system from state D3.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1348264"></A><A NAME="_Toc475523797"></A><A NAME="_Toc486665656"></A><A NAME="_Toc489272773"></A><A NAME="_Toc202342129"></A><A NAME="_Toc258262759"></A><A NAME="_Toc489267581"></A><A NAME="_Toc489267799"></A>Wake Events<A NAME="marker-1348263"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348265"></A>If the COM port is capable of generating wake events, asserting the &#8220;ring indicator&#8221; line (V.24 circuit 125) will cause the COM port to assert a wake event. There are two common mechanisms that may be employed (either one or both) for performing machine wake using COM ports.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348266"></A>The first provides a solution that is capable of waking the PC whether the UART is powered (D0) or not (D3). Here, the &#8220;ring indicator&#8221; line (from V.24 circuit 125) is commonly connected directly to the system wake device in addition to being connected to the UART. While this implementation is normative for COM ports located on system motherboards (see the ACPI specification), it could also be done by add-in cards with COM ports that reside on buses supporting system wake from devices in D3 (for example, PME# signal on PCI).</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348267"></A>The second mechanism requires that the UART be powered (D0) to use the UART&#8217;s interrupt output pin to generate the wake event instead. When using this method, the OS COM port policy owner or power management control methods are expected to configure the UART. Although any UART interrupt source (for example, &#8216;data ready&#8217;) could theoretically be used to wake the system, these methods are beyond the scope of this document.</P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1348275"></A><A NAME="_Toc475523798"></A><A NAME="_Toc486665657"></A><A NAME="_Toc489272774"></A><A NAME="_Toc202342130"></A><A NAME="_Toc258262760"></A> <A NAME="_Toc489267582"></A><A NAME="_Toc489267800"></A>Minimum Power Capabilities</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348276"></A>A COM port conforming to this specification must support the D0 and D3 states.</P>
+</DIV>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-2-Appendix">
+<A NAME="pgfId-1348290"></A> <A NAME="_Toc489267583"></A><A NAME="_Toc489267801"></A>Display Device Class <A NAME="marker-1348284"></A><A NAME="marker-1348285"></A><A NAME="marker-1348286"></A><A NAME="marker-1348287"></A><A NAME="marker-1348288"></A><A NAME="marker-1348289"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348291"></A>The requirements expressed in this section apply to all devices engaged in the display of program content, which includes full screen display devices, display controllers, and graphics adapters. This class does not include video capture devices unless they are children of the graphics adapter. This class does not include edge displays or hardware indicators for device states. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1348292"></A>While saving power from the display and adapter are primary goals of Display Device Class power management definitions, the definitions are also intended to ensure that the user perceives the system as &quot;off&quot; during system sleeping states, as required above. When the system enters a lower power state, the screen must go black so the user knows the system is idle. This is important because devices that cannot actually save power (standard televisions, for example) can still support the user notice of system idle by going black.</P>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1348300"></A> <A NAME="_Toc489267584"></A><A NAME="_Toc489267802"></A>Power State Definitions</H6>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-4-Appendix">
+<A NAME="pgfId-1348302"></A> <A NAME="_Toc489267585"></A>CRT Monitors (not including other full screen displays)</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348306"></A>State</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348308"></A>Status</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348310"></A>Definition</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348312"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348314"></A>Required</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348316"></A>This state is equivalent to the &#8220;On&#8221; state defined in the VESA DPMS specification (see Related Documents) and is signaled to the display using the DPMS method. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348317"></A>Display is fully on </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348318"></A>Video image is active</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348320"></A>D1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348322"></A>Optional</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348324"></A>This state is equivalent to the &#8220;Standby&#8221; state defined in the VESA DPMS and is signaled to the display using the DPMS method. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348325"></A>Display is functional but may be conserving energy </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348326"></A>Video image is blank</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348327"></A>Latency to return to D0 must be less than 5 seconds</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348329"></A>D2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348331"></A>Required</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348333"></A>This state is equivalent to the &#8220;Suspend&#8221; state defined in the VESA DPMS specification and is signaled to the display using the DPMS method. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348334"></A>Display is functional and conserving energy </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348335"></A>Video image is blank</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348336"></A>Latency to return to D0 is less than 10 seconds</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348338"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348340"></A>Required</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348342"></A>This state is equivalent to the &#8220;Off&#8221; state defined in the VESA DPMS specification and is signaled to the display using the DPMS method. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348343"></A>Display is non-functional </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348344"></A>Video image is blank</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1407208"></A>CRT Monitors are a special case in power management. On the one hand, they support a common defined method (DPMS) for changing power states. On the other hand, that procedure and the CRT support is extremely slow and out of keeping with other faster power control methods used by other forms of display.  This definition should not preclude the use of faster and more effective methods of transitioning the CRT if they are available and known to the controller. DPMS is not recommended as solution for new display devices in the future.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1407209"></A>&nbsp;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1407217"></A>&nbsp;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1407218"></A>&nbsp;</P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-4-Appendix">
+<A NAME="pgfId-1407219"></A>Internal Flat Panel Devices</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348352"></A>State</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348354"></A>Status</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348356"></A>Definition</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348358"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348360"></A>Required</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348362"></A>This state is equivalent to the &#8220;On&#8221; state for a DPMS device, but is signaled to the panel by the correct application of power and/or controller specific signaling.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348363"></A>Display is fully on </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348364"></A>Backlight (if present) is fully on(subject to performance state requirements - see below)</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348365"></A>Video image is active</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348367"></A>D1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348369"></A>Optional</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348371"></A>This state is not required to be physically different than a D3 state if the device is able to meet the resume requirement and the driver is able to restore state.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348372"></A>Display retains internal state but may be conserving energy </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348373"></A>Backlight(if present) is fully off</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348374"></A>Video image is blank</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348375"></A>Latency to return to D0 must be less than 500 milliseconds</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348377"></A>D2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348379"></A>Optional</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348381"></A>This state is not required to be physically different than a D3 state if the device is able to meet the resume requirement and the driver is able to restore state.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348382"></A>Display retains state but is conserving energy </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348383"></A>Backlight (if present) is fully off;</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348384"></A>Video image is blank</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348385"></A>Latency to return to D0 is less than 500 milliseconds</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348387"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348389"></A>Required</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348391"></A>This state is equivalent to the &#8220;Off&#8221; state defined in the VESA DPMS specification. It is signaled by the removal of power or possibly by controller-specific signaling.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348392"></A>Display is non-functional </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348393"></A>Backlight (if present) is fully off.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348394"></A>Video image is blank</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348395"></A>Latency to return to D0 is less than 500 milliseconds</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1348404"></A>Internal flat panels (also known as local flat panels or sometimes as LCDs) do not normally support or require DPMS signaling to change power states. Instead, controllers capable of managing such panels tend to provide vendor-specific methods to control internal flat panels, often involving special sequencing of power signals to the panel. Some may be managed only by the application or removal of power. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1348405"></A>Backlight control for power management states is likewise controller and even platform specific. Note that on-off backlight control for power management states is often unrelated to backlight intensity or brightness control that is used while in the D0 state.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348406"></A>The 500 milliseconds is only to allow some existing hardware to function . The target for new devices should be 100 milliseconds.</P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-4-Appendix">
+<A NAME="pgfId-1348407"></A>DVI Displays (Digital Flat Panels and DVI Monitors</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1402483"></A>State</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1402485"></A>Status</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1402487"></A>Definition</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348417"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348419"></A>Required</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348421"></A>This state is equivalent to the &#8220;On&#8221; state for a DPMS device, but is signaled to the display by the correct application of power and/or controller specific signaling. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348422"></A>Display is fully on </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348423"></A>Video image is active</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348425"></A>D1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348427"></A>Optional</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348429"></A>This state is not required to be physically different than a D3 state if the device is able to meet the resume requirement and the driver is able to restore state. It is signaled by the removal of display output and time expiring. The physical state entered is no different than D2.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348430"></A>Display retains internal state but may be conserving energy </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348431"></A>Video image is blank</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348432"></A>Latency to return to D0 must be less than 250 milliseconds</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348434"></A>D2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348436"></A>Optional</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348438"></A>This state is not required to be physically different than a D3 state if the device is able to meet the resume requirement and the driver is able to restore state. It is signaled by the removal of display output and time expiring The physical state entered is no different than D1.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348439"></A>Display retains state but is conserving energy </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348440"></A>Video image is blank</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348441"></A>Latency to return to D0 is less than 250 milliseconds</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348443"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348445"></A>Required</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348447"></A>This state is equivalent to the &#8220;Off&#8221; state defined in the VESA DPMS specification. It is signaled by the removal of display output and time expiring</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348448"></A>Display is non-functional </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348449"></A>Video image is blank</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348450"></A>Latency to return to D0 is less than 250 milliseconds</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1348453"></A>Although 250 milliseconds is shown here because not all devices in this group are fast now, the target resume for a new device should be 100 milliseconds. </P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-4-Appendix">
+<A NAME="pgfId-1348454"></A>Standard TV Devices (and Analog HDTVs)</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348458"></A>State</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348460"></A>Status</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348462"></A>Definition</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348464"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348466"></A>Required</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348468"></A>This state is equivalent to the &#8220;On&#8221; state for a DPMS device. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348469"></A>Display is fully on </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348470"></A>Video image is active</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348472"></A>D1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348474"></A>Optional</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348476"></A>Video image is blank</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348477"></A>Latency to return to D0 must be less than 100 milliseconds</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348479"></A>D2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348481"></A>Optional</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348483"></A>Video image is blank</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348484"></A>Latency to return to D0 must be less than 100 milliseconds</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348486"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348488"></A>Required</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348490"></A>This state is not equivalent to the &#8220;Off&#8221; state defined in the VESA DPMS specification because not power is actually saved.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348491"></A>Video image is blank</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348492"></A>Latency to return to D0 is less than 100 milliseconds</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-4-Appendix">
+<A NAME="pgfId-1348501"></A>Other (new) Full Screen Devices</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348502"></A>Some devices not specifically defined here already exist, such as projectors that emulate CRTs or HDTVs. Others may be coming. It is important for any device used for full screen display to support power transitions and power management states, but the primary requirement for the method should be low overhead.</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="Body">
+<A NAME="pgfId-1412697"></A>State</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="Body">
+<A NAME="pgfId-1412699"></A>Status</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="Body">
+<A NAME="pgfId-1412701"></A>Definition</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348512"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348514"></A>Required</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348516"></A>This state is equivalent to the &#8220;On&#8221; state for a DPMS device, but is signaled to the panel by the correct application of power and/or device specific signaling known to the controller.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348517"></A>Display is fully on </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348518"></A>Video image is active</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348520"></A>D1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348522"></A>Optional</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348524"></A>This state is not required to be physically different than a D3 state if the device is able to meet the resume requirement and the driver is able to restore state. It is signaled to the panel by the correct application of power and/or device specific signaling known to the controller.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348525"></A>Display retains internal state but may be conserving energy </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348526"></A>Video image is blank</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348527"></A>Latency to return to D0 must be less than 100 milliseconds</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348529"></A>D2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348531"></A>Optional</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348533"></A>This state is not required to be physically different than a D3 state if the device is able to meet the resume requirement and the driver is able to restore state. It is signaled to the panel by the correct application of power and/or device specific signaling known to the controller.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348534"></A>Display retains state but is conserving energy </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348535"></A>Video image is blank</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348536"></A>Latency to return to D0 is less than 100 milliseconds</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348538"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348540"></A>Required</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348542"></A>This state is equivalent to the &#8220;Off&#8221; state defined in the VESA DPMS specification. It is signaled by the removal of display output and/or device specific methods known to the controller.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348543"></A>Display is non-functional </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348544"></A>Video image is blank</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348545"></A>Latency to return to D0 is less than 250 milliseconds</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1348548"></A>Although 250 milliseconds is shown here because not all devices in this group are fast now, the target resume for a new device should be 100 milliseconds. </P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-4-Appendix">
+<A NAME="pgfId-1348550"></A>V<A NAME="_Toc489267586"></A>ideo Controllers (Graphics Adapters)</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1402495"></A>State</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1402497"></A>Status</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1402499"></A>Definition</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348560"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348562"></A>Required</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348564"></A>Back-end is on </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348565"></A>Video controller context is preserved </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348566"></A>Video memory contents are preserved</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348568"></A>D1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348570"></A>Optional</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348572"></A>Back-end is off, except for CRT control signaling (DPMS) </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348573"></A>Video controller context is preserved </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348574"></A>Video memory contents is preserved</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348575"></A>Latency to return to D0 is less than 100 milliseconds</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348577"></A>D2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348579"></A>Optional</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348581"></A>Back-end is off, except for CRT control signaling (DPMS) </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348582"></A>Video controller context is lost </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348583"></A>Video memory contents is lost</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348584"></A>Latency to return to D0 is less than 200 milliseconds</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348586"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348588"></A>Required</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348590"></A>Back-end is off </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348591"></A>Video controller context is lost (power removed) </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348592"></A>Video memory contents is lost (power removed)</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348593"></A>Latency to return to D0 is less than 200 milliseconds</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-4-Appendix">
+<A NAME="pgfId-1348599"></A> Display Codecs </H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348600"></A>Like the displays they control, display codecs are children of the adapter and cannot be in a higher state than the adapter or a lower state than the displays they control . It is generally not helpful to deal with codecs entirely separately from the adapter or the displays they control. While it may vary from device to device, a codec will either be safely powered down when its display is powered down or it may require power as long as the adapter receives power. </P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1348605"></A>Power Management Policy for the Display Class</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348609"></A>Present State</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348611"></A>Next State</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348613"></A>Cause</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348615"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348617"></A>D1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348619"></A>User inactivity for a period of time (T1)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348621"></A>D1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348623"></A>D2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348625"></A>User inactivity for a period of time (T2 &gt; T1)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348627"></A>D2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348629"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348631"></A>User inactivity for a period of time (T3 &gt; T2)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348633"></A>D1/D2/D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348635"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348637"></A>User activity or application UI change (for example, dialog pop-up)</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1348640"></A>These state transition definitions apply to both the full screen display and the video controller. However, the control of the two devices is independent, except that a video controller will never be put into a lower power state than its full screen display. Also, while full screen displays can transition directly from D1 to D3 or from D2 to D3, the adapters require a transition to D0 from D1 or D2 before entering D3. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1348641"></A>Transitions for the video controller are commanded via the bus-specific control mechanism for device states. Monitor/LCD transitions are commanded by signaling from the video controller and are only generated as a result of explicit commands from the policy-owner. Full screen display power control is functionally independent from any other interface the monitor may provide (such as USB). For instance, Hubs and HID devices in the monitor enclosure may be power-managed by their driver over the USB bus, but the Monitor/LCD device itself may not; it must be power-managed from the video controller using the methods above.</P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1348658"></A><A NAME="marker-1348655"></A> Wake Events</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348659"></A>Display devices incorporating a system power switch should generate a wake event when the switch is pressed while the system is sleeping.</P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1348667"></A> <A NAME="_Toc489267589"></A><A NAME="_Toc489267805"></A>Minimum Power Capabilities</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348668"></A>A CRT monitor conforming to this specification must support the D0, D2, and D3 states. Other full screen displays only need to support D0 and D3. Support for the D1 state is optional in all cases. Transitional latencies for the D1 or D2 state must meet the requirements above.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348669"></A>A video controller conforming to this specification must support the D0 and D3 states. Support for the D1 and D2 states is optional. Transitional latencies for the D1 must be less than 100 milliseconds while D2 and D3 must transition to D0 in less than 200 milliseconds.</P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1348672"></A>Performance States for Display Class Devices</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348673"></A>Performance states for display devices and adapters have one clear difference from defined power management states. There is no display in any power management state higher than D0. However, performance states are all applied within D0, which means they save power while continuing to display. Not all display class devices will support performance states, but in all cases, they must allow continued display where they exist. </P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-4-Appendix">
+<A NAME="pgfId-1348674"></A>Common Requirements for Display Class Performance States</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348675"></A>The definition of each state (up the line toward the OSPM) must include maximum latency information on transitions into the state and transitions out of the state. (For states other than DPS1, it may be necessary to indicate whether the latency is the time from DPS0 to DPSx or only from DPSx-1 to DPSx.) </P>
+<P CLASS="Body">
+<A NAME="pgfId-1348676"></A>Each state has to have a relative weight indicator or a relative power savings indicator (i.e., it can make a difference in OSPM policies whether DPS1 saves 2% power and DPS2 save 75% power even if latency is longer.)</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348677"></A>While ASL NameSpace structures may provide some of this information, it is recommended that display class performance states be entered and exited by driver and not by control method wherever possible.</P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-4-Appendix">
+<A NAME="pgfId-1348678"></A>  Performance states for Full Screen Displays</H6>
+<DIV>
+<H6 CLASS="zHeading-5-Appendix">
+<A NAME="pgfId-1348679"></A>CRT Performance States</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348680"></A>Some CRTs (in theory) have the capability for &quot;reduced on&quot; -- a mode which displays but uses less power than full performance. Even without this capability, a CRT may be able to use reduced refresh or other methods to reduce the total power of displaying. </P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-5-Appendix">
+<A NAME="pgfId-1348681"></A>Internal Flat Panel</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348682"></A>In general, panels consume a fixed amount of power. However, some panels are also capable of supporting reduced refresh. More important, the amount of backlight brightness is a major factor in system power. This clearly needs to be coordinated with direct ASL control methods for brightness and with ambient light sensing when present. However, a performance state may be achieved by offsetting the brightness value computed by other methods, either by a fixed amount or a fixed percentage. </P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-5-Appendix">
+<A NAME="pgfId-1348683"></A> DVI Full Screen Devices</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348684"></A>DVI Devices are normally capable of frequency control and may be able to benefit by frequency control. However, because of sensitivity to signal loss, DVI devices may have limitations on other types of performance control. </P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-5-Appendix">
+<A NAME="pgfId-1348685"></A>Standard TV and Analog HDTVs</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348686"></A>Standard TV and Analog HDTVs do not appear capable of performance states. Codecs controlling them may be capable of power saving, however.</P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-5-Appendix">
+<A NAME="pgfId-1348687"></A>  New Devices</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348688"></A>The ability to reduce power while continuing to display will be increasingly important.</P>
+<P CLASS="ACPIHeading-4">
+<A NAME="pgfId-1348689"></A>A.6.5.3   Performance States for Video Controllers/Display Adapters</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348690"></A>Adapters are somewhat limited during performance states because they have to continue to support display on one or more full screen devices. However, they can still do a number of things to support performance states, including</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348691"></A>Changes to basic display and render capabilities, including speed or frequency range supported. </LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348692"></A>Feature/Capability/Quality Control - limiting specific hardware features, limiting refresh rates, limiting resolutions. </LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1348693"></A>The limiting factor on what can be supported may sometimes be in the OSPM. If the OSPM support dynamic changes in these features during a performance state change (even if no other time), more opportunities arise. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1348694"></A>Once again, the latency on transitions and the power saved by specific states have to be made available to the OSPM in order to use these options effectively. </P>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-2-Appendix">
+<A NAME="pgfId-1350897"></A> <A NAME="_Toc489267590"></A><A NAME="_Toc489267806"></A>Input Device Class</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348712"></A><A NAME="marker-1348705"></A><A NAME="marker-1348706"></A><A NAME="marker-1348707"></A><A NAME="marker-1348708"></A><A NAME="marker-1348709"></A><A NAME="marker-1348710"></A><A NAME="marker-1348711"></A>The requirements expressed in this section apply to standard types of input devices such as keyboards, keypads, mice, pointing devices, joysticks, game pads, to devices that combine these kinds of input functionality (composite devices, and so on), and to new types of input devices such as virtual reality devices, simulation devices, and so on.</P>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1348720"></A><A NAME="_Toc489267591"></A><A NAME="_Toc489267807"></A>Power State Definitions</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1402507"></A>State</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1402509"></A>Status</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1402511"></A>Definition</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348730"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348732"></A>Required</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348734"></A>Device is receiving full power from its power source, delivering full functionality to the user, and preserving applicable context and state information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348736"></A>D1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348738"></A>Optional</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348740"></A>Input device power consumption is greatly reduced. In general, device is in a power management state and is not delivering any functionality to the user except wake functionality if applicable. Device status, state, or other information indicators (for example, LEDs, LCD displays, and so on) are turned off to save power. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348741"></A>The following device context and state information should be preserved by the policy owner or other software: </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348742"></A>Keyboard. Num, caps, scroll lock states (and Compose and Kana states if applicable) and associated LED/indicator states, repeat delay, and repeat rate. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348743"></A>Joystick. Forced feedback effects (if applicable). </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348744"></A>Any input device. All context and state information that cannot be preserved by the device when it&#8217;s conserving power.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348746"></A>D2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348748"></A>N/A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348750"></A>This state is not defined for input devices, use D1 as the power management state instead.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348752"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348754"></A>Required</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348756"></A>Input device is off and not running. In general, the device is not delivering any functionality to the user except wake functionality if applicable. Device context and state information is lost.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1353680"></A><A NAME="_Toc475523806"></A><A NAME="_Toc486665665"></A><A NAME="_Toc489272782"></A><A NAME="_Toc202342139"></A><A NAME="_Toc258262769"></A>Power Management Policy</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1353683"></A>Present State</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1353685"></A>Next State</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1353687"></A>Cause</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1353689"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1353691"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1353693"></A>Requested by the system</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1353695"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1353697"></A>D1/D3*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1353699"></A>Requested by the system (for example, system goes to sleep with wake enabled)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1353701"></A>D0/D1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1353703"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1353705"></A>Requested by the system (for example, system goes to sleep with wake disabled) </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1353706"></A>Power is removed</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1353708"></A>D1/D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1353710"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1353712"></A>Device with enabled wake capability requests transition by generating a wake event </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1353713"></A>Requested by the system</P>
+</TD>
+</TR>
+</TABLE>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1353715"></A>*Depends on capability of device (if it features D1 or D3 wake capability or not); device will be put in state with the lowest possible power consumption.</LI>
+</UL>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1348812"></A><A NAME="_Toc489267593"></A><A NAME="_Toc489267809"></A>Wake Events<A NAME="marker-1348811"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348813"></A>It is recommended, but not required, that input devices implement and support bus-specific wake mechanisms if these are defined for their bus type. This is recommended because a user typically uses an input device of some kind to wake the system when it is in a power management state (for example, when the system is sleeping).</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348814"></A>The actual input data (particular button or key pressed) that&#8217;s associated with a wake event should never be discarded by the device itself, but should always be passed along to the policy owner or other software for further interpretation. This software implements a policy for how this input data should be interpreted, and decides what should be passed along to higher-level software, and so on.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348815"></A>It is recommended that the device button(s) or key(s) used for power management purposes are clearly labeled with text and/or icons. This is recommended for keyboards and other input devices on which all buttons or keys are typically labeled with text and/or icons that identify their usage.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348816"></A>For example, a keyboard could include a special-purpose power management button (for example, &#8220;Power&#8221;) that, when pressed during a system sleeping state, generates a wake event. Alternatively, the button(s) on mice and other pointing devices could be used to trigger a wake event. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1348817"></A>Examples of more advanced wake events include keyboard wake signaling when any key is pressed, mouse wake signaling on detection of X/Y motion, joystick wake signaling on X/Y motion, and so on. However, in order to avoid accidental or unintentional wake of the system, and to give the user some control over which input events will result in a system wake, it&#8217;s suggested that more advanced types of wake events are implemented as features that can be turned on or off by the user (for example, as part of the OSPM user interface).</P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1348825"></A><A NAME="_Toc489267594"></A><A NAME="_Toc489267810"></A>Minimum Power Capabilities</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348826"></A>An input device conforming to this specification must support the D0 and D3 states. Support for the D1 state is optional.</P>
+</DIV>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-2-Appendix">
+<A NAME="pgfId-1348840"></A><A NAME="_Toc489267595"></A><A NAME="_Toc489267811"></A>Modem Device Class<A NAME="marker-1348834"></A><A NAME="marker-1348835"></A><A NAME="marker-1348836"></A><A NAME="marker-1348837"></A><A NAME="marker-1348838"></A><A NAME="marker-1348839"></A></H6>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348841"></A>The requirements expressed in this section apply to modems and similar devices, such as USB controlled ISDN Terminal Adapters (&#8220;digital modems&#8221;) and computer-connected telephone devices (&quot;CT phones&quot;). This specification will refer to these devices as &#8220;modems; the same considerations apply to digital modems and CT phones unless explicitly stated otherwise.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348842"></A>The scope of this section is further restricted to modems that support power management using methods defined by the relevant PC-modem connection bus. These include PCI, USB, PCCARD (PCMCIA), CardBus, and modems on the system motherboard described by ACPI system firmware control methods. The scope does not include bus-specific means for devices to alert the host PC (for example, how to deliver a &#8221;ringing&#8221;&#8217; message), nor does it address how those alerting operations are controlled.</LI>
+</UL>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1348850"></A><A NAME="_Toc489267596"></A><A NAME="_Toc489267812"></A>Technology Overview</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348851"></A>Modems are traditionally serial devices, but today modems may be attached to a PC by many different means. Further, many new modems expose a software serial interface, where the modem controller function is implemented in software. This specification addresses three different connection types:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348852"></A>Traditional connections without power-managed connections (for example, COM, LPT, ISA) </LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348853"></A>Power managed connections (for example, PCCARD, CardBus, PCI, USB)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348854"></A>Motherboard modems</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1348855"></A>For some of the above modem connection types mentioned, there are three different modem architectures possible:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348856"></A>Traditional modem (DAA, DSP, and controller in hardware)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348857"></A>Controller-less design (DAA and DSP in hardware)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1348858"></A>&quot;Soft modem&quot; design (DAA and CODEC only in hardware)</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1348859"></A>The hardware components of the modem shall be controlled by the relevant bus commands, where applicable (USB, PCI, CardBus). The software components are dependent on the power state of the CPU.</P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-4-Appendix">
+<A NAME="pgfId-1348861"></A><A NAME="_Toc489267597"></A>Traditional Connections</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348862"></A>In older methods (COM, LPT, ISA) the modem is controlled primarily by serialized ASCII command strings (for example, V.25ter) and traditional V.24 (RS-232) out-of-band leads. In these legacy devices, there are no common means for power management other than the power switch for the device, or the entire system unit. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1348863"></A>An external modem connected to a COM port or LPT port typically has its own power supply. An LPT port modem might run from the current on the LPT port +5V supply. For COM or LPT port modems, power is typically controlled by a user switch.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348864"></A>The most common modem type is an ISA card with an embedded COM port. From a software standpoint, they are logically identical to external modems, but the modems are powered by the PC system unit. Power is drawn from the ISA bus without independent power switching.</P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-4-Appendix">
+<A NAME="pgfId-1348866"></A><A NAME="_Toc489267598"></A>Power-Managed Connections</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348867"></A>PCMCIA, PCCARD and CardBus slots are powered and power-managed by the system, using means defined in the relevant bus specifications. For PCMCIA and PCCARD devices, only D0 and D3 states are available, via Socket Services in the OS and/or ACPI system firmware. CardBus adds intermediate states, using the same mechanisms defined for PCI Bus.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348868"></A>PCI bus slots are powered and power-managed by the system, using means defined in the PCI specification.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348869"></A>USB devices may be powered by the USB itself (100mA or 500mA), or have their own external power supply. All USB devices are power-managed by the USB bus master, using means defined in the USB specification.</P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-4-Appendix">
+<A NAME="pgfId-1348872"></A><A NAME="_Toc489267599"></A>Motherboard Modems<A NAME="marker-1348871"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348873"></A>A modem embedded in the motherboard is powered by controls on the motherboard. It should be power-managed by using control methods exposed via ACPI system firmware tables.</P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1348881"></A><A NAME="_Toc489267600"></A><A NAME="_Toc489267813"></A>Power State Definitions</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348885"></A>State</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348887"></A>Status</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348889"></A>Definition</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348891"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348893"></A>Required</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348895"></A>Phone interface is on (may be on or off hook) </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348896"></A>Speaker is on </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348897"></A>Controller Context is preserved</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348899"></A>D1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348901"></A>N/A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348903"></A>Not defined (do not use)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348905"></A>D2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348907"></A>Optional</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348909"></A>Phone interface is not powered by the host (on hook) </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348910"></A>Speaker is off </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348911"></A>Controller context is preserved </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348912"></A>2 seconds maximum restore time</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348914"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348916"></A>Required</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348918"></A>Phone interface is not powered by host (on hook) </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348919"></A>Speaker is off </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348920"></A>Controller context may be lost </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1348921"></A>5 seconds maximum restore time</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1348931"></A> <A NAME="_Toc489267601"></A><A NAME="_Toc489267814"></A>Power Management Policy</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348935"></A>Present State</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348937"></A>Next State</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1348939"></A>Cause</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348941"></A>D2/D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348943"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348945"></A>System issues a bus command to enter the D0 state (for example, an application is answering or originating a call).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348947"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348949"></A>D2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348951"></A>System issues a bus command to enter the D2 state. (for example, an application is listening for an incoming call).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348953"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348955"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1348957"></A>System issues a bus command to enter the D3 state (for example, all applications have closed the Modem device).</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1348968"></A><A NAME="_Toc475523813"></A><A NAME="_Toc486665672"></A><A NAME="_Toc489272789"></A><A NAME="_Toc202342146"></A><A NAME="_Toc258262776"></A> <A NAME="_Toc489267602"></A><A NAME="_Toc489267815"></A>Wake Events<A NAME="marker-1348967"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348969"></A>For any type of modem device, wake events (if supported and enabled) are only generated in response to detected &#8220;ringing&#8221; from an incoming call. All other events associated with modems (V.8bis messages, and so on) require that the PC be in the &#8220;working&#8221; state to capture them. The methods and signals used to generate the wake may vary as a function of the modem connection (bus) type and modem architecture.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348970"></A>Machine wake is allowed from any modem power state (D0, D2, and D3), and is accomplished by methods described in the appropriate bus power management specification (PCI, USB, PCCARD), or by ACPI system board control methods (for Modem on Motherboard implementations).</P>
+<P CLASS="Body">
+<A NAME="pgfId-1348971"></A>If the specific modem implementation or connection type does not enable it to assert system wake signaling, these modems will not be able to wake the machine. The OS modem policy owner will have to retain the PC in the &#8220;working&#8221; state to perform all types of event detection (including ringing).</P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1348979"></A><A NAME="_Toc489267603"></A><A NAME="_Toc489267816"></A>Minimum Power Capabilities</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348980"></A>A modem or similar device conforming to this specification must support the D0 and D3 states. Support of the D2 state is optional.</P>
+</DIV>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-2-Appendix">
+<A NAME="pgfId-1348994"></A><A NAME="_Toc475523815"></A><A NAME="_Toc486665674"></A><A NAME="_Toc489272791"></A><A NAME="_Toc202342148"></A><A NAME="_Toc258262778"></A><A NAME="_Toc489267604"></A><A NAME="_Toc489267817"></A>Network Device Class<A NAME="marker-1348989"></A><A NAME="marker-1348990"></A><A NAME="marker-1348991"></A><A NAME="marker-1348992"></A><A NAME="marker-1348993"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1348995"></A>The requirements expressed in this section apply to Ethernet and token ring adapters. ATM and ISDN adapters are not supported by this specification.</P>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1349003"></A> <A NAME="_Toc489267605"></A><A NAME="_Toc489267818"></A>Power State Definitions</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349004"></A>For the purpose of the following state definitions &#8220;no bus transmission&#8221; means that transmit requests from the host processor are not honored, and &#8220;no bus reception&#8221; means that received data are not transferred to host memory.</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1402529"></A>State</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1402531"></A>Status</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1402533"></A>Definition</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349014"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349016"></A>Required</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349018"></A>Device is on and running and is delivering full functionality and performance to the user</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1349019"></A>Device is fully compliant with the requirements of the attached network</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349021"></A>D1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349023"></A>Optional</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349025"></A>No bus transmission allowed </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1349026"></A>No bus reception allowed </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1349027"></A>No interrupts can occur </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1349028"></A>Device context may be lost</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349030"></A>D2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349032"></A>Optional</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349034"></A>No bus transmission allowed </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1349035"></A>No bus reception allowed </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1349036"></A>No interrupts can occur </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1349037"></A>Device context may be lost</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349039"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349041"></A>Required</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349043"></A>Device context is assumed to be lost </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1349044"></A>No bus transmission allowed </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1349045"></A>No bus reception allowed </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1349046"></A>No interrupts can occur</P>
+</TD>
+</TR>
+</TABLE>
+<P CLASS="Body">
+<A NAME="pgfId-1349049"></A>This document does not specify maximum power and maximum latency requirements for the sleeping states because these numbers are very different for different network technologies. The device must meet the requirements of the bus that it attaches to.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1349050"></A>Although the descriptions of states D1 and D2 are the same, the choice of whether to implement D1 or D2 or both may depend on bus services required, power requirements, or time required to restore the physical layer. For example, a device designed for a particular bus might include state D1 because it needs a bus service such as a bus clock to support Magic Packet&#8482; wake, and that service is available in the bus device&#8217;s D1 power state but not in D2. Also, a device might include both state D1 and state D2 to provide a choice between lower power and lower latency.<A NAME="marker-1349051"></A></P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1351087"></A>Power Management Policy</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349064"></A>Present State</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349066"></A>Next State</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349068"></A>Cause</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349070"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349072"></A>Dx</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349074"></A>System enters sleep state. If wake is enabled, Dx is the lowest power state (for example, D1, D2, D3) from which the network device supports system wake. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1349075"></A>An appropriate time-out has elapsed after a &#8220;link down&#8221; condition was detected. Dx is the lowest power state in which the network device can detect &#8220;link up.&#8221;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349077"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349079"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349081"></A>System initiated network shutdown. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1349082"></A>System enters sleep state and wake is either not enabled or the network device is capable of waking from D3. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349084"></A>D1/D2/D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349086"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349088"></A>System wake (transition to S0), including a wake caused by a network wake event.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1349099"></A><A NAME="_Toc489267607"></A><A NAME="_Toc489267820"></A>Wake Events<A NAME="marker-1349098"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349100"></A>Network wake events are generally the result of either a change in the link status or the reception of a wake frame from the network.</P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-4-Appendix">
+<A NAME="pgfId-1349104"></A> <A NAME="_Toc489267608"></A>Link Status Events<A NAME="marker-1349102"></A><A NAME="marker-1349103"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349105"></A>Link status wake events are useful to indicate a change in the network&#8217;s availability, particularly when this change may impact the level at which the system should re-enter the sleeping state. For example, a transition from &#8220;link off&#8221; to &#8220;link on&#8221; may trigger the system to re-enter sleep at a higher level (for example, S2 versus S3) so that wake frames can be detected. Conversely, a transition from &#8220;link on&#8221; to &#8220;link off&#8221; may trigger the system to re-enter sleep at a deeper level (for example, S3 versus S2) since the network is not currently available. The network device should implement an internal delay to avoid unnecessary transitions when the link status toggles on or off momentarily.</P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-4-Appendix">
+<A NAME="pgfId-1349109"></A> <A NAME="_Toc489267609"></A>Wake Frame Events<A NAME="marker-1349107"></A><A NAME="marker-1349108"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349110"></A>Wake frame events are used to wake the system whenever meaningful data is presented to the system over the network. Examples of meaningful data include the reception of a Magic Packet&#8482;, a management request from a remote administrator, or simply network traffic directly targeted to the local system. In all of these cases the network device was pre-programmed by the policy owner or other software with information on how to identify wake frames from other network traffic. The details of how this information is passed between software and network device depend on the OS and therefore are not described in this specification.</P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1349118"></A> <A NAME="_Toc489267610"></A><A NAME="_Toc489267821"></A>Minimum Power Capabilities</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349119"></A>A network device conforming to this specification must support the D0 and D3 states. Support for the D1 and D2 states is optional.</P>
+</DIV>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-2-Appendix">
+<A NAME="pgfId-1349130"></A> <A NAME="_Toc489267611"></A><A NAME="_Toc489267822"></A>PC Card Controller Device Class<A NAME="marker-1349127"></A><A NAME="marker-1349128"></A><A NAME="marker-1349129"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349131"></A>The requirements expressed in this section apply to PC Card controller devices and the PC Card slots. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1349132"></A>Power management of PC Cards is not defined by this specification. PC Card power management is defined by the relevant power management specification for the card&#8217;s device class (for example, network, modem, and so on), in conjunction with the PC Card standard (for 16-bit cards) or the PCI Power Management Specification (for CardBus cards).</P>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1349140"></A> <A NAME="_Toc489267612"></A><A NAME="_Toc489267823"></A>Power State Definitions</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="Body">
+<A NAME="pgfId-1412896"></A>State</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="Body">
+<A NAME="pgfId-1412898"></A>Status</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="Body">
+<A NAME="pgfId-1412900"></A>Definition</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1351164"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1351166"></A>Required</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1351168"></A>Card status change interrupts are fully functional. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1351169"></A>Card functional interrupts are fully functional. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1351170"></A>Controller context (for example, memory, I/O windows) is fully functional. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1351171"></A>Controller interface is fully functional (processor can access cards). </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1351172"></A>Power to cards (slots) is available (may be on or off under software control). </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1351173"></A>The controller is at its highest power consumption level. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1351174"></A>Bus command response time is at its fastest level.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1351175"></A>PC Cards can be in any Dx power state (D0-D3).</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1351176"></A>Note: In D0 state, CSTSCHG interrupts can be passed to a system from a powered down PC Card (for more detail, refer to section 5.2.11.2 of PC Card Standard, Electrical Specification). </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1351178"></A>D1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1351180"></A>Optional</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1351182"></A>Card status change interrupts are disabled. CSTSCHG interrupt events are still detectable by the controller and cause the bus-specific wake signal to be asserted if wake is enabled on the controller. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1351183"></A>Card functional interrupts are disabled. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1351184"></A>Controller context is preserved (all register contents must be maintained but memory and I/O windows need not be functional). </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1351185"></A>Controller interface is non-functional (processor cannot access cards). </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1351186"></A>Power to cards (slots) is available (may be on or off; retains power setting it had at time of entry to D1). </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1351187"></A>Power-level consumption for the controller is high but less than D0. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1351188"></A>The time required to restore the function from the D1 state to the D0 state is quicker than resumption from D3. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1351189"></A>Bus command response time is equal to or slower than in D0. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1351190"></A>PC Cards can be in the D1, D2, or D3 power states (not D0).</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1351191"></A>Note: In D1 state, CSTSCHG interrupts can be passed to a system from a powered-down PC Card (for more detail, refer to section 5.2.11.2 of PC Card Standard, Electrical Specification). </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1351193"></A>D2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1351195"></A>Optional</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1351197"></A>Functionally the same as D1 (may be implemented instead of D1 in order to allow bus and/or system to enter a lower-power state).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1351199"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1351201"></A>Required</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1351203"></A>Card status change interrupt: Disabled and need not be detected. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1351204"></A>Card functional interrupt: Disabled and need not be detected. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1351205"></A>Controller context (for example, memory, I/O windows): Lost. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1351206"></A>Controller interface: Non-functional (processor can not access cards). </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1351207"></A>Clock to controller: Off. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1351208"></A>Power to cards (slots): Off (card context lost).</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1351209"></A>Note: If Vcc is removed (for example, PCI Bus B3) while the device is in the D3 state, a bus-specific reset (for example, PCI RST#) must be asserted when power is restored and functions will then return to the D0 state with a full power-on reset sequence. Whenever the transition from D3 to D0 is initiated through assertion of a bus-specific reset, the power-on defaults will be restored to the function by hardware just as at initial power up. The function must then be fully initialized and reconfigured by software. </P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1351218"></A><A NAME="_Toc489267613"></A><A NAME="_Toc489267824"></A>Power Management Policy</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349206"></A>The PC Card controller is a bus controller. As such, its power state is dependent on the devices plugged into the bus (child devices). OSPM will track the state of all devices on the bus and will put the bus into the best possible power state based on the current device requirements on that bus. For example, if the PC Card cards are all in the D1 state, OSPM will put the PC Card controller in the D1 state.</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349210"></A>Present State</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349212"></A>Next State</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349214"></A>Cause</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349216"></A>D2/D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349218"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349220"></A>Any card in any slot needing to transition to state D0 due to a wake event or because of system usage.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349222"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349224"></A>D1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349226"></A>No card in any slot is in state D0.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349228"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349230"></A>D2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349232"></A>No card in any slot is in state D0 or D1.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349234"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349236"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349238"></A>All cards in all slots are in state D3.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1349249"></A>  <A NAME="_Toc489267614"></A><A NAME="_Toc489267825"></A>Wake Events<A NAME="marker-1349248"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349250"></A>A wake event is any event that would normally assert the controller&#8217;s status change interrupt (for example, card insertion, card battery state change, card ReqAttn event, and so on) or ring-indicate signal.</P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1349258"></A>Minimum Power Capabilities</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349259"></A>A PC Card controller device conforming to this specification must support the D0 and D3 states. Support for the D1 or D2 states is optional.</P>
+</DIV>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-2-Appendix">
+<A NAME="pgfId-1349268"></A> <A NAME="_Toc489267616"></A><A NAME="_Toc489267827"></A>Storage Device Class</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349275"></A><A NAME="marker-1349269"></A><A NAME="marker-1349270"></A><A NAME="marker-1349271"></A><A NAME="marker-1349272"></A><A NAME="marker-1349273"></A><A NAME="marker-1349274"></A>The requirements expressed in this section apply to ATA hard disks, floppy disks, ATAPI and SCSI CD-ROMs, and the IDE channel.</P>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1349283"></A><A NAME="_Toc489267617"></A><A NAME="_Toc489267828"></A>Power State Definitions</H6>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-4-Appendix">
+<A NAME="pgfId-1349285"></A> <A NAME="_Toc489267618"></A>Hard Disk, CD-ROM and IDE/ATAPI Removable Storage Devices</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349289"></A>State</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349291"></A>Status</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349293"></A>Definition</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349295"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349297"></A>Required</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349299"></A>Drive controller (for example, interface and control electronics) is functional. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1349300"></A>Interface mode context (for example, communications timings) is programmed. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349302"></A>D1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349304"></A>Optional</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349306"></A>Drive controller (for example, interface and control electronics) is functional. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1349307"></A>Interface mode context (for example, communications timings) is preserved. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1349308"></A>Drive motor (for example, spindle) is stopped, with fast-start mode enabled, if available. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1349309"></A>Laser (if any) is off.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1349310"></A>Recommended latency to return to D0 is less than 5 seconds.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1349311"></A>Power consumption in D1 should be no more than 80% of power consumed in D0.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1349312"></A>Note: For ATA devices, this state is invoked by the Standby Immediate command. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349314"></A>D2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349316"></A>N/A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349318"></A>This state is not defined for storage devices.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349320"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349322"></A>Required</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349324"></A>Drive controller (for example, interface and control electronics) is not functional; context is lost. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1349325"></A>Interface mode (for example, communications timings) is not preserved. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1349326"></A>Drive motor (for example, spindle) is stopped. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1349327"></A>Laser (if any) is off.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1349328"></A>Power consumption in D3 is no more than 10% of power consumed in D0.</P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1349329"></A>Note: For ATA devices, this state is invoked by the &#8220;sleep&#8221; command.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-4-Appendix">
+<A NAME="pgfId-1351297"></A>  <A NAME="_Toc489267619"></A>Floppy Disk Devices</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1351300"></A>State</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1351302"></A>Status</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1351304"></A>Definition</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1351306"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1351308"></A>Required</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1351310"></A>Drive controller (for example, interface and control electronics) is functional. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1351311"></A>Drive motor (for example, spindle) is turning.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1351313"></A>D1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1351315"></A>N/A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1351317"></A>This state is not defined for floppy disk drives.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1351319"></A>D2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1351321"></A>N/A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1351323"></A>This state is not defined for floppy disk drives.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1351325"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1351327"></A>Required</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1351329"></A>Drive controller (for example, interface and control electronics) is not functional; context is lost. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1351330"></A>Drive motor (for example, spindle) is stopped.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-4-Appendix">
+<A NAME="pgfId-1351333"></A>I<A NAME="_Toc489267620"></A>DE Channel Devices</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349376"></A>State</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349378"></A>Status</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349380"></A>Definition</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349382"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349384"></A>Required</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349386"></A>Adapter is functional. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1349387"></A>Adapter interface mode (for example, communications timings) is programmed. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1349388"></A>Power is applied to the bus (and all devices connected to it).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349390"></A>D1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349392"></A>N/A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349394"></A>This state is not defined for the IDE Channel.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349396"></A>D2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349398"></A>N/A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349400"></A>This state is not defined for the IDE Channel.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349402"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349404"></A>Required</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349406"></A>Adapter is non-functional. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1349407"></A>Adapter interface mode (for example, communications timings) is not preserved. </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1349408"></A>Power to the bus (and all devices connected to it) may be off.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1349416"></A><A NAME="_Toc489267621"></A>Power Management Policy</H6>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-4-Appendix">
+<A NAME="pgfId-1349418"></A> <A NAME="_Toc489267622"></A>Hard Disk, Floppy Disk, CD-ROM and IDE/ATAPI Removable Storage Devices </H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349422"></A>Present State</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349424"></A>Next State</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349426"></A>Cause</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349428"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349430"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349432"></A>Device usage (high-priority I/O).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349434"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349436"></A>D1*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349438"></A>Device inactivity (no high-priority I/O) for some period of time (T1).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349440"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349442"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349444"></A>Device inactivity (no high-priority I/O) for a period of time (T2=&gt;T1). </P>
+<P CLASS="TableBody">
+<A NAME="pgfId-1349445"></A>System enters sleeping state. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349447"></A>D1*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349449"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349451"></A>Device usage (High-priority I/O).</P>
+</TD>
+</TR>
+</TABLE>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1349454"></A>* If supported. </LI>
+<LI CLASS="Note">
+<A NAME="pgfId-1351367"></A> For ATA, the D3-to-D0 transition requires a reset of the IDE channel. This means that both devices on a channel must be placed into D3 at the same time.</LI>
+</UL>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-4-Appendix">
+<A NAME="pgfId-1349456"></A> <A NAME="_Toc489267623"></A>IDE Channel Devices</H6>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349460"></A>Present State</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349462"></A>Next State</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1349464"></A>Cause</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349466"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349468"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349470"></A>Any device on the channel needing to transition to a state other than state D3.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349472"></A>D0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349474"></A>D3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1349476"></A>All devices on the channel in state D3.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1349487"></A> <A NAME="_Toc489267624"></A><A NAME="_Toc489267829"></A>Wake Events<A NAME="marker-1349486"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349488"></A>Storage devices with removable media can, optionally, signal wake upon insertion of media using their bus-specific notification mechanism. There are no other wake events defined for Storage devices.</P>
+</DIV>
+<DIV>
+<H6 CLASS="zHeading-3-Appendix">
+<A NAME="pgfId-1349496"></A> <A NAME="_Toc489267625"></A><A NAME="_Toc489267830"></A>Minimum Power Capabilities</H6>
+<P CLASS="Body">
+<A NAME="pgfId-1349497"></A>A hard disk, CD-ROM or IDE/ATAPI removable storage device conforming to this specification must support the D0 and D3 states. Support for the D1 state is optional.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1346798"></A>A floppy disk and IDE channel device conforming to this specification must support the D0 and D3 states.</P>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</BODY>
+</HTML>

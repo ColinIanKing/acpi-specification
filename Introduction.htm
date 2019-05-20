@@ -1,0 +1,876 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2016/HTML Export Filter">
+<LINK REL="STYLESHEET" HREF="Introduction.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE> 1 Introduction</TITLE></HEAD>
+<BODY>
+<DIV>
+<H1 CLASS="Heading-1">
+<A NAME="pgfId-1347747"></A><A NAME="66527"></A>Introduction<DIV>
+<IMG SRC="Introduction-1.gif" ALT="">
+</DIV>
+</H1>
+<P CLASS="Body">
+<A NAME="pgfId-1347751"></A>The Advanced Configuration and Power Interface (ACPI) specification was developed to establish industry common interfaces enabling robust operating system (OS)-directed motherboard device configuration and power management of both devices and entire systems. ACPI is the key element in Operating System-directed configuration and Power Management (OSPM).<A NAME="marker-1347752"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1346812"></A>ACPI evolved the existing pre-ACPI collection of power management BIOS code, Advanced Power Management (APM) application programming interfaces (APIs, PNPBIOS APIs, Multiprocessor Specification (MPS) tables and so on into a well-defined power management and configuration interface specification. ACPI provides the means for an orderly transition from existing (legacy) hardware to ACPI hardware, and it allows for both ACPI and legacy mechanisms to exist in a single machine and to be used as needed.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1346813"></A>Further, system architectures being built at the time of the original ACPI specification&#8217;s inception, stretched the limits of historical &#8220;Plug and Play&#8221; interfaces. ACPI evolved existing motherboard configuration interfaces to support advanced architectures in a more robust, and potentially more efficient manner.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1346814"></A>The interfaces and OSPM concepts defined within this specification are suitable to all classes of computers including (but not limited to) desktop, mobile, workstation, and server machines. From a power management perspective, OSPM/ACPI promotes the concept that systems should conserve energy by transitioning unused devices into lower power states including placing the entire system in a low-power state (sleeping state) when possible.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1346815"></A>This document describes ACPI hardware interfaces, ACPI software interfaces and ACPI data structures that, when implemented, enable support for robust OS-directed configuration and power management (OSPM).<A NAME="marker-1346816"></A><A NAME="marker-1346817"></A></P>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1346833"></A><A NAME="_Toc489255930"></A><A NAME="_Toc489267854"></A><A NAME="_Toc489272407"></A><A NAME="_Toc202340453"></A><A NAME="_Toc258262134"></A>Principal Goals</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1346834"></A>ACPI is the key element in implementing OSPM. ACPI-defined interfaces are intended for wide adoption to encourage hardware and software vendors to build ACPI-compatible (and, thus, OSPM-compatible) implementations. <A NAME="marker-1346835"></A><A NAME="marker-1346836"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1346837"></A>The principal goals of ACPI and OSPM are to:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1346838"></A>Enable all computer systems to implement motherboard configuration and power management functions, using appropriate cost/function tradeoffs.</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1346839"></A>Computer systems include (but are not limited to) desktop, mobile, workstation, and server machines.</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1346840"></A>Machine implementers have the freedom to implement a wide range of solutions, from the very simple to the very aggressive, while still maintaining full OS support.</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1346841"></A>Wide implementation of power management will make it practical and compelling for applications to support and exploit it. It will make new uses of PCs practical and existing uses of PCs more economical.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1346843"></A>Enhance power management functionality and robustness.  </LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1346844"></A>Power management policies too complicated to implement in platform firmware can be implemented and supported in the OS, allowing inexpensive power managed hardware to support very elaborate power management policies.</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1346845"></A>Gathering power management information from users, applications, and the hardware together into the OS will enable better power management decisions and execution. </LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1346846"></A>Unification of power management algorithms in the OS will reduce conflicts between the firmware and OS and will enhance reliability.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1346853"></A>Facilitate and accelerate industry-wide implementation of power management.</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1346854"></A>OSPM and ACPI reduces the amount of redundant investment in power management throughout the industry, as this investment and function will be gathered into the OS. This will allow industry participants to focus their efforts and investments on innovation rather than simple parity.</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1346855"></A>The OS can evolve independently of the hardware, allowing all ACPI-compatible machines to gain the benefits of OS improvements and innovations.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1346856"></A>Create a robust interface for configuring motherboard devices.<A NAME="_Toc357858867"></A></LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1346859"></A>Enable new advanced designs not possible with existing interfaces.</LI>
+</UL>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1346876"></A><A NAME="_Toc489255931"></A><A NAME="_Toc489267855"></A><A NAME="_Toc489272408"></A><A NAME="_Toc202340454"></A><A NAME="_Toc258262135"></A>Power Management Rationale<A NAME="marker-1346873"></A><A NAME="marker-1346874"></A><A NAME="marker-1346875"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1346900"></A>It is necessary to move power management into the OS and to use an abstract interface (ACPI) between the OS and the hardware to achieve the principal goals set forth above. Because ACPI is abstract, the OS can evolve separately from the hardware and, likewise, the hardware from the OS. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1363944"></A>ACPI is by nature more portable across operating systems and processors. ACPI control methods allow for very flexible implementations of particular features.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1363947"></A>Issues with older power management approaches include the following:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1346878"></A>Minimal support for power management inhibits application vendors from supporting or exploiting it.</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1346879"></A>Moving power management functionality into the OS makes it available on every machine on which the OS is installed. The level of functionality (power savings, and so on) varies from machine to machine, but users and applications will see the same power interfaces and semantics on all OSPM machines. </LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1346880"></A>This will enable application vendors to invest in adding power management functionality to their products.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1346881"></A>Legacy power management algorithms were restricted by the information available to the platform firmware that implemented them. This limited the functionality that could be implemented.</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1346882"></A>Centralizing power management information and directives from the user, applications, and hardware in the OS allows the implementation of more powerful functionality. For example, an OS can have a policy of dividing I/O operations into normal and lazy. Lazy I/O operations (such as a word processor saving files in the background) would be gathered up into clumps and done only when the required I/O device is powered up for some other reason. A non-lazy I/O request made when the required device was powered down would cause the device to be powered up immediately, the non-lazy I/O request to be carried out, and any pending lazy I/O operations to be done. Such a policy requires knowing when I/O devices are powered up, knowing which application I/O requests are lazy, and being able to assure that such lazy I/O operations do not starve.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1346885"></A>Appliance functions, such as answering machines, require globally coherent power decisions. For example, a telephone-answering application could call the OS and assert, &#8220;I am waiting for incoming phone calls; any sleep state the system enters must allow me to wake and answer the telephone in 1 second.&#8221; Then, when the user presses the &#8220;off&#8221; button, the system would pick the deepest sleep state consistent with the needs of the phone answering service.</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1346886"></A>Platform firmware has become very complex to deal with power management. It is difficult to make work with an OS and is limited to static configurations of the hardware. </LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1346889"></A>There is much less state information for the platform firmware to retain and manage (because the OS manages it).</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1346890"></A>Power management algorithms are unified in the OS, yielding much better integration between the OS and the hardware.</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1346891"></A>Because additional ACPI tables (Definition Blocks) can be loaded, for example, when a mobile system docks, the OS can deal with dynamic machine configurations.</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1346892"></A>Because the platform firmware has fewer functions and they are simpler, it is much easier (and therefore cheaper) to implement and support.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1346899"></A>The legacy PC platform structure constrains OS and hardware designs.</LI>
+</UL>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1346921"></A><A NAME="_Toc489255932"></A><A NAME="_Toc489267856"></A><A NAME="_Toc489272409"></A><A NAME="_Toc202340455"></A><A NAME="_Toc258262136"></A>Legacy Support<A NAME="marker-1346918"></A><A NAME="marker-1346919"></A><A NAME="marker-1346920"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1346922"></A>ACPI provides support for an orderly transition from legacy hardware to ACPI hardware, and allows for both mechanisms to exist in a single machine and be used as needed.</P>
+<DIV>
+<H6 CLASS="TableTitle">
+<A NAME="pgfId-1346923"></A>Hardware Type vs. OS Type Interaction</H6>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1356799"></A>Hardware&#92;OS</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1356801"></A>Legacy OS</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableHeading">
+<A NAME="pgfId-1356803"></A>ACPI OS with OSPM</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1346932"></A>Legacy hardware</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1346934"></A>A legacy OS on legacy hardware does what it always did.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1346936"></A>If the OS lacks legacy support, legacy support is completely contained within the hardware functions.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1346938"></A>Legacy and ACPI hardware support in machine</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1346940"></A>It works just like a legacy OS on legacy hardware.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1346942"></A>During boot, the OS tells the hardware to switch from legacy to OSPM/ACPI mode and from then on, the system has full OSPM/ACPI support.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1346944"></A>ACPI-only hardware</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1346946"></A>There is no power management.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P CLASS="TableBody">
+<A NAME="pgfId-1346948"></A>There is full OSPM/ACPI support.</P>
+</TD>
+</TR>
+</TABLE>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1346966"></A><A NAME="_Toc489255933"></A><A NAME="_Toc489267857"></A><A NAME="_Toc489272410"></A><A NAME="_Toc202340456"></A><A NAME="_Toc258262137"></A>OEM Implementation Strategy<A NAME="marker-1346965"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1346967"></A>Any OEM is, as always, free to build hardware as they see fit. Given the existence of the ACPI specification, two general implementation strategies are possible:<A NAME="marker-1346968"></A><A NAME="marker-1346969"></A><A NAME="marker-1346970"></A></P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1346971"></A>An original equipment manufacturer (OEM) can adopt the OS vendor-provided ACPI OSPM software and implement the hardware part of the ACPI specification (for a given platform) in one of many possible ways. </LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1346972"></A>An OEM can develop a driver and hardware that are not ACPI-compatible. This strategy opens up even more hardware implementation possibilities. However, OEMs who implement hardware that is OSPM-compatible but not ACPI-compatible will bear the cost of developing, testing, and distributing drivers for their implementation. </LI>
+</UL>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1346988"></A><A NAME="_Toc489255934"></A><A NAME="_Toc489267858"></A><A NAME="_Toc489272411"></A><A NAME="_Ref42580243"></A><A NAME="_Toc202340457"></A><A NAME="_Toc258262138"></A>Power and Sleep Buttons</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1346989"></A>OSPM provides a new appliance interface to consumers. In particular, it provides for a sleep button that is a &#8220;soft&#8221; button that does not turn the machine physically off but signals the OS to put the machine in a soft off or sleeping state. ACPI defines two types of these &#8220;soft&#8221; buttons: one for putting the machine to sleep and one for putting the machine in soft off.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1346990"></A>This gives the OEM two different ways to implement machines: A one-button model or a two-button model. The one-button model has a single button that can be used as a power button or a sleep button as determined by user settings. The two-button model has an easily accessible sleep button and a separate power button. In either model, an override feature that forces the machine to the soft-off state without OSPM interaction is also needed to deal with various rare, but problematic, situations.</P>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1347010"></A>ACPI Specification and the Structure of ACPI</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1348690"></A>This specification defines ACPI hardware interfaces, ACPI software interfaces and ACPI data structures. This specification also defines the semantics of these interfaces. <A NAME="marker-1348691"></A><A NAME="marker-1348692"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1348693"></A><A HREF="Introduction.htm#96574" CLASS="XRef">See OSPM/ACPI Global System.</A> lays out the software and hardware components relevant to OSPM/ACPI and how they relate to each other. This specification describes the interfaces between components, the contents of the ACPI System Description Tables, and the related semantics of the other ACPI components. Notice that the ACPI System Description Tables, which describe a particular platform&#8217;s hardware, are at heart of the ACPI implementation and the role of the ACPI System Firmware is primarily to supply the ACPI Tables (rather than a native instruction API).</P>
+<P CLASS="Body">
+<A NAME="pgfId-1356786"></A>ACPI is not a software specification; it is not a hardware specification, although it addresses both software and hardware and how they must behave. ACPI is, instead, an interface specification comprised of both software and hardware elements.</P>
+<P CLASS="Body">
+<A NAME="pgfId-1356791"></A><IMG SRC="Introduction-2.gif" ALIGN="BASELINE" ALT="">
+&nbsp;</P>
+<DIV>
+<H6 CLASS="FigureTitle">
+<A NAME="pgfId-1356795"></A><A NAME="96574"></A>OSPM/ACPI Global System<A NAME="marker-1361961"></A><A NAME="marker-1361962"></A></H6>
+<P CLASS="Body">
+<A NAME="pgfId-1347281"></A>There are three run-time components to ACPI:</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347282"></A>ACPI System Description Tables</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348704"></A>Describe the interfaces to the hardware. Some descriptions limit what can be built (for example, some controls are embedded in fixed blocks of registers and the table specifies the address of the register block). Most descriptions allow the hardware to be built in arbitrary ways and can describe arbitrary operation sequences needed to make the hardware function. ACPI Tables containing &#8220;Definition Blocks&#8221; can make use of a pseudo-code type of language, the interpretation of which is performed by the OS. That is, OSPM contains and uses an interpreter that executes procedures encoded in the pseudo-code language and stored in the ACPI tables containing &#8220;Definition Blocks.&#8221; The pseudo-code language, known as ACPI Machine Language (AML), is a compact, tokenized, abstract type of machine language.<A NAME="marker-1347283"></A></P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347289"></A><A NAME="marker-1347284"></A><A NAME="marker-1347285"></A><A NAME="marker-1347286"></A>ACPI Registers. </H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348711"></A>The constrained part of the hardware interface, described (at least in location) by the ACPI System Description Tables. </P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347290"></A>ACPI Platform Firmware. </H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348718"></A>Refers to the portion of the firmware that is compatible with the ACPI specifications. Typically, this is the code that boots the machine (as legacy BIOSs have done) and implements interfaces for sleep, wake, and some restart operations. It is called rarely, compared to a legacy BIOS. The ACPI Description Tables are also provided by the ACPI Platform Firmware. <A NAME="marker-1347291"></A></P>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1347308"></A><A NAME="_Toc489255936"></A><A NAME="_Toc489267860"></A><A NAME="_Toc489272413"></A><A NAME="_Toc202340459"></A><A NAME="_Toc258262140"></A>OS and Platform Compliance</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1347309"></A>The ACPI specification contains only interface specifications. ACPI does not contain any platform compliance requirements. The following sections provide guidelines for class specific platform implementations that reference ACPI-defined interfaces and guidelines for enhancements that operating systems may require to completely support OSPM/ACPI. The minimum feature implementation requirements of an ACPI-compatible OS are also provided.</P>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1347319"></A>Platform Implementations of ACPI-defined Interfaces<A NAME="marker-1347318"></A></H3>
+<P CLASS="Body">
+<A NAME="pgfId-1347320"></A>System platforms implement ACPI-defined hardware interfaces via the platform hardware and ACPI-defined software interfaces and system description tables via the ACPI system firmware. Specific ACPI-defined interfaces and OSPM concepts while appropriate for one class of machine (for example, a mobile system), may not be appropriate for another class of machine (for example, a multi-domain enterprise server). It is beyond the capability and scope of this specification to specify all platform classes and the appropriate ACPI-defined interfaces that should be required for the platform class. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1347321"></A>Platform design guide authors are encouraged to require the appropriate ACPI-defined interfaces and hardware requirements suitable to the particular system platform class addressed in a particular design guide. Platform design guides should not define alternative interfaces that provide similar functionality to those defined in the ACPI specification.</P>
+<DIV>
+<H5 CLASS="Heading-4">
+<A NAME="pgfId-1348771"></A>Recommended Features and Interface Descriptions for Design Guides</H5>
+<P CLASS="Body">
+<A NAME="pgfId-1347330"></A>Common description text and category names should be used i<A NAME="marker-1347325"></A><A NAME="marker-1347326"></A><A NAME="marker-1347327"></A><A NAME="marker-1347328"></A><A NAME="marker-1347329"></A>n design guides to describe all features, concepts, and interfaces defined by the ACPI specification as requirements for a platform class. Listed below is the recommended set of high-level text and category names to be used to describe the features, concepts, and interfaces defined by ACPI. </P>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1347331"></A>Where definitions or relational requirements of interfaces are localized to a specific section, the section number is provided. The interface definitions and relational requirements of the interfaces specified below are generally spread throughout the ACPI specification. The ACPI specification defines:</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347332"></A>System address map reporting interfaces (Section 14)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347333"></A>ACPI System Description Tables (Section 5.2):</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347334"></A>Root System Description Pointer (RSDP)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347335"></A>System Description Table Header</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347336"></A>Root System Description Table (RSDT)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347337"></A>Fixed ACPI Description Table (FADT)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347338"></A>Firmware ACPI Control Structure (FACS)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347339"></A>Differentiated System Description Table (DSDT)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347340"></A>Secondary System Description Table (SSDT)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347341"></A>Multiple APIC Description Table (MADT)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347342"></A>Smart Battery Table (SBST)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347343"></A>Extended System Description Table (XSDT)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347344"></A>Embedded Controller Boot Resources Table (ECDT)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347345"></A>System Resource Affinity Table (SRAT)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347346"></A>System Locality Information Table (SLIT)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1357091"></A>Corrected Platform Error Polling Table (CPEP)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1357102"></A>Maximum System Characteristics Table (MSCT)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1357109"></A>ACPI RAS FeatureTable (RASF)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1357116"></A>Memory Power StateTable (MPST)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1357130"></A>Platform Memory Topology Table (PMTT)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1357456"></A>Boot Graphics Resource Table (BGRT)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1357216"></A>Firmware Performance Data Table (FPDT) </LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1357447"></A>Generic Timer Description Table (GTDT)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1357267"></A>ACPI-defined Fixed Registers Interfaces (Section 4, Section 5.2.9):</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1357287"></A>Power management timer control/status </LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1357262"></A>Power or sleep button with S5 override (also possible in generic space)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347350"></A>Real time clock wakeup alarm control/status</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347351"></A>SCI /SMI routing control/status for Power Management and General-purpose events </LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347352"></A>System power state controls (sleeping/wake control) (Section 7)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347353"></A>Processor power state control (c states) (Section 8)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347354"></A>Processor throttling control/status (Section 8)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347355"></A>Processor performance state control/status (Section 8)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347356"></A>General-purpose event control/status</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347357"></A>Global Lock control/status</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347358"></A>System Reset control (Section 4.7.3.6)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347359"></A>Embedded Controller control/status (Section 12)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347360"></A>SMBus Host Controller (HC) control/status (Section 13)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347361"></A>Smart Battery Subsystem (Section 10.1)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347362"></A>ACPI-defined Generic Register Interfaces and object definitions in the ACPI Namespace (Section 4.2, Section 5.6.5):</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347363"></A>General-purpose event processing</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347364"></A>Motherboard device identification, configuration, and insertion/removal (Section 6)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347365"></A>Thermal zones (Section 11)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347366"></A>Power resource control (Section 7.1)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347367"></A>Device power state control (Section 7.2)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347368"></A>System power state control (Section 7.3)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347369"></A>System indicators (Section 9.1)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347370"></A>Devices and device controls (Section 9):</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1347371"></A>Processor (Section 8)</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1347372"></A>Control Method Battery (Section 10)</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1347373"></A>Smart Battery Subsystem (Section 10)</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1347374"></A>Mobile Lid</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1347375"></A>Power or sleep button with S5 override (also possible in fixed space)</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1347376"></A>Embedded controller (Section 12)</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1347377"></A>Fan</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1347378"></A>Generic Bus Bridge</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1347379"></A>ATA Controller</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1347380"></A>Floppy Controller</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1347381"></A>GPE Block</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1347382"></A>Module</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1347383"></A>Memory</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347384"></A>Global Lock related interfaces</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347386"></A>ACPI Event programming model (Section 5.6)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347388"></A>ACPI-defined Platform Firmware Responsibilities (Section 15)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347390"></A>ACPI-defined State Definitions (Section 2):</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1347391"></A>Global system power states (G-states, S0, S5)</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1347392"></A>System sleeping states (S-states S1-S4) (Section 15)</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1347393"></A>Device power states (D-states (Appendix B))</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1347394"></A>Processor power states (C-states) (Section 8)</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1347395"></A>Device and processor performance states (P-states) (Section 3, Section 8)</LI>
+</UL>
+</DIV>
+<DIV>
+<H5 CLASS="Heading-4">
+<A NAME="pgfId-1347396"></A>Terminology Examples for Design Guides</H5>
+<P CLASS="Body">
+<A NAME="pgfId-1347402"></A>The following example shows how a client platform design guide could use the recommended terminology to define ACPI requirements, with a goal of requiring robust configuration and power management for the system class. </P>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1347403"></A>This example is provided as a guideline for how ACPI terminology can be used. It should not be interpreted as a statement of ACPI requirements.</LI>
+</UL>
+<P CLASS="ACPINormal">
+<A NAME="pgfId-1347404"></A>Platforms compliant with this platform design guide must implement the following ACPI defined system features, concepts, and interfaces, along with their associated event models:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347405"></A>System address map reporting interfaces</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347406"></A>ACPI System Description Tables provided in the system firmware</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347407"></A>ACPI-defined Fixed Registers Interfaces:</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347408"></A>Power management timer control/status</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347409"></A>Power or sleep button with S5 override (may also be implemented in generic register space)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347410"></A>Real time clock wakeup alarm control/status</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347411"></A>General-purpose event control/status</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347412"></A>SCI /SMI routing control/status for Power Management and General-purpose events </LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347413"></A>(control required only if system supports legacy mode)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347414"></A>System power state controls (sleeping/wake control)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347415"></A>Processor power state control (for C1)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347416"></A>Global Lock control/status (if Global Lock interfaces are required by the system)</LI>
+</UL>
+<P CLASS="ACPINormal">
+<A NAME="pgfId-1347417"></A>&nbsp;</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347418"></A>ACPI-defined Generic Register Interfaces and object definitions in the ACPI Namespace:</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1347419"></A>General-purpose event processing</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1347420"></A>Motherboard device identification, configuration, and insertion/removal (Section 6)</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1347421"></A>System power state control ( Section 7.3)</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1347422"></A>Devices and device controls:</LI>
+</UL>
+<P CLASS="BulletPara">
+<A NAME="pgfId-1347423"></A>Processor</P>
+<P CLASS="BulletPara">
+<A NAME="pgfId-1347424"></A>Control Method Battery (or Smart Battery Subsystem on a mobile system)</P>
+<P CLASS="BulletPara">
+<A NAME="pgfId-1347425"></A>Smart Battery Subsystem (or Control Method Battery on a mobile system)</P>
+<P CLASS="BulletPara">
+<A NAME="pgfId-1347426"></A>Power or sleep button with S5 override (may also be implemented in fixed register space)</P>
+<UL>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1347427"></A>Global Lock related interfaces when a logical register in the hardware is shared between OS and firmware environments</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347428"></A>ACPI Event programming model (Section 5.6)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347429"></A>ACPI-defined Platform Firmware Responsibilities (Section 15)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347430"></A>ACPI-defined State Definitions:</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1347431"></A>System sleeping states (At least one system sleeping state, S1-S4, must be implemented)</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1347432"></A>Device power states (D-states must be implemented in accordance with device class specifications)</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1347433"></A>Processor power states (All processors must support the C1 Power State)</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1362132"></A>&nbsp;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1347434"></A>The following example shows how a design guide could use the recommended terminology to define ACPI related requirements for systems that execute multiple OS instances, with a goal of requiring robust configuration and continuous availability for the system class. </P>
+<UL>
+<LI CLASS="Note">
+<A NAME="pgfId-1347435"></A>This example is provided as a guideline for how ACPI terminology can be used. It should not be interpreted as a statement of ACPI requirements.</LI>
+</UL>
+<P CLASS="ACPINormal">
+<A NAME="pgfId-1347436"></A>Platforms compliant with this platform design guide must implement the following ACPI defined system features and interfaces, along with their associated event models:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347437"></A>System address map reporting interfaces</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347438"></A>ACPI System Description Tables provided in the system firmware</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347439"></A>ACPI-defined Fixed Registers Interfaces:</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347440"></A>Power management timer control/status</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347441"></A>General-purpose event control/status</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347442"></A>SCI /SMI routing control/status for Power Management and General-purpose events </LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347443"></A>(control required only if system supports legacy mode)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347444"></A>System power state controls (sleeping/wake control)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347445"></A>Processor power state control (for C1)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347446"></A>Global Lock control/status (if Global Lock interfaces are required by the system)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347447"></A>&nbsp;</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347448"></A>ACPI-defined Generic Register Interfaces and object definitions in the ACPI Namespace:</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1347449"></A>General-purpose event processing</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1347450"></A>Motherboard device identification, configuration, and insertion/removal (Section 6)</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1347451"></A>System power state control (Section 7.3)</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1347452"></A>System indicators</LI>
+<LI CLASS="BulletSubDash">
+<A NAME="pgfId-1347453"></A>Devices and device controls:</LI>
+</UL>
+<P CLASS="BulletPara">
+<A NAME="pgfId-1347454"></A>Processor</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347455"></A>Global Lock related interfaces when a logical register in the hardware is shared between OS and firmware environments</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347456"></A>ACPI Event programming model ( Section 5.6)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347457"></A>ACPI-defined Platform Firmware Responsibilities (Section 15)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347458"></A>ACPI-defined State Definitions:</LI>
+</UL>
+<DIV>
+<H6 CLASS="List-Bullet-1-lb1-Lb1">
+<A NAME="pgfId-1347459"></A>Processor power states (All processors must support the C1 Power State)</H6>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1347472"></A><A NAME="_Toc489255938"></A><A NAME="_Toc489267862"></A><A NAME="_Toc489272415"></A><A NAME="_Toc202340461"></A><A NAME="_Toc258262142"></A>OSPM Implementations<A NAME="marker-1347469"></A><A NAME="marker-1347470"></A><A NAME="marker-1347471"></A></H3>
+<P CLASS="Body">
+<A NAME="pgfId-1347473"></A>OS enhancements are needed to support ACPI-defined features, concepts, and interfaces, along with their associated event models appropriate to the system platform class upon which the OS executes. This is the implementation of OSPM. The following outlines the OS enhancements and elements necessary to support all ACPI-defined interfaces. To support ACPI through the implementation of OSPM, the OS needs to be modified to:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347474"></A>Use system address map reporting interfaces. </LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347475"></A>Find and consume the ACPI System Description Tables.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347476"></A>Interpret ACPI machine language (AML).</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347477"></A>Enumerate and configure motherboard devices described in the ACPI Namespace.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347478"></A>Interface with the power management timer.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347479"></A>Interface with the real-time clock wake alarm.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347480"></A>Enter ACPI mode (on legacy hardware systems).</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347481"></A>Implement device power management policy.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347482"></A>Implement power resource management.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347483"></A>Implement processor power states in the scheduler idle handlers.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347484"></A>Control processor and device performance states.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347485"></A>Implement the ACPI thermal model.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347486"></A>Support the ACPI Event programming model including handling SCI interrupts, managing fixed events, general-purpose events, embedded controller interrupts, and dynamic device support.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347487"></A>Support acquisition and release of the Global Lock.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347488"></A>Use the reset register to reset the system.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347489"></A>Provide APIs to influence power management policy.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347490"></A>Implement driver support for ACPI-defined devices.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347491"></A>Implement APIs supporting the system indicators.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347492"></A>Support all system states S1-S5.</LI>
+</UL>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1347505"></A><A NAME="_Toc489255939"></A><A NAME="_Toc489267863"></A><A NAME="_Toc489272416"></A><A NAME="_Toc202340462"></A><A NAME="_Toc258262143"></A>OS Requirements<A NAME="marker-1347502"></A><A NAME="marker-1347503"></A><A NAME="marker-1347504"></A></H3>
+<P CLASS="Body">
+<A NAME="pgfId-1347506"></A>The following list describes the minimum requirements for an OSPM/ACPI-compatible OS:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347507"></A>Use system address map reporting interfaces to get the system address map on Intel Architecture (IA) platforms:</LI>
+<LI CLASS="StepSubBullet">
+<A NAME="pgfId-1347508"></A>INT 15H, E820H - Query System Address Map interface (see <A HREF="Sys_Address_Map_Interfaces.htm#68313" CLASS="XRef">See System Address Map Interfaces.</A>,&#8220;System Address Map Interfaces&#8221;)</LI>
+<LI CLASS="StepSubBullet">
+<A NAME="pgfId-1347509"></A>EFI GetMemoryMap() Boot Services Function (see <A HREF="Sys_Address_Map_Interfaces.htm#68313" CLASS="XRef">See System Address Map Interfaces.</A>, &#8220;System Address Map Interfaces&#8221;)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347510"></A>Find and consume the ACPI System Description Tables (see <A HREF="ACPI_Software_Programming_Model.htm#20338" CLASS="XRef">See ACPI Software Programming Model.</A>, &#8220;ACPI Software Programming Model&#8221;).</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347511"></A>Implementation of an AML interpreter supporting all defined AML grammar elements (see <A HREF="ACPI_Machine_Language_Specification.htm#35965" CLASS="XRef">See ACPI Machine Language (AML) Specification.</A>, ACPI Machine Language Specification&#8221;).</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347512"></A>Support for the ACPI Event programming model including handling SCI interrupts, managing fixed events, general-purpose events, embedded controller interrupts, and dynamic device support.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347513"></A>Enumerate and configure motherboard devices described in the ACPI Namespace.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347514"></A>Implement support for the following ACPI devices defined within this specification:</LI>
+<LI CLASS="StepSubBullet">
+<A NAME="pgfId-1347515"></A>Embedded Controller Device (see <A HREF="ACPI_Embedded_Controller_Interface_Specification.htm#71995" CLASS="XRef">See ACPI Embedded Controller Interface Specification.</A>, &#8220;ACPI Embedded Controller Interface Specification&#8221;)</LI>
+<LI CLASS="StepSubBullet">
+<A NAME="pgfId-1347516"></A>GPE Block Device (see <A HREF="ACPIdefined_Devices_and_DeviceSpecificObjects.htm#_Toc489256152" CLASS="XRef">See GPE Block Device.</A>, &#8220;GPE Block Device&#8221;)</LI>
+<LI CLASS="StepSubBullet">
+<A NAME="pgfId-1347517"></A>Module Device (see <A HREF="ACPIdefined_Devices_and_DeviceSpecificObjects.htm#_Toc489256154" CLASS="XRef">See Module Device.</A>, &#8220;Module Device&#8221;)</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347518"></A>Implementation of the ACPI thermal model (see <A HREF="Thermal_management.htm#54593" CLASS="XRef">See Thermal Management.</A>, &#8220;Thermal Management&#8221;).</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347519"></A>Support acquisition and release of the Global Lock.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347520"></A>OS-directed power management support (device drivers are responsible for maintaining device context as described by the Device Power Management Class Specifications described in <A HREF="Apx_A_Device_Class_Specifications.htm#92338" CLASS="XRef">See Device Class Specifications.</A>).</LI>
+</UL>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1347534"></A><A NAME="_Toc489255940"></A><A NAME="_Toc489267864"></A><A NAME="_Toc489272417"></A><A NAME="_Toc202340463"></A><A NAME="_Toc258262144"></A>Target Audience</H2>
+<P CLASS="Body">
+<A NAME="pgfId-1347535"></A>This specification is intended for the following users:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347536"></A>OEMs building hardware containing ACPI-compatible interfaces</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347537"></A>Operating system and device driver developers</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347538"></A>All platform system firmware developers</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347539"></A>CPU and chip set vendors</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347540"></A>Peripheral vendors</LI>
+</UL>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1347557"></A><A NAME="_Toc489255941"></A><A NAME="_Toc489267865"></A><A NAME="_Toc489272418"></A><A NAME="_Toc202340464"></A><A NAME="_Toc258262145"></A>Document Organization<A NAME="marker-1347555"></A><A NAME="marker-1347556"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1347558"></A>The ACPI specification document is organized into the following four parts: </P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347559"></A>The first part of the specification (sections 1 through 3) introduces ACPI and provides an executive overview.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347560"></A>The second part (sections 4 and 5) defines the ACPI hardware and software programming models.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347561"></A>The third part (sections 6 through 17) specifies the ACPI implementation details; this part of the specification is primarily for developers.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347562"></A>The fourth part (sections 18 and 19) is technical reference material; section 18 is the ACPI Source Language (ASL) reference, parts of which are referred to by most of the other sections in the document.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347563"></A>Appendices contain device class specifications, describing power management characteristics of specific classes of devices, and device class-specific ACPI interfaces.</LI>
+</UL>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1347577"></A><A NAME="_Toc489255942"></A><A NAME="_Toc489267866"></A><A NAME="_Toc489272419"></A><A NAME="_Toc202340465"></A><A NAME="_Toc258262146"></A>ACPI Introduction and Overview</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1347578"></A>The first three sections of the specification provide an executive overview of ACPI.</P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347579"></A>Section 1: Introduction.</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348862"></A> Discusses the purpose and goals of the specification, presents an overview of the ACPI-compatible system architecture, specifies the minimum requirements for an ACPI-compatible system, and provides references to related specifications.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347580"></A>Section 2: Definition of Terms.</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348873"></A> Defines the key terminology used in this specification. In particular, the global system states (Mechanical Off, Soft Off, Sleeping, Working, and Non-Volatile Sleep) are defined in this section, along with the device power state definitions: Off (D3), D3hot, D2, D1, and Fully-On (D0). Device and processor performance states (P0, P1, ...Pn) are also discussed.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347581"></A>Section 3: ACPI Overview. </H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348889"></A>Gives an overview of the ACPI specification in terms of the functional areas covered by the specification: system power management, device power management, processor power management, Plug and Play, handling of system events, battery management, and thermal management.</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1347595"></A><A NAME="_Toc489255943"></A><A NAME="_Toc489267867"></A><A NAME="_Toc489272420"></A><A NAME="_Toc202340466"></A><A NAME="_Toc258262147"></A>Programming Models</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1347596"></A>Sections 4 and 5 define the ACPI hardware and software programming models. This part of the specification is primarily for system designers, developers, and project managers. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1347597"></A>All of the implementation-oriented, reference, and platform example sections of the specification that follow (all the rest of the sections of the specification) are based on the models defined in sections 4 and 5. These sections are the heart of the ACPI specification. There are extensive cross-references between the two sections. </P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347598"></A>Section 4: ACPI Hardware Specification. </H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348925"></A>Defines a set of hardware interfaces that meet the goals of this specification.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347599"></A>Section 5: ACPI Software Programming Model.</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348932"></A>Defines a set of software interfaces that meet the goals of this specification.</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1347613"></A><A NAME="_Toc489255944"></A><A NAME="_Toc489267868"></A><A NAME="_Toc489272421"></A><A NAME="_Toc202340467"></A><A NAME="_Toc258262148"></A>Implementation Details</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1347614"></A>The third part of the specification defines the implementation details necessary to actually build components that work on an ACPI-compatible platform. This part of the specification is primarily for developers.</P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347615"></A>Section 6: Configuration. </H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348959"></A>Defines the reserved Plug and Play objects used to configure and assign resources to devices, and share resources and the reserved objects used to track device insertion and removal. Also defines the format of ACPI-compatible resource descriptors.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347616"></A>Section 7: Power and Performance Management. </H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348966"></A>Defines the reserved device power-management objects and the reserved-system power-management objects.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347617"></A>Section 8: Processor Configuration and Control. </H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348973"></A>Defines how the OS manages the processors&#8217; power consumption and other controls while the system is in the working state.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347618"></A>Section 9: ACPI-Specific Device Objects. </H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348980"></A>Lists the integrated devices that need support for some device-specific ACPI controls, along with the device-specific ACPI controls that can be provided. Most device objects are controlled through generic objects and control methods and have generic device IDs; this section discusses the exceptions.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347619"></A>Section 10: Power Source Devices. </H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348987"></A>Defines the reserved battery device and AC adapter objects.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1349027"></A>Section 11: Thermal Management. </H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1348997"></A>Defines the reserved thermal management objects.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347621"></A>Section 12: ACPI Embedded Controller Interface Specification. </H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1349055"></A>Defines the interfaces between an ACPI-compatible OS and an embedded controller.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347622"></A>Section 13: ACPI System Management Bus Interface Specification. </H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1349062"></A>Defines the interfaces between an ACPI-compatible OS and a System Management Bus (SMBus) host controller.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1357007"></A>Section 14: Platform Communications Channel.</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1357024"></A> <EM CLASS="SC-19-233517">
+Explains the generic mechanism for OSPM to communicate with an entity in the platform  defines a new address space type</EM>
+</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1357000"></A>Section 15: System Address Map Interfaces.</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1357001"></A> Explains the special INT 15 call for use in ISA/EISA/PCI bus-based systems. This call supplies the OS with a clean memory map indicating address ranges that are reserved and ranges that are available on the motherboard. UEFI-based memory address map reporting interfaces are also described. </P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347624"></A>Section 16: Waking and Sleeping.</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1349076"></A> Defines in detail the transitions between system working and sleeping states and their relationship to wake events. Refers to the reserved objects defined in sections 6, 7, and 8.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347625"></A>Section 17: Non-Uniform Memory Access (NUMA) Architecture Platforms. </H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1349083"></A>Discusses in detail how ACPI define interfaces can be used to describe a NUMA architecture platform. Refers to the reserved objects defined in sections 5, 6, 8, and 9.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347626"></A>Section 18: ACPI Platform Error Interfaces. </H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1349090"></A>Defines interfaces that enable OSPM to processes different types of hardware error events that are detected by platform-based error detection hardware.</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1347645"></A><A NAME="_Toc489255945"></A><A NAME="_Toc489267869"></A><A NAME="_Toc489272422"></A><A NAME="_Toc202340468"></A><A NAME="_Toc258262149"></A>Technical Reference</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1347646"></A>The fourth part of the specification contains reference material for developers.</P>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347647"></A>Section 19: ACPI Source Language Reference.</H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1349139"></A> Defines the syntax of all the ASL statements that can be used to write ACPI control methods, along with example syntax usage.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347648"></A>Section 20: ACPI Machine Language Specification. </H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1349146"></A>Defines the grammar of the language of the ACPI virtual machine language. An ASL translator (compiler) outputs AML.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1357066"></A>Section 21: ACPI Data Tables and Table Language Definition. </H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1357045"></A><EM CLASS="SC-19-233517">
+Describes a simple language (the Table Definition Language or TDL) that can be used to generate any ACPI data table. </EM>
+</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347649"></A>Appendix A: Device class specifications. </H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1349153"></A>Describes device-specific power management behavior on a per device-class basis.</P>
+</DIV>
+<DIV>
+<H4 CLASS="GlossTerm">
+<A NAME="pgfId-1347650"></A>Appendix B: Video Extensions. </H4>
+<P CLASS="ArgDefinitionRH">
+<A NAME="pgfId-1349160"></A>Contains video device class-specific ACPI interfaces.</P>
+</DIV>
+</DIV>
+<DIV>
+<H3 CLASS="Heading-3">
+<A NAME="pgfId-1364410"></A>Revsion Numbers</H3>
+<P CLASS="Body">
+<A NAME="pgfId-1364357"></A>Updates to the ACPI specification are considered either new revisions or errata as described below:</P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1364358"></A>A new revision is produced when there is substantive new content or changes that may modify existing behavior. New revisions are designated by a Major.Minor version number (e.g. 6.3). In cases where the changes are exceptionally minor, we may have a Major.Minor.Minor naming convention (e.g. 6.3.1). </LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1364430"></A>An errata is produced when proposed changes or fixes of the specification do not include any significant new material or modify existing behavior. Errata are designated by adding an upper-case letter at the end of the version number, such as 6.2A.</LI>
+</UL>
+</DIV>
+</DIV>
+<DIV>
+<H2 CLASS="Heading-2">
+<A NAME="pgfId-1347670"></A><A NAME="_Toc489255946"></A><A NAME="_Toc489267870"></A><A NAME="_Toc489272423"></A><A NAME="_Toc202340469"></A><A NAME="_Toc258262150"></A>Related Documents<A NAME="marker-1347668"></A><A NAME="marker-1347669"></A></H2>
+<P CLASS="Body">
+<A NAME="pgfId-1357501"></A>Power management and Plug and Play specifications for legacy hardware platforms are the following, available from &#8220;Links to ACPI-Related Documents&#8221; (<EM CLASS="Hyperlink">
+http://uefi.org/acpi</EM>
+) under the heading &quot;Legacy PNP Guidelines&quot;.<A NAME="marker-1357502"></A><A NAME="marker-1357503"></A><A NAME="marker-1357504"></A><A NAME="marker-1357505"></A></P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1357506"></A>Advanced Power Management (APM) BIOS Specification, Revision 1.2.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347677"></A>Plug and Play BIOS Specification, Version 1.0a.</LI>
+</UL>
+<P CLASS="Body">
+<A NAME="pgfId-1347681"></A>Intel Architecture specifications are available from http://developer.intel.com:<A NAME="marker-1347678"></A><A NAME="marker-1347679"></A><A NAME="marker-1347680"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1347682"></A>Intel&#174; ItaniumTM Architecture Software Developer&#8217;s Manual, see &#8220;Links to ACPI-Related Documents&#8221; (<EM CLASS="Hyperlink">
+http://uefi.org/acpi</EM>
+)   under the heading &quot;Intel Architecture Specifications&quot;. </P>
+<P CLASS="Body">
+<A NAME="pgfId-1347683"></A>ItaniumTM Processor Family System Abstraction Layer Specification, Intel Corporation, December 2003 (June 2004 Update).</P>
+<P CLASS="Body">
+<A NAME="pgfId-1357555"></A>Unified Extensible Firmware Interface Specifications are available from http://www.uefi.org:<A NAME="marker-1357552"></A><A NAME="marker-1357553"></A><A NAME="marker-1357554"></A></P>
+<P CLASS="Body">
+<A NAME="pgfId-1357556"></A>Unified Extensible Firmware Interface Specification, see &#8220;Links to ACPI-Related Documents&#8221; (<EM CLASS="Hyperlink">
+http://uefi.org/acpi</EM>
+)  under the heading &quot;Unified Extensible Firmware Interface Specifications&quot;</P>
+<P CLASS="Body">
+<A NAME="pgfId-1357557"></A>Documentation and specifications for the Smart Battery System components and the SMBus are available from <EM CLASS="Hyperlink">
+http://www.sbs-forum.org</EM>
+:<A NAME="marker-1357558"></A><A NAME="marker-1357559"></A><A NAME="marker-1357560"></A><A NAME="marker-1357561"></A></P>
+<UL>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347694"></A>&#8220;Links to ACPI-Related Documents&#8221; (<EM CLASS="Hyperlink">
+http://uefi.org/acpi</EM>
+) under the heading &quot;Smart Battery System Components and SMBus Specification&quot;.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347695"></A>Smart Battery Data Specification, see &#8220;Links to ACPI-Related Documents&#8221; (<EM CLASS="Hyperlink">
+http://uefi.org/acpi</EM>
+)  under the heading &quot;Smart Battery System Components and SMBus Specification&quot;.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1357596"></A>Smart Battery Selector Specification, Revision 1.1, Smart Battery System Implementers Forum, December, 1998.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1347697"></A>Smart Battery System Manager Specification, Revision 1.0, Smart Battery System Implementers Forum, December, 1998.</LI>
+<LI CLASS="Bullet">
+<A NAME="pgfId-1346798"></A>System Management Bus Specification, Revision 1.1, Smart Battery System Implementers Forum, December, 1998.</LI>
+</UL>
+<P CLASS="Normal">
+<A NAME="pgfId-1364324"></A>&nbsp;</P>
+<P CLASS="Normal">
+<A NAME="pgfId-1364326"></A>&nbsp;</P>
+<P CLASS="Normal">
+<A NAME="pgfId-1364310"></A>&nbsp;</P>
+</DIV>
+</DIV>
+</BODY>
+</HTML>
