@@ -38,17 +38,10 @@ do_headings()
 do_links()
 {
     # this sed command joins 2 lines into one line
-    sed -i '/`\(.*\)/ {
+    sed -i '/^[^|].*`\(.*\)/ {
         N
         s/`\(.*\)\n\(.*\)`__/`\1 \2`__/g
     }' $1
-
-    # this sed command joins 2 lines into one line
-    sed -i '/`\(.*\)/ {
-        N
-        s/`\(.*\)\n\(.*\)”/`\1 \2”/g
-    }' $1
-
 
     # this sed command joins 3 lines into one line
     sed -i '/`\(.*\)/ {
@@ -57,24 +50,66 @@ do_links()
         s/`\(.*\)\n\(.*\)\n\(.*\)`__/`\1 \2 \3`__/g
     }' $1
 
-    # this sed command joins 3 lines into one line
-    sed -i '/`\(.*\)/ {
-        N
-        N
-        s/`\(.*\)\n\(.*\)\n\(.*\)”/`\1 \2 \3”/g
-    }' $1
-
     # this sed command joins 4 lines into one line
     sed -i '/`\(.*\)/ {
         N
         N
         N
-        s/`\(.*\)\n\(.*\)\n\(.*\)\n\(.*\)”/`\1 \2 \3 \4”/g
+        s/`\(.*\)\n\(.*\)\n\(.*\)\n\(.*\)`/`\1 \2 \3 \4`/g
     }' $1
 
+    # this sed command joins "" on the same line
+    sed -i '/`__, “\(.*\)/ {
+        N
+        s/`__, “\(.*\)\n\(.*\)”/`__, “\1\2”/g
+    }' $1
+
+    # this sed command joins `__ and "" on the same line
+    sed -i '/`__,/ {
+        N
+        s/`__,\n[[:space:]]*“\(.*\)”/`__, “\1”/g
+    }' $1
+
+    # this sed command eliminates contents inside of "" after a link.
+    # They are useless.
+    sed -i 's/`__,[[:space:]]*“.*”/`__/g' $1
+
+    # this sed command replaces `See with `. The word "See" inside of a link is useless.
+    sed -i 's/`See /`/g' $1
+
+    # this sed command replaces the contents inside  <> with the title preceding the <. The material preceding <
+    # contains the label for this link.
+    sed -i 's/`\(.*\)\. <.*>`__/`\1<\1>`__/g' $1
+
+    # This sed command replaces multiple spaces inside of links with a single space.
+    # This is a clean up from joining the lines above.
+    sed -i 's/`\(.*\) [[:space:]]\+\(.*\)`__/`\1 \2`__/g' $1
+    sed -i 's/`\(.*\) [[:space:]]\+\(.*\)`__/`\1 \2`__/g' $1
+    sed -i 's/`\(.*\) [[:space:]]\+\(.*\)`__/`\1 \2`__/g' $1
+    sed -i 's/`\(.*\) [[:space:]]\+\(.*\)`__/`\1 \2`__/g' $1
+    sed -i 's/`\(.*\) [[:space:]]\+\(.*\)`__/`\1 \2`__/g' $1
+    sed -i 's/`\(.*\) [[:space:]]\+\(.*\)`__/`\1 \2`__/g' $1
+    sed -i 's/`\(.*\) [[:space:]]\+\(.*\)`__/`\1 \2`__/g' $1
+    sed -i 's/`\(.*\) [[:space:]]\+\(.*\)`__/`\1 \2`__/g' $1
+
+    # Lower case all characters in <>
+    sed -i 's/<\(.*\)>/<\L\1>/g' $1
+
+    # Inside of <>, replace all spaces with - do this a bunch of times.
+    sed -i 's/<\(.*\) \(.*\)>/<\1-\2>/g' $1
+    sed -i 's/<\(.*\) \(.*\)>/<\1-\2>/g' $1
+    sed -i 's/<\(.*\) \(.*\)>/<\1-\2>/g' $1
+    sed -i 's/<\(.*\) \(.*\)>/<\1-\2>/g' $1
+    sed -i 's/<\(.*\) \(.*\)>/<\1-\2>/g' $1
+    sed -i 's/<\(.*\) \(.*\)>/<\1-\2>/g' $1
+    sed -i 's/<\(.*\) \(.*\)>/<\1-\2>/g' $1
+    sed -i 's/<\(.*\) \(.*\)>/<\1-\2>/g' $1
+    sed -i 's/<\(.*\) \(.*\)>/<\1-\2>/g' $1
+    sed -i 's/<\(.*\) \(.*\)>/<\1-\2>/g' $1
+    sed -i 's/<\(.*\)(\(.*\)>/<\1\2>/g' $1
+    sed -i 's/<\(.*\))\(.*\)>/<\1\2>/g' $1
+
     # WIP: replace the link with an approperiate name
-    #sed -i 's/`.*`/REPLACE/g' $targetFilename
-    #sed -i 's/\(`.\)\.htm/\1/g' $targetFilename
     #sed -i 's/see `See \(.*\)<.*>`__/see `\1<\1>`/g' $targetFilename
 }
 
