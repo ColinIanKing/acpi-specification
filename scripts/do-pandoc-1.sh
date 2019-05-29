@@ -124,7 +124,7 @@ do_tables()
 
 }
 
-git clean -f
+rm *.rst
 for file in ../frameMakerOutput/*.htm; do
     targetFilename=`basename -s .htm $file`.rst
     echo "Converting $file to $targetFilename"
