@@ -108,9 +108,6 @@ do_links()
     sed -i 's/<\(.*\) \(.*\)>/<\1-\2>/g' $1
     sed -i 's/<\(.*\)(\(.*\)>/<\1\2>/g' $1
     sed -i 's/<\(.*\))\(.*\)>/<\1\2>/g' $1
-
-    # WIP: replace the link with an approperiate name
-    #sed -i 's/see `See \(.*\)<.*>`__/see `\1<\1>`/g' $targetFilename
 }
 
 # convert grid tables to list tables for readablility
@@ -119,13 +116,12 @@ do_tables()
 {
     # Convert Grid tables to list tables
     echo "Converting grid tables to list tables [$targetFilename]"
-    ~/.local/bin/pandoc --list-tables --from rst --to rst -o LT"$1" $1
+    ~/.local/bin/pandoc --list-tables --from rst --to rst -o "$1" $1
 
     # pandoc conversion doesn't retain labels so labels are nested inside of heading titles.
     # separate the label and heading title after conversion
-    sed -i "s/^RSTH \(.*\):[[:space:]]*\(.*\)$/\.\. _\1:\n\2/g" LT"$1"
+    sed -i "s/^RSTH \(.*\):[[:space:]]*\(.*\)$/\.\. _\1:\n\2/g" "$1"
 
-    # TODO: take care of links inside tables
 }
 
 git clean -f
@@ -146,7 +142,6 @@ for file in ../frameMakerOutput/*.htm; do
     do_links $targetFilename
     rm orig-*.rst
 
-    #sed -i 's/^[^|].*`.*<.*>`__/\nREPLACE/g' $targetFilename
     # tables
     do_tables $targetFilename
 
