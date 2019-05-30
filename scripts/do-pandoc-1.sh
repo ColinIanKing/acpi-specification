@@ -23,15 +23,15 @@ do_headings()
 
     # Awful sed script to replace heading text. I'm pretty sure python or perl would have been cleaner but this "does the trick"...
     # TODO: figure out how to do this more cleanly. This is very error prone and bad programming
-    sed -i '/^Heading-1 .*/ y/\/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ()-0123456789:"“”,./=========================================================================/' $1
-    sed -i '/^Heading-2 .*/ y/\/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ()-0123456789:"“”,./-------------------------------------------------------------------------/' $1
-    sed -i '/^Heading-3 .*/ y/\/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ()-0123456789:"“”,./~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/' $1
-    sed -i '/^Heading-4 .*/ y/\/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ()-0123456789:"“”,./-------------------------------------------------------------------------/' $1
-    sed -i '/^ACPIHeading-4 .*/ y/\/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ()-0123456789:"“”,./-------------------------------------------------------------------------/' $1
-    sed -i '/^GlossTerm .*/ y/\/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ()-0123456789:"“”,./^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^/' $1
-    sed -i '/^SubHeading .*/ y/\/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ()-0123456789:"“”,./+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++/' $1
-    sed -i '/^FigureTitle .*/ y/\/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ()-0123456789:"“”,./+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++/' $1
-    sed -i '/^TableTitle .*/ y/\/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ()-0123456789:"“”,./+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++/' $1
+    sed -i '/^Heading-1 .*/ y/_\\\/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ()-0123456789:"“”,./===========================================================================/' $1
+    sed -i '/^Heading-2 .*/ y/_\\\/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ()-0123456789:"“”,./---------------------------------------------------------------------------/' $1
+    sed -i '/^Heading-3 .*/ y/_\\\/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ()-0123456789:"“”,./~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/' $1
+    sed -i '/^Heading-4 .*/ y/_\\\/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ()-0123456789:"“”,./---------------------------------------------------------------------------/' $1
+    sed -i '/^ACPIHeading-4 .*/ y/_\\\/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ()-0123456789:"“”,./---------------------------------------------------------------------------/' $1
+    sed -i '/^GlossTerm .*/ y/_\\\/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ()-0123456789:"“”,./^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^/' $1
+    sed -i '/^SubHeading .*/ y/_\\\/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ()-0123456789:"“”,./+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++/' $1
+    sed -i '/^FigureTitle .*/ y/_\\\/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ()-0123456789:"“”,./+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++/' $1
+    sed -i '/^TableTitle .*/ y/_\\\/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ()-0123456789:"“”,./+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++/' $1
 }
 
 # fixup links - they tend to span between 2-4 lines
