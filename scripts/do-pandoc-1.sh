@@ -142,6 +142,10 @@ for file in ../frameMakerOutput/*.htm; do
     do_links $targetFilename
     rm orig-*.rst
 
+    # this sed command eliminates contents inside of "" after a link.
+    # They are useless.
+    sed -i 's/`\(.*\)`__/:ref:`\1`__/g' $targetFilename
+
     # tables
     do_tables $targetFilename
 
