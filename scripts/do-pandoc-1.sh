@@ -120,7 +120,7 @@ do_tables()
 
     # pandoc conversion doesn't retain labels so labels are nested inside of heading titles.
     # separate the label and heading title after conversion
-    sed -i "s/^RSTH \(.*\):[[:space:]]*\(.*\)$/\.\. _\1:\n\2/g" "$1"
+    sed -i "s/^RSTH \(.*\):[[:space:]]*\(.*\)$/\.\. _\1:\n\n\2/g" "$1"
 
 }
 
