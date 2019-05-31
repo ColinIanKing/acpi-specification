@@ -152,4 +152,7 @@ for file in ../frameMakerOutput/*.htm; do
     sed -i 's/ `\(.*\)`__/ :ref:`\1`/g' $targetFilename
     sed -i 's/ `\(.*\)`__/ :ref:`\1`/g' $targetFilename
 
+    # remove some blank newlines
+    cat -s $targetFilename > temp
+    mv temp $targetFilename
 done
