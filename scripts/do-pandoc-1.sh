@@ -118,7 +118,7 @@ do_links()
 # take care of links inside of table entries
 do_tables()
 {
-    ltname=LT"$2"
+    ltname=LT_"$2"
     # Convert Grid tables to list tables
     echo "Converting grid tables to list tables [$targetFilename]"
     ~/.local/bin/pandoc --list-tables --from html --to rst -o $ltname $1
