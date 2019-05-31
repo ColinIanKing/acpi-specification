@@ -34,6 +34,7 @@ Welcome to ACPI-Specification's documentation!
    ACPI_Data_Tables
    Apx_A_Device_Class_Specifications
    Apx_B_Video_Extensions
+   Apx_C_Deprecated_Content
 
 
 Indices and tables
