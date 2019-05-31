@@ -18,6 +18,14 @@ do_headings()
         s/[[:space:]]*\.\. rubric::[[:space:]]*\(.*\)\n[[:space:]]*:name: \(.*\)\n[[:space:]]*:class: \(.*\)/\.\. _\2:\n\n\1\n\3 \1/
     }' $1
 
+    # rubric may span 2 lines
+    sed -i '/[[:space:]]*\.\. rubric:: \(.*\)/ {
+        N
+        N
+        N
+        s/[[:space:]]*\.\. rubric::[[:space:]]*\(.*\)\n[[:space:]]*\(.*\)\n[[:space:]]*:name: \(.*\)\n[[:space:]]*:class: \(.*\)/\.\. _\3:\n\n\1 \2\n\4 \1 \2/
+    }' $1
+
     # replace entire lines with symbols to create heading lines
     sed -i '/^Heading-1/s/./~/g' $1
     sed -i '/^Heading-2/s/./!/g' $1
