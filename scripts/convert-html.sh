@@ -2,7 +2,9 @@
 
 # clean sphinx files
 rm -f ../Makefile ../make.bat
-rm -rf ../source ../build
+rm -rf ../source ../build ../listTables
+
+mkdir ../listTables
 
 # run conversion
 . rename-files-with-spaces.sh

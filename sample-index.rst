@@ -5,6 +5,7 @@ Welcome to ACPI-Specification's documentation!
 ==============================================
 
 .. toctree::
+   :numbered:
    :maxdepth: 2
    :caption: Contents:
 
